@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctoralia Scraper Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrapper">
+                    <i class="fas fa-robot logo-icon"></i>
+                    <h1>Scraper Pro</h1>
+                </div>
+                <button id="theme-toggle" class="btn-icon" title="Alternar Tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <h2><i class="fas fa-play-circle"></i> Em Execução</h2>
+                <div id="active-scrapers-list" class="scrapers-list">
+                    <div class="empty-state">Nenhum scraper ativo</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h2><i class="fas fa-history"></i> Histórico</h2>
+                <div id="history-list" class="scrapers-list">
+                    <div class="empty-state">Histórico vazio</div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h2>Novo Scraping</h2>
+                <p>Configure os parâmetros para iniciar uma nova extração</p>
+            </div>
+
+            <div class="config-card">
+                <form id="scrape-form">
+                    <div class="form-group">
+                        <label>Selecione as Especialidades</label>
+                        <div class="specialty-grid" id="specialty-grid">
+                            <!-- Cards serão carregados dinamicamente -->
+                        </div>
+                        <small>Clique nos cards para selecionar. Nenhuma seleção = "Médico" (todos)</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">Cidade / Região</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="city" placeholder="Ex: São Paulo, SP">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantity">Quantidade de Médicos</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-users"></i>
+                                <input type="number" id="quantity" value="10" min="1" max="5000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-rocket"></i> Iniciar Extração
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <div id="scraper-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h2 id="modal-title">Detalhes do Scraper</h2>
+                    <span id="modal-status" class="status-badge">Running</span>
+                </div>
+                <button id="close-modal" class="btn-icon"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>Estatísticas</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-label">Progresso</span>
+                            <span id="modal-progress-text" class="stat-value">0/0</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label" id="modal-time-label">Tempo Restante</span>
+                            <span id="modal-time-remaining" class="stat-value">--:--</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Total Extraído</span>
+                            <span id="modal-total-extracted" class="stat-value">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Logs</h3>
+                    <div id="modal-logs" class="logs-container"></div>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Resultados</h3>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Especialidades</th>
+                                <th>Telefone</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-results-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btn-pause" class="btn-secondary"><i class="fas fa-pause"></i> Pausar</button>
+                <button id="btn-resume" class="btn-secondary hidden"><i class="fas fa-play"></i> Retomar</button>
+                <button id="btn-cancel" class="btn-danger"><i class="fas fa-stop"></i> Cancelar</button>
+                <a id="btn-download" href="#" class="btn-secondary hidden" target="_blank"><i
+                        class="fas fa-download"></i> Baixar CSV</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

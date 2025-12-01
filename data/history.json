@@ -1,0 +1,4431 @@
+[
+  {
+    "id": "c8e90705-dd4d-4725-bb33-f7c2be1af164",
+    "config": {
+      "specialties": [],
+      "city": "",
+      "quantity": "100"
+    },
+    "result": {
+      "success": true,
+      "count": 100,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-12-01T17-13-10-362Z.csv",
+      "data": [
+        {
+          "nome": "Bernardo Oliveira Castro de Medina Coeli",
+          "especialidades": [
+            "Cirurgiao Geral Cirurgiao Oncologico"
+          ],
+          "numeroFixo": "",
+          "numeroMovel": "(21) 3952-6352",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Ricardo Fernandes Carneiro",
+          "especialidades": [
+            "Psiquiatra"
+          ],
+          "numeroFixo": "(62) 99153-7997",
+          "numeroMovel": "(62) 98316-9070",
+          "enderecos": [
+            "Goiania"
+          ]
+        },
+        {
+          "nome": "Leandro Maximiano",
+          "especialidades": [
+            "Otorrino"
+          ],
+          "numeroFixo": "(11) 93318-2909",
+          "numeroMovel": "(31) 97343-7691",
+          "enderecos": [
+            "Belo Horizonte"
+          ]
+        },
+        {
+          "nome": "Claudia Lopes Santoro Neiva",
+          "especialidades": [
+            "Reumatologista"
+          ],
+          "numeroFixo": "(31) 98426-8601",
+          "numeroMovel": "(31) 98426-8601",
+          "enderecos": [
+            "Belo Horizonte"
+          ]
+        },
+        {
+          "nome": "Wander Malva",
+          "especialidades": [
+            "Cardiologista Alergista"
+          ],
+          "numeroFixo": "(61) 3346-1019",
+          "numeroMovel": "(61) 99269-8481",
+          "enderecos": [
+            "Brasilia"
+          ]
+        },
+        {
+          "nome": "Rafael Cofiño de Sá",
+          "especialidades": [
+            "Psiquiatra Medico De Familia"
+          ],
+          "numeroFixo": "(11) 4014-6279",
+          "numeroMovel": "(19) 98410-8300",
+          "enderecos": [
+            "Campinas"
+          ]
+        },
+        {
+          "nome": "Gilberto Sousa",
+          "especialidades": [
+            "Cirurgiao Buco Maxilo Facial"
+          ],
+          "numeroFixo": "(81) 99139-1098",
+          "numeroMovel": "(81) 94042-8999",
+          "enderecos": [
+            "Recife"
+          ]
+        },
+        {
+          "nome": "Adriana Zanini de Almeida",
+          "especialidades": [
+            "Cirurgiao Geral Cirurgiao Do Aparelho Digestivo"
+          ],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Kleber Stelmasuk",
+          "especialidades": [
+            "Cirurgiao Vascular Cirurgiao Geral Generalista"
+          ],
+          "numeroFixo": "(41) 3229-2797",
+          "numeroMovel": "(41) 99214-8395",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Flávia Araújo Milhomem",
+          "especialidades": [
+            "Endocrinologista Generalista"
+          ],
+          "numeroFixo": "(31) 98309-7254",
+          "numeroMovel": "(31) 98309-7254",
+          "enderecos": [
+            "Belo Horizonte"
+          ]
+        },
+        {
+          "nome": "Rafaela Milagres Santana",
+          "especialidades": [
+            "Oncologista"
+          ],
+          "numeroFixo": "(21) 3747-3808",
+          "numeroMovel": "(21) 99831-9735",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Vivian Proença Lara",
+          "especialidades": [
+            "Neurologista"
+          ],
+          "numeroFixo": "(31) 99941-2206",
+          "numeroMovel": "(31) 99941-2206",
+          "enderecos": [
+            "Belo Horizonte"
+          ]
+        },
+        {
+          "nome": "Ricardo Rezende",
+          "especialidades": [
+            "Medico Clinico Geral Geriatra"
+          ],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Rodrigo Alvarez",
+          "especialidades": [
+            "Otorrino"
+          ],
+          "numeroFixo": "(41) 3335-0302",
+          "numeroMovel": "",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Milena Burégio Galanternick Braga",
+          "especialidades": [
+            "Cirurgiao Plastico"
+          ],
+          "numeroFixo": "(41) 98870-5521",
+          "numeroMovel": "(21) 97292-1660",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Thiago Lessa",
+          "especialidades": [
+            "Urologista"
+          ],
+          "numeroFixo": "(71) 3512-6477",
+          "numeroMovel": "",
+          "enderecos": [
+            "Salvador"
+          ]
+        },
+        {
+          "nome": "Glenda Morgana Borges",
+          "especialidades": [
+            "Cirurgiao Geral Cirurgiao De Cabeca E Pescoco"
+          ],
+          "numeroFixo": "(62) 3878-7474",
+          "numeroMovel": "(62) 99414-5685",
+          "enderecos": [
+            "Goiania"
+          ]
+        },
+        {
+          "nome": "Vinicius Carlos Ribeiro Da Silva",
+          "especialidades": [
+            "Urologista"
+          ],
+          "numeroFixo": "(21) 4020-0057",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Dra. Greice Batista",
+          "especialidades": [
+            "Gastroenterologista"
+          ],
+          "numeroFixo": "(21) 3641-0859",
+          "numeroMovel": "(21) 99733-7408",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Claudia Caetano Mendes",
+          "especialidades": [
+            "Otorrino"
+          ],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Rafael Machado De Oliveira Lima",
+          "especialidades": [
+            "Nefrologista"
+          ],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Bernardo Welkovic",
+          "especialidades": [
+            "Cirurgiao Oncologico Cirurgiao Geral"
+          ],
+          "numeroFixo": "(81) 3095-5204",
+          "numeroMovel": "(81) 99738-5010",
+          "enderecos": [
+            "Recife"
+          ]
+        },
+        {
+          "nome": "Flávia Santos",
+          "especialidades": [
+            "Psiquiatra"
+          ],
+          "numeroFixo": "(16) 99787-7244",
+          "numeroMovel": "(16) 99787-7244",
+          "enderecos": [
+            "Ribeirao Preto"
+          ]
+        },
+        {
+          "nome": "Fernanda Almada",
+          "especialidades": [
+            "Fisioterapeuta"
+          ],
+          "numeroFixo": "(61) 3346-1842",
+          "numeroMovel": "(61) 98404-7641",
+          "enderecos": [
+            "Brasilia"
+          ]
+        },
+        {
+          "nome": "Mateus Bignotto Bortolozzo",
+          "especialidades": [
+            "Psiquiatra"
+          ],
+          "numeroFixo": "(19) 3341-6195",
+          "numeroMovel": "",
+          "enderecos": [
+            "Campinas"
+          ]
+        },
+        {
+          "nome": "Vitória Fockink Duarte",
+          "especialidades": [
+            "Generalista Medico Clinico Geral"
+          ],
+          "numeroFixo": "(31) 3888-2565",
+          "numeroMovel": "",
+          "enderecos": [
+            "Sao Paulo"
+          ]
+        },
+        {
+          "nome": "Breno Dauster",
+          "especialidades": [
+            "Urologista"
+          ],
+          "numeroFixo": "(71) 2108-4988",
+          "numeroMovel": "",
+          "enderecos": [
+            "Salvador"
+          ]
+        },
+        {
+          "nome": "Tatiana Peron",
+          "especialidades": [
+            "Geriatra Medico Clinico Geral"
+          ],
+          "numeroFixo": "(61) 3255-0144",
+          "numeroMovel": "",
+          "enderecos": [
+            "Brasilia"
+          ]
+        },
+        {
+          "nome": "Jonas Spezia",
+          "especialidades": [
+            "Medico Clinico Geral Generalista"
+          ],
+          "numeroFixo": "(51) 99368-6873",
+          "numeroMovel": "(51) 99368-6873",
+          "enderecos": [
+            "Sao Paulo"
+          ]
+        },
+        {
+          "nome": "Kyra Harbich Kuster",
+          "especialidades": [
+            "Psiquiatra"
+          ],
+          "numeroFixo": "(21) 4063-8447",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Eduardo Rabolini",
+          "especialidades": [
+            "Urologista"
+          ],
+          "numeroFixo": "(51) 99208-4231",
+          "numeroMovel": "(51) 99208-4231",
+          "enderecos": [
+            "Porto Alegre"
+          ]
+        },
+        {
+          "nome": "Rodrigo Silva",
+          "especialidades": [
+            "Dentista"
+          ],
+          "numeroFixo": "(41) 3093-4143",
+          "numeroMovel": "(41) 99717-6192",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Alyne Ornellas Neves",
+          "especialidades": [
+            "Ortopedista Traumatologista"
+          ],
+          "numeroFixo": "(61) 3024-8380",
+          "numeroMovel": "",
+          "enderecos": [
+            "Brasilia"
+          ]
+        },
+        {
+          "nome": "Carlos Eduardo Mateus",
+          "especialidades": [
+            "Cirurgiao Geral"
+          ],
+          "numeroFixo": "(41) 3012-5557",
+          "numeroMovel": "",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Michelle Piekarski",
+          "especialidades": [
+            "Dermatologista"
+          ],
+          "numeroFixo": "(11) 93450-0356",
+          "numeroMovel": "(11) 93450-0356",
+          "enderecos": [
+            "Sao Caetano Do Sul"
+          ]
+        },
+        {
+          "nome": "Alan Motter",
+          "especialidades": [
+            "Cirurgiao Oncologico Cirurgiao Geral Oncologista"
+          ],
+          "numeroFixo": "(41) 3320-3500",
+          "numeroMovel": "",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Bruna Ribeiro Coutinho Calino",
+          "especialidades": [
+            "Medico Clinico Geral"
+          ],
+          "numeroFixo": "(21) 99414-0320",
+          "numeroMovel": "(21) 99458-4945",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Tereza Nigro",
+          "especialidades": [
+            "Cardiologista"
+          ],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Adriano Britto de Campos",
+          "especialidades": [
+            "Cirurgiao Do Aparelho Digestivo Cirurgiao Geral"
+          ],
+          "numeroFixo": "(71) 2108-4656",
+          "numeroMovel": "(71) 99288-8880",
+          "enderecos": [
+            "Lauro De Freitas"
+          ]
+        },
+        {
+          "nome": "Guilherme Capel",
+          "especialidades": [
+            "Medico Clinico Geral Cardiologista"
+          ],
+          "numeroFixo": "(11) 5039-6184",
+          "numeroMovel": "(11) 99759-4545",
+          "enderecos": [
+            "Sao Paulo"
+          ]
+        },
+        {
+          "nome": "Ewerton Pedrosa Muragaki",
+          "especialidades": [
+            "Urologista"
+          ],
+          "numeroFixo": "(71) 3231-6161",
+          "numeroMovel": "(71) 99631-0851",
+          "enderecos": [
+            "Salvador"
+          ]
+        },
+        {
+          "nome": "Sergio Paulo Campos Lisboa",
+          "especialidades": [
+            "Cardiologista Medico Clinico Geral"
+          ],
+          "numeroFixo": "(41) 3209-2670",
+          "numeroMovel": "(41) 99269-5354",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Diego Campelo",
+          "especialidades": [
+            "Cirurgiao Plastico"
+          ],
+          "numeroFixo": "(21) 3682-3080",
+          "numeroMovel": "(21) 97325-2915",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Natália Raye Maciel",
+          "especialidades": [
+            "Otorrino"
+          ],
+          "numeroFixo": "(21) 2112-5173",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Juliana Goulart Pimentel",
+          "especialidades": [
+            "Oftalmologista"
+          ],
+          "numeroFixo": "(21) 3256-2291",
+          "numeroMovel": "(21) 99252-9894",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Felipe Rodrigues Gonçalves",
+          "especialidades": [
+            "Neurocirurgiao"
+          ],
+          "numeroFixo": "(21) 99175-8702",
+          "numeroMovel": "(21) 99638-0524",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Victor Lunau",
+          "especialidades": [
+            "Cirurgiao Geral"
+          ],
+          "numeroFixo": "(21) 3578-2766",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Carla Pacha",
+          "especialidades": [
+            "Generalista"
+          ],
+          "numeroFixo": "(21) 3083-6070",
+          "numeroMovel": "(21) 97177-3539",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Ricardo Souza",
+          "especialidades": [
+            "Urologista"
+          ],
+          "numeroFixo": "(71) 4009-4973",
+          "numeroMovel": "(71) 98791-2362",
+          "enderecos": [
+            "Salvador"
+          ]
+        },
+        {
+          "nome": "Julia Alencar Leite",
+          "especialidades": [
+            "Cirurgiao Geral"
+          ],
+          "numeroFixo": "(21) 99586-6249",
+          "numeroMovel": "(21) 99586-6249",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Ana Carolina de Moura Rocha Teixeira Miranda",
+          "especialidades": [
+            "Alergista Alergista Pediatrico"
+          ],
+          "numeroFixo": "(21) 99973-1787",
+          "numeroMovel": "(21) 98880-4439",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Médico Exame Neurologico",
+          "especialidades": [
+            "Tecnico Em Analises Clinicas"
+          ],
+          "numeroFixo": "(22) 99290-6359",
+          "numeroMovel": "(22) 99202-6461",
+          "enderecos": [
+            "Campos Dos Goytacazes"
+          ]
+        },
+        {
+          "nome": "Daniele Schetini",
+          "especialidades": [
+            "Dermatologista"
+          ],
+          "numeroFixo": "(21) 3952-6167",
+          "numeroMovel": "(21) 3952-6167",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Rafael Frederico Peres",
+          "especialidades": [
+            "Oftalmologista"
+          ],
+          "numeroFixo": "(15) 3231-5085",
+          "numeroMovel": "(15) 99807-8152",
+          "enderecos": [
+            "Sorocaba"
+          ]
+        },
+        {
+          "nome": "Veridiana Luizari",
+          "especialidades": [
+            "Otorrino"
+          ],
+          "numeroFixo": "(11) 3509-4663",
+          "numeroMovel": "(11) 99142-2342",
+          "enderecos": [
+            "Barueri"
+          ]
+        },
+        {
+          "nome": "Gustavo Freitas",
+          "especialidades": [
+            "Medico Clinico Geral"
+          ],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": [
+            "Porto Alegre"
+          ]
+        },
+        {
+          "nome": "Matheus Chioro Corrêa",
+          "especialidades": [
+            "Otorrino"
+          ],
+          "numeroFixo": "(41) 3040-0011",
+          "numeroMovel": "",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Marcia Ferro",
+          "especialidades": [
+            "Radiologista Especialista Em Diagnostico Por Imagem"
+          ],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Felipe Alves Rodrigues",
+          "especialidades": [
+            "Psiquiatra"
+          ],
+          "numeroFixo": "(21) 99895-7003",
+          "numeroMovel": "(22) 99795-7003",
+          "enderecos": [
+            "Nova Friburgo"
+          ]
+        },
+        {
+          "nome": "Lucas Andrade",
+          "especialidades": [
+            "Oftalmologista"
+          ],
+          "numeroFixo": "(92) 3644-2406",
+          "numeroMovel": "(92) 98159-1971",
+          "enderecos": [
+            "Manaus"
+          ]
+        },
+        {
+          "nome": "Daniel Peixoto Giglio",
+          "especialidades": [
+            "Psicologo"
+          ],
+          "numeroFixo": "(62) 98206-0382",
+          "numeroMovel": "(62) 98206-0382",
+          "enderecos": [
+            "Goiania"
+          ]
+        },
+        {
+          "nome": "Ricardo Otranto Neto",
+          "especialidades": [
+            "Neurocirurgiao Neurologista"
+          ],
+          "numeroFixo": "(21) 2260-8002",
+          "numeroMovel": "(21) 99549-4516",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Aldenor Gomes Santos",
+          "especialidades": [
+            "Medico Clinico Geral Geriatra Medico Do Trabalho"
+          ],
+          "numeroFixo": "(87) 3201-3672",
+          "numeroMovel": "",
+          "enderecos": [
+            "Arcoverde"
+          ]
+        },
+        {
+          "nome": "Henrique Passos Rios",
+          "especialidades": [
+            "Otorrino"
+          ],
+          "numeroFixo": "(71) 3036-4040",
+          "numeroMovel": "",
+          "enderecos": [
+            "Salvador"
+          ]
+        },
+        {
+          "nome": "Sergio Luiz Affonso Pinto",
+          "especialidades": [
+            "Ginecologista"
+          ],
+          "numeroFixo": "",
+          "numeroMovel": "(21) 97110-9974",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Gilmar Alves Zonzin",
+          "especialidades": [
+            "Pneumologista"
+          ],
+          "numeroFixo": "(24) 3028-9001",
+          "numeroMovel": "(24) 99986-2765",
+          "enderecos": [
+            "Volta Redonda"
+          ]
+        },
+        {
+          "nome": "Marcos Jose Prado Alves",
+          "especialidades": [
+            "Cirurgiao Geral Medico Clinico Geral"
+          ],
+          "numeroFixo": "(11) 2296-9799",
+          "numeroMovel": "",
+          "enderecos": [
+            "Sao Paulo"
+          ]
+        },
+        {
+          "nome": "Ruy Wirtz",
+          "especialidades": [
+            "Ginecologista Medico Clinico Geral"
+          ],
+          "numeroFixo": "(21) 3094-4966",
+          "numeroMovel": "",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Helcio Kazuhiro Watanabe",
+          "especialidades": [
+            "Cirurgiao Geral"
+          ],
+          "numeroFixo": "(43) 3306-8217",
+          "numeroMovel": "",
+          "enderecos": [
+            "Londrina"
+          ]
+        },
+        {
+          "nome": "Joao Paulo Wengrzynovski",
+          "especialidades": [
+            "Oftalmologista"
+          ],
+          "numeroFixo": "(41) 3514-5813",
+          "numeroMovel": "",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "José Eduardo Petri",
+          "especialidades": [
+            "Medico De Familia Pediatra"
+          ],
+          "numeroFixo": "(19) 3807-7063",
+          "numeroMovel": "",
+          "enderecos": [
+            "Amparo"
+          ]
+        },
+        {
+          "nome": "Mario Augusto Krugner Lopes",
+          "especialidades": [
+            "Infectologista"
+          ],
+          "numeroFixo": "(35) 2101-9187",
+          "numeroMovel": "",
+          "enderecos": [
+            "Pocos De Caldas"
+          ]
+        },
+        {
+          "nome": "Fabio Rauen Martinelli",
+          "especialidades": [
+            "Otorrino"
+          ],
+          "numeroFixo": "(41) 3040-0011",
+          "numeroMovel": "(41) 99760-9034",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Euzanete Maria Coser",
+          "especialidades": [
+            "Infectologista Pediatra Pediatra"
+          ],
+          "numeroFixo": "(27) 3235-1188",
+          "numeroMovel": "(27) 99830-0442",
+          "enderecos": [
+            "Vitoria"
+          ]
+        },
+        {
+          "nome": "Nicki Mallmann",
+          "especialidades": [
+            "Cardiologista"
+          ],
+          "numeroFixo": "(41) 3358-0756",
+          "numeroMovel": "",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Renato Brasil",
+          "especialidades": [
+            "Otorrino"
+          ],
+          "numeroFixo": "(41) 3040-0011",
+          "numeroMovel": "(41) 99760-9034",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Adrián De La Torre Rodríguez",
+          "especialidades": [
+            "Medico Clinico Geral"
+          ],
+          "numeroFixo": "(31) 97544-6355",
+          "numeroMovel": "(31) 97544-6355",
+          "enderecos": [
+            "Belo Horizonte"
+          ]
+        },
+        {
+          "nome": "Ariane Pagnoncelli",
+          "especialidades": [
+            "Endocrinologista"
+          ],
+          "numeroFixo": "(21) 3557-3528",
+          "numeroMovel": "(21) 97264-6121",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Cláudia Rios",
+          "especialidades": [
+            "Psicologo Psicanalista"
+          ],
+          "numeroFixo": "(47) 99609-5615",
+          "numeroMovel": "(47) 99609-5615",
+          "enderecos": [
+            "Joinville"
+          ]
+        },
+        {
+          "nome": "Giovanna Massaud Ribeiro",
+          "especialidades": [
+            "Endocrinologista Medico Clinico Geral"
+          ],
+          "numeroFixo": "(21) 2568-7440",
+          "numeroMovel": "(21) 99977-0058",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Vitor Torturella",
+          "especialidades": [
+            "Oftalmologista"
+          ],
+          "numeroFixo": "(21) 3609-2836",
+          "numeroMovel": "(21) 99079-8702",
+          "enderecos": [
+            "Rio De Janeiro"
+          ]
+        },
+        {
+          "nome": "Marluce Da Costa Mello",
+          "especialidades": [
+            "Ginecologista"
+          ],
+          "numeroFixo": "(41) 3366-0000",
+          "numeroMovel": "(41) 99207-8517",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Thereza Cristina A. Winckler",
+          "especialidades": [
+            "Neurologista"
+          ],
+          "numeroFixo": "(41) 3514-5839",
+          "numeroMovel": "",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Vinícius Rezende Abou Rejaile",
+          "especialidades": [
+            "Coloproctologista Cirurgiao Geral"
+          ],
+          "numeroFixo": "(41) 3072-7272",
+          "numeroMovel": "(41) 98896-0389",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Judith Pim Nogueira",
+          "especialidades": [
+            "Ginecologista"
+          ],
+          "numeroFixo": "(27) 3235-2632",
+          "numeroMovel": "(27) 99756-2767",
+          "enderecos": [
+            "Vitoria"
+          ]
+        },
+        {
+          "nome": "Flavia Cunha Gomide Capraro",
+          "especialidades": [
+            "Infectologista"
+          ],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Maria Claudia Peixoto Cenci",
+          "especialidades": [
+            "Endocrinologista"
+          ],
+          "numeroFixo": "(47) 3367-0050",
+          "numeroMovel": "(47) 99648-1010",
+          "enderecos": [
+            "Balneario Camboriu"
+          ]
+        },
+        {
+          "nome": "Miguel Delfes",
+          "especialidades": [
+            "Oftalmologista"
+          ],
+          "numeroFixo": "(41) 3014-6611",
+          "numeroMovel": "",
+          "enderecos": [
+            "Curitiba"
+          ]
+        },
+        {
+          "nome": "Maria Beatriz Dias",
+          "especialidades": [
+            "Endocrinologista"
+          ],
+          "numeroFixo": "(11) 91069-1705",
+          "numeroMovel": "(11) 91069-1705",
+          "enderecos": [
+            "Campinas"
+          ]
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/henrique-lemos-2/anestesiologista-especialista-em-dor-psiquiatra/betim",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/idalena-esteves-2/gastroenterologista-cirurgiao-do-aparelho-digestivo-medico-clinico-geral/aracaju",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/karina-coutinho-lelis-dos-santos-ribeiro/medico-do-trabalho-tecnico-em-analises-clinicas/belem-para",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/anderson-araujo-paiva/ortopedista-traumatologista/ribeirao-preto",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/bruno-casimiro/cirurgiao-do-aparelho-digestivo-cirurgiao-geral/cambe",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/natalia-blanco/pneumologista-especialista-em-clinica-medica/rio-de-janeiro",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/felipe-carnevale/psiquiatra/sao-paulo",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/jonathan-prestes-rodrigues/psiquiatra/porto-alegre",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/larissa-argenau-marques-brunaldi/hematologista/ribeirao-preto",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/hamilton-nere/especialista-em-clinica-medica/sao-paulo",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro - Pular",
+          "url": "https://www.doctoralia.com.br/luiz-gustavo-marin-emed-2/cardiologista-medico-do-esporte/curitiba",
+          "error": "Timeout de extração (10s)",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        }
+      ],
+      "logs": [
+        {
+          "timestamp": "2025-12-01T17:01:59.639Z",
+          "message": "Buscando Médico (1/1)..."
+        },
+        {
+          "timestamp": "2025-12-01T17:01:59.679Z",
+          "message": "Acessando Doctoralia..."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:01.873Z",
+          "message": "Navegando para resultados: https://www.doctoralia.com.br/pesquisa?q=Médico"
+        },
+        {
+          "timestamp": "2025-12-01T17:02:10.490Z",
+          "message": "Página 1: Coletados 0/100. Buscando mais..."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:13.807Z",
+          "message": "Encontrados 20 na página 1."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:13.851Z",
+          "message": "Indo para página 2..."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:21.691Z",
+          "message": "Página 2: Coletados 20/100. Buscando mais..."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:24.463Z",
+          "message": "Encontrados 18 na página 2."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:24.520Z",
+          "message": "Indo para página 3..."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:32.159Z",
+          "message": "Página 3: Coletados 37/100. Buscando mais..."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:35.117Z",
+          "message": "Encontrados 20 na página 3."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:35.153Z",
+          "message": "Indo para página 4..."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:43.034Z",
+          "message": "Página 4: Coletados 56/100. Buscando mais..."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:45.768Z",
+          "message": "Encontrados 20 na página 4."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:45.808Z",
+          "message": "Indo para página 5..."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:53.989Z",
+          "message": "Página 5: Coletados 76/100. Buscando mais..."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:56.998Z",
+          "message": "Encontrados 20 na página 5."
+        },
+        {
+          "timestamp": "2025-12-01T17:02:57.025Z",
+          "message": "Indo para página 6..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:04.680Z",
+          "message": "Página 6: Coletados 96/100. Buscando mais..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:07.485Z",
+          "message": "Encontrados 20 na página 6."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:07.487Z",
+          "message": "Iniciando extração de 100 perfis..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:07.487Z",
+          "message": "Acessando médico 1/100: https://www.doctoralia.com.br/bernardo-oliveira-castro-de-medina-coeli-2/cirurgiao-geral-cirurgiao-oncologico/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:07.491Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/bernardo-oliveira-castro-de-medina-coeli-2/cirurgiao-geral-cirurgiao-oncologico/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:11.179Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:11.887Z",
+          "message": "Extraído: Bernardo Oliveira Castro de Medina Coeli (4.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:11.887Z",
+          "message": "Acessando médico 2/100: https://www.doctoralia.com.br/ricardo-fernandes-carneiro-2/psiquiatra/goiania"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:11.888Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/ricardo-fernandes-carneiro-2/psiquiatra/goiania"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:15.226Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:15.892Z",
+          "message": "Extraído: Ricardo Fernandes Carneiro (4.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:15.893Z",
+          "message": "Acessando médico 3/100: https://www.doctoralia.com.br/leandro-maximiano/otorrino/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:15.893Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/leandro-maximiano/otorrino/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:19.536Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:20.238Z",
+          "message": "Extraído: Leandro Maximiano (4.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:20.239Z",
+          "message": "Acessando médico 4/100: https://www.doctoralia.com.br/claudia-lopes-santoro-neiva-2/reumatologista/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:20.239Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/claudia-lopes-santoro-neiva-2/reumatologista/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:24.420Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:25.063Z",
+          "message": "Extraído: Claudia Lopes Santoro Neiva (4.8s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:25.063Z",
+          "message": "Acessando médico 5/100: https://www.doctoralia.com.br/wander-malva/cardiologista-alergista/brasilia"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:25.063Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/wander-malva/cardiologista-alergista/brasilia"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:27.889Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:28.751Z",
+          "message": "Extraído: Wander Malva (3.7s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:28.751Z",
+          "message": "Acessando médico 6/100: https://www.doctoralia.com.br/rafael-cofino-de-sa/psiquiatra-medico-de-familia/campinas"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:28.752Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/rafael-cofino-de-sa/psiquiatra-medico-de-familia/campinas"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:31.316Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:32.391Z",
+          "message": "Extraído: Rafael Cofiño de Sá (3.6s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:32.391Z",
+          "message": "Acessando médico 7/100: https://www.doctoralia.com.br/gilberto-sousa/cirurgiao-buco-maxilo-facial/recife"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:32.392Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/gilberto-sousa/cirurgiao-buco-maxilo-facial/recife"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:35.653Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:36.296Z",
+          "message": "Extraído: Gilberto Sousa (3.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:36.297Z",
+          "message": "Acessando médico 8/100: https://www.doctoralia.com.br/adriana-zanini-de-almeida/cirurgiao-geral-cirurgiao-do-aparelho-digestivo/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:36.297Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/adriana-zanini-de-almeida/cirurgiao-geral-cirurgiao-do-aparelho-digestivo/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:40.036Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:40.719Z",
+          "message": "Extraído: Adriana Zanini de Almeida (4.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:40.719Z",
+          "message": "Acessando médico 9/100: https://www.doctoralia.com.br/kleber-stelmasuk/cirurgiao-vascular-cirurgiao-geral-generalista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:40.719Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/kleber-stelmasuk/cirurgiao-vascular-cirurgiao-geral-generalista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:43.358Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:44.028Z",
+          "message": "Extraído: Kleber Stelmasuk (3.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:44.029Z",
+          "message": "Acessando médico 10/100: https://www.doctoralia.com.br/flavia-araujo-milhomem/endocrinologista-generalista/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:44.029Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/flavia-araujo-milhomem/endocrinologista-generalista/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:47.374Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:48.412Z",
+          "message": "Extraído: Flávia Araújo Milhomem (4.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:48.412Z",
+          "message": "Acessando médico 11/100: https://www.doctoralia.com.br/rafaela-milagres-santana/oncologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:48.413Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/rafaela-milagres-santana/oncologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:51.524Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:52.487Z",
+          "message": "Extraído: Rafaela Milagres Santana (4.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:52.487Z",
+          "message": "Acessando médico 12/100: https://www.doctoralia.com.br/vivian-proenca-lara/neurologista/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:52.487Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/vivian-proenca-lara/neurologista/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:56.040Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:03:57.032Z",
+          "message": "Extraído: Vivian Proença Lara (4.5s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:57.033Z",
+          "message": "Acessando médico 13/100: https://www.doctoralia.com.br/ricardo-rezende-2/medico-clinico-geral-geriatra/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:57.033Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/ricardo-rezende-2/medico-clinico-geral-geriatra/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:03:59.338Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:00.604Z",
+          "message": "Extraído: Ricardo Rezende (3.6s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:00.604Z",
+          "message": "Acessando médico 14/100: https://www.doctoralia.com.br/rodrigo-alvarez/otorrino/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:00.604Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/rodrigo-alvarez/otorrino/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:03.988Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:04.611Z",
+          "message": "Extraído: Rodrigo Alvarez (4.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:04.611Z",
+          "message": "Acessando médico 15/100: https://www.doctoralia.com.br/milena-buregio-galanternick-braga/cirurgiao-plastico/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:04.611Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/milena-buregio-galanternick-braga/cirurgiao-plastico/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:07.219Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:08.156Z",
+          "message": "Extraído: Milena Burégio Galanternick Braga (3.5s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:08.157Z",
+          "message": "Acessando médico 16/100: https://www.doctoralia.com.br/thiago-lessa/urologista/salvador"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:08.157Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/thiago-lessa/urologista/salvador"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:10.901Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:11.677Z",
+          "message": "Extraído: Thiago Lessa (3.5s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:11.678Z",
+          "message": "Acessando médico 17/100: https://www.doctoralia.com.br/glenda-morgana-borges/cirurgiao-geral-cirurgiao-de-cabeca-e-pescoco/goiania"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:11.678Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/glenda-morgana-borges/cirurgiao-geral-cirurgiao-de-cabeca-e-pescoco/goiania"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:14.562Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:15.260Z",
+          "message": "Extraído: Glenda Morgana Borges (3.6s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:15.260Z",
+          "message": "Acessando médico 18/100: https://www.doctoralia.com.br/vinicius-carlos-ribeiro-da-silva/urologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:15.260Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/vinicius-carlos-ribeiro-da-silva/urologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:18.412Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:19.130Z",
+          "message": "Extraído: Vinicius Carlos Ribeiro Da Silva (3.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:19.130Z",
+          "message": "Acessando médico 19/100: https://www.doctoralia.com.br/dra-greice-batista/gastroenterologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:19.131Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/dra-greice-batista/gastroenterologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:22.087Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:23.071Z",
+          "message": "Extraído: Dra. Greice Batista (3.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:23.071Z",
+          "message": "Acessando médico 20/100: https://www.doctoralia.com.br/claudia-caetano-mendes/otorrino/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:23.072Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/claudia-caetano-mendes/otorrino/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:26.403Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:27.212Z",
+          "message": "Extraído: Claudia Caetano Mendes (4.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:27.213Z",
+          "message": "Acessando médico 21/100: https://www.doctoralia.com.br/rafael-machado-de-oliveira-lima/nefrologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:27.213Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/rafael-machado-de-oliveira-lima/nefrologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:30.570Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:31.150Z",
+          "message": "Extraído: Rafael Machado De Oliveira Lima (3.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:31.150Z",
+          "message": "Acessando médico 22/100: https://www.doctoralia.com.br/bernardo-welkovic/cirurgiao-oncologico-cirurgiao-geral/recife"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:31.151Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/bernardo-welkovic/cirurgiao-oncologico-cirurgiao-geral/recife"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:34.368Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:35.489Z",
+          "message": "Extraído: Bernardo Welkovic (4.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:35.489Z",
+          "message": "Acessando médico 23/100: https://www.doctoralia.com.br/flavia-santos-8/psiquiatra/ribeirao-preto"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:35.489Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/flavia-santos-8/psiquiatra/ribeirao-preto"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:39.330Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:40.135Z",
+          "message": "Extraído: Flávia Santos (4.6s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:40.136Z",
+          "message": "Acessando médico 24/100: https://www.doctoralia.com.br/fernanda-almada/fisioterapeuta/brasilia"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:40.136Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/fernanda-almada/fisioterapeuta/brasilia"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:44.647Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:45.393Z",
+          "message": "Extraído: Fernanda Almada (5.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:45.394Z",
+          "message": "Acessando médico 25/100: https://www.doctoralia.com.br/mateus-bignotto-bortolozzo/psiquiatra/campinas"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:45.394Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/mateus-bignotto-bortolozzo/psiquiatra/campinas"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:49.836Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:50.408Z",
+          "message": "Extraído: Mateus Bignotto Bortolozzo (5.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:50.409Z",
+          "message": "Acessando médico 26/100: https://www.doctoralia.com.br/vitoria-fockink-duarte/generalista-medico-clinico-geral/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:50.409Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/vitoria-fockink-duarte/generalista-medico-clinico-geral/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:53.633Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:54.493Z",
+          "message": "Extraído: Vitória Fockink Duarte (4.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:54.494Z",
+          "message": "Acessando médico 27/100: https://www.doctoralia.com.br/breno-dauster/urologista/salvador"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:54.494Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/breno-dauster/urologista/salvador"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:58.542Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:04:59.228Z",
+          "message": "Extraído: Breno Dauster (4.7s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:59.228Z",
+          "message": "Acessando médico 28/100: https://www.doctoralia.com.br/tatiana-peron/geriatra-medico-clinico-geral/brasilia"
+        },
+        {
+          "timestamp": "2025-12-01T17:04:59.228Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/tatiana-peron/geriatra-medico-clinico-geral/brasilia"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:02.361Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:03.686Z",
+          "message": "Extraído: Tatiana Peron (4.5s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:03.687Z",
+          "message": "Acessando médico 29/100: https://www.doctoralia.com.br/jonas-spezia/medico-clinico-geral-generalista/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:03.687Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/jonas-spezia/medico-clinico-geral-generalista/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:07.287Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:07.880Z",
+          "message": "Extraído: Jonas Spezia (4.2s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:07.881Z",
+          "message": "Acessando médico 30/100: https://www.doctoralia.com.br/kyra-harbich-kuster/psiquiatra/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:07.881Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/kyra-harbich-kuster/psiquiatra/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:11.401Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:12.350Z",
+          "message": "Extraído: Kyra Harbich Kuster (4.5s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:12.350Z",
+          "message": "Acessando médico 31/100: https://www.doctoralia.com.br/eduardo-rabolini/urologista/porto-alegre"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:12.351Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/eduardo-rabolini/urologista/porto-alegre"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:16.639Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:17.237Z",
+          "message": "Extraído: Eduardo Rabolini (4.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:17.237Z",
+          "message": "Acessando médico 32/100: https://www.doctoralia.com.br/rodrigo-silva/dentista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:17.238Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/rodrigo-silva/dentista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:20.757Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:22.230Z",
+          "message": "Extraído: Rodrigo Silva (5.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:22.230Z",
+          "message": "Acessando médico 33/100: https://www.doctoralia.com.br/alyne-ornellas-neves/ortopedista-traumatologista/brasilia"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:22.230Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/alyne-ornellas-neves/ortopedista-traumatologista/brasilia"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:25.826Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:26.850Z",
+          "message": "Extraído: Alyne Ornellas Neves (4.6s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:26.850Z",
+          "message": "Acessando médico 34/100: https://www.doctoralia.com.br/carlos-eduardo-mateus-2/cirurgiao-geral/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:26.851Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/carlos-eduardo-mateus-2/cirurgiao-geral/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:31.133Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:32.712Z",
+          "message": "Extraído: Carlos Eduardo Mateus (5.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:32.712Z",
+          "message": "Acessando médico 35/100: https://www.doctoralia.com.br/michelle-piekarski/dermatologista/sao-caetano-do-sul"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:32.712Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/michelle-piekarski/dermatologista/sao-caetano-do-sul"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:37.201Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:38.150Z",
+          "message": "Extraído: Michelle Piekarski (5.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:38.150Z",
+          "message": "Acessando médico 36/100: https://www.doctoralia.com.br/alan-motter/cirurgiao-oncologico-cirurgiao-geral-oncologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:38.151Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/alan-motter/cirurgiao-oncologico-cirurgiao-geral-oncologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:41.548Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:42.305Z",
+          "message": "Extraído: Alan Motter (4.2s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:42.306Z",
+          "message": "Acessando médico 37/100: https://www.doctoralia.com.br/bruna-ribeiro-coutinho-calino/medico-clinico-geral/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:42.306Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/bruna-ribeiro-coutinho-calino/medico-clinico-geral/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:45.060Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:46.169Z",
+          "message": "Extraído: Bruna Ribeiro Coutinho Calino (3.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:46.169Z",
+          "message": "Acessando médico 38/100: https://www.doctoralia.com.br/tereza-nigro/cardiologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:46.170Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/tereza-nigro/cardiologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:50.498Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:51.506Z",
+          "message": "Extraído: Tereza Nigro (5.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:51.507Z",
+          "message": "Acessando médico 39/100: https://www.doctoralia.com.br/adriano-britto-de-campos/cirurgiao-do-aparelho-digestivo-cirurgiao-geral/lauro-de-freitas"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:51.507Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/adriano-britto-de-campos/cirurgiao-do-aparelho-digestivo-cirurgiao-geral/lauro-de-freitas"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:55.954Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:05:57.276Z",
+          "message": "Extraído: Adriano Britto de Campos (5.8s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:57.277Z",
+          "message": "Acessando médico 40/100: https://www.doctoralia.com.br/guilherme-capel/medico-clinico-geral-cardiologista/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:05:57.277Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/guilherme-capel/medico-clinico-geral-cardiologista/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:02.599Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:04.562Z",
+          "message": "Extraído: Guilherme Capel (7.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:04.563Z",
+          "message": "Acessando médico 41/100: https://www.doctoralia.com.br/ewerton-pedrosa-muragaki-2/urologista/salvador"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:04.563Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/ewerton-pedrosa-muragaki-2/urologista/salvador"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:09.275Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:10.430Z",
+          "message": "Extraído: Ewerton Pedrosa Muragaki (5.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:10.431Z",
+          "message": "Acessando médico 42/100: https://www.doctoralia.com.br/sergio-paulo-campos-lisboa/cardiologista-medico-clinico-geral/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:10.431Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/sergio-paulo-campos-lisboa/cardiologista-medico-clinico-geral/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:14.769Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:16.011Z",
+          "message": "Extraído: Sergio Paulo Campos Lisboa (5.6s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:16.011Z",
+          "message": "Acessando médico 43/100: https://www.doctoralia.com.br/diego-campelo/cirurgiao-plastico/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:16.011Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/diego-campelo/cirurgiao-plastico/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:20.051Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:21.066Z",
+          "message": "Extraído: Diego Campelo (5.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:21.067Z",
+          "message": "Acessando médico 44/100: https://www.doctoralia.com.br/natalia-raye-maciel/otorrino/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:21.067Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/natalia-raye-maciel/otorrino/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:23.525Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:24.418Z",
+          "message": "Extraído: Natália Raye Maciel (3.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:24.418Z",
+          "message": "Acessando médico 45/100: https://www.doctoralia.com.br/juliana-goulart-pimentel/oftalmologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:24.419Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/juliana-goulart-pimentel/oftalmologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:28.255Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:29.028Z",
+          "message": "Extraído: Juliana Goulart Pimentel (4.6s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:29.028Z",
+          "message": "Acessando médico 46/100: https://www.doctoralia.com.br/felipe-rodrigues-goncalves-2/neurocirurgiao/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:29.029Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/felipe-rodrigues-goncalves-2/neurocirurgiao/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:33.731Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:34.917Z",
+          "message": "Extraído: Felipe Rodrigues Gonçalves (5.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:34.917Z",
+          "message": "Acessando médico 47/100: https://www.doctoralia.com.br/victor-lunau/cirurgiao-geral/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:34.917Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/victor-lunau/cirurgiao-geral/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:38.834Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:39.999Z",
+          "message": "Extraído: Victor Lunau (5.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:39.999Z",
+          "message": "Acessando médico 48/100: https://www.doctoralia.com.br/carla-pacha/generalista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:40.000Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/carla-pacha/generalista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:45.389Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:46.182Z",
+          "message": "Extraído: Carla Pacha (6.2s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:46.183Z",
+          "message": "Acessando médico 49/100: https://www.doctoralia.com.br/ricardo-souza/urologista/salvador"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:46.183Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/ricardo-souza/urologista/salvador"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:51.190Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:52.354Z",
+          "message": "Extraído: Ricardo Souza (6.2s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:52.354Z",
+          "message": "Acessando médico 50/100: https://www.doctoralia.com.br/julia-alencar-leite/cirurgiao-geral/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:52.354Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/julia-alencar-leite/cirurgiao-geral/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:56.365Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:06:57.441Z",
+          "message": "Extraído: Julia Alencar Leite (5.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:57.442Z",
+          "message": "Acessando médico 51/100: https://www.doctoralia.com.br/ana-carolina-de-moura-rocha-teixeira-miranda/alergista-alergista-pediatrico/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:06:57.442Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/ana-carolina-de-moura-rocha-teixeira-miranda/alergista-alergista-pediatrico/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:02.614Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:07:03.399Z",
+          "message": "Extraído: Ana Carolina de Moura Rocha Teixeira Miranda (6.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:03.399Z",
+          "message": "Acessando médico 52/100: https://www.doctoralia.com.br/medico-exame-neurologico/tecnico-em-analises-clinicas/campos-dos-goytacazes"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:03.399Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/medico-exame-neurologico/tecnico-em-analises-clinicas/campos-dos-goytacazes"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:08.563Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:07:09.762Z",
+          "message": "Extraído: Médico Exame Neurologico (6.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:09.763Z",
+          "message": "Acessando médico 53/100: https://www.doctoralia.com.br/daniele-schetini/dermatologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:09.763Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/daniele-schetini/dermatologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:15.286Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:07:16.086Z",
+          "message": "Extraído: Daniele Schetini (6.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:16.086Z",
+          "message": "Acessando médico 54/100: https://www.doctoralia.com.br/rafael-frederico-peres/oftalmologista/sorocaba"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:16.086Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/rafael-frederico-peres/oftalmologista/sorocaba"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:20.946Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:07:21.767Z",
+          "message": "Extraído: Rafael Frederico Peres (5.7s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:21.767Z",
+          "message": "Acessando médico 55/100: https://www.doctoralia.com.br/veridiana-luizari/otorrino/barueri"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:21.768Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/veridiana-luizari/otorrino/barueri"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:27.540Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:07:28.713Z",
+          "message": "Extraído: Veridiana Luizari (6.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:28.714Z",
+          "message": "Acessando médico 56/100: https://www.doctoralia.com.br/gustavo-freitas-4/medico-clinico-geral/porto-alegre"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:28.714Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/gustavo-freitas-4/medico-clinico-geral/porto-alegre"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:35.845Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:07:37.130Z",
+          "message": "Extraído: Gustavo Freitas (8.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:37.131Z",
+          "message": "Acessando médico 57/100: https://www.doctoralia.com.br/matheus-chioro-correa/otorrino/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:37.131Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/matheus-chioro-correa/otorrino/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:41.050Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:07:42.072Z",
+          "message": "Extraído: Matheus Chioro Corrêa (4.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:42.072Z",
+          "message": "Acessando médico 58/100: https://www.doctoralia.com.br/marcia-ferro/radiologista-especialista-em-diagnostico-por-imagem/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:42.073Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/marcia-ferro/radiologista-especialista-em-diagnostico-por-imagem/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:47.342Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:07:48.487Z",
+          "message": "Extraído: Marcia Ferro (6.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:48.488Z",
+          "message": "Acessando médico 59/100: https://www.doctoralia.com.br/felipe-alves-rodrigues/psiquiatra/nova-friburgo"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:48.488Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/felipe-alves-rodrigues/psiquiatra/nova-friburgo"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:53.999Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:07:55.273Z",
+          "message": "Extraído: Felipe Alves Rodrigues (6.8s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:55.274Z",
+          "message": "Acessando médico 60/100: https://www.doctoralia.com.br/lucas-andrade/oftalmologista/manaus"
+        },
+        {
+          "timestamp": "2025-12-01T17:07:55.274Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/lucas-andrade/oftalmologista/manaus"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:00.647Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:08:01.494Z",
+          "message": "Extraído: Lucas Andrade (6.2s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:01.495Z",
+          "message": "Acessando médico 61/100: https://www.doctoralia.com.br/daniel-peixoto-giglio/psicologo/goiania"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:01.495Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/daniel-peixoto-giglio/psicologo/goiania"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:05.189Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:08:06.085Z",
+          "message": "Extraído: Daniel Peixoto Giglio (4.6s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:06.086Z",
+          "message": "Acessando médico 62/100: https://www.doctoralia.com.br/ricardo-otranto-neto/neurocirurgiao-neurologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:06.086Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/ricardo-otranto-neto/neurocirurgiao-neurologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:10.427Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:08:11.159Z",
+          "message": "Extraído: Ricardo Otranto Neto (5.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:11.159Z",
+          "message": "Acessando médico 63/100: https://www.doctoralia.com.br/aldenor-gomes-santos/medico-clinico-geral-geriatra-medico-do-trabalho/arcoverde"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:11.160Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/aldenor-gomes-santos/medico-clinico-geral-geriatra-medico-do-trabalho/arcoverde"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:16.586Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:08:17.605Z",
+          "message": "Extraído: Aldenor Gomes Santos (6.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:17.605Z",
+          "message": "Acessando médico 64/100: https://www.doctoralia.com.br/henrique-passos-rios/otorrino/salvador"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:17.606Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/henrique-passos-rios/otorrino/salvador"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:21.823Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:08:22.946Z",
+          "message": "Extraído: Henrique Passos Rios (5.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:22.946Z",
+          "message": "Acessando médico 65/100: https://www.doctoralia.com.br/sergio-luiz-affonso-pinto/ginecologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:22.947Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/sergio-luiz-affonso-pinto/ginecologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:27.782Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:08:28.478Z",
+          "message": "Extraído: Sergio Luiz Affonso Pinto (5.5s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:28.478Z",
+          "message": "Acessando médico 66/100: https://www.doctoralia.com.br/gilmar-alves-zonzin/pneumologista/volta-redonda"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:28.480Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/gilmar-alves-zonzin/pneumologista/volta-redonda"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:33.891Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:08:35.346Z",
+          "message": "Extraído: Gilmar Alves Zonzin (6.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:35.346Z",
+          "message": "Acessando médico 67/100: https://www.doctoralia.com.br/marcos-jose-prado-alves/cirurgiao-geral-medico-clinico-geral/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:35.347Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/marcos-jose-prado-alves/cirurgiao-geral-medico-clinico-geral/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:41.182Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:08:42.707Z",
+          "message": "Extraído: Marcos Jose Prado Alves (7.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:42.707Z",
+          "message": "Acessando médico 68/100: https://www.doctoralia.com.br/ruy-wirtz/ginecologista-medico-clinico-geral/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:42.707Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/ruy-wirtz/ginecologista-medico-clinico-geral/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:48.149Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:08:49.276Z",
+          "message": "Extraído: Ruy Wirtz (6.6s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:49.277Z",
+          "message": "Acessando médico 69/100: https://www.doctoralia.com.br/helcio-kazuhiro-watanabe/cirurgiao-geral/londrina"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:49.277Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/helcio-kazuhiro-watanabe/cirurgiao-geral/londrina"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:54.308Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:08:55.540Z",
+          "message": "Extraído: Helcio Kazuhiro Watanabe (6.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:55.541Z",
+          "message": "Acessando médico 70/100: https://www.doctoralia.com.br/joao-paulo-wengrzynovski/oftalmologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:08:55.542Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/joao-paulo-wengrzynovski/oftalmologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:01.254Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:09:02.214Z",
+          "message": "Extraído: Joao Paulo Wengrzynovski (6.7s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:02.215Z",
+          "message": "Acessando médico 71/100: https://www.doctoralia.com.br/jose-eduardo-petri-2/medico-de-familia-pediatra/amparo"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:02.215Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/jose-eduardo-petri-2/medico-de-familia-pediatra/amparo"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:07.981Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:09:09.103Z",
+          "message": "Extraído: José Eduardo Petri (6.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:09.104Z",
+          "message": "Acessando médico 72/100: https://www.doctoralia.com.br/mario-augusto-krugner-lopes/infectologista/pocos-de-caldas"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:09.105Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/mario-augusto-krugner-lopes/infectologista/pocos-de-caldas"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:13.910Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:09:15.127Z",
+          "message": "Extraído: Mario Augusto Krugner Lopes (6.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:15.128Z",
+          "message": "Acessando médico 73/100: https://www.doctoralia.com.br/fabio-rauen-martinelli/otorrino/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:15.129Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/fabio-rauen-martinelli/otorrino/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:21.303Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:09:22.074Z",
+          "message": "Extraído: Fabio Rauen Martinelli (6.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:22.074Z",
+          "message": "Acessando médico 74/100: https://www.doctoralia.com.br/euzanete-maria-coser-2/infectologista-pediatra-pediatra/vitoria"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:22.074Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/euzanete-maria-coser-2/infectologista-pediatra-pediatra/vitoria"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:26.800Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:09:27.929Z",
+          "message": "Extraído: Euzanete Maria Coser (5.9s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:27.930Z",
+          "message": "Acessando médico 75/100: https://www.doctoralia.com.br/nicki-mallmann/cardiologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:27.930Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/nicki-mallmann/cardiologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:34.652Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:09:35.753Z",
+          "message": "Extraído: Nicki Mallmann (7.8s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:35.753Z",
+          "message": "Acessando médico 76/100: https://www.doctoralia.com.br/renato-brasil/otorrino/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:35.754Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/renato-brasil/otorrino/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:39.952Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:09:40.870Z",
+          "message": "Extraído: Renato Brasil (5.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:40.871Z",
+          "message": "Acessando médico 77/100: https://www.doctoralia.com.br/adrian-de-la-torre-rodriguez/medico-clinico-geral/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:40.871Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/adrian-de-la-torre-rodriguez/medico-clinico-geral/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:45.844Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:09:46.933Z",
+          "message": "Extraído: Adrián De La Torre Rodríguez (6.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:46.933Z",
+          "message": "Acessando médico 78/100: https://www.doctoralia.com.br/ariane-pagnoncelli/endocrinologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:46.934Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/ariane-pagnoncelli/endocrinologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:51.863Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:09:52.931Z",
+          "message": "Extraído: Ariane Pagnoncelli (6.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:52.932Z",
+          "message": "Acessando médico 79/100: https://www.doctoralia.com.br/claudia-rios/psicologo-psicanalista/joinville"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:52.932Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/claudia-rios/psicologo-psicanalista/joinville"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:58.729Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:09:59.726Z",
+          "message": "Extraído: Cláudia Rios (6.8s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:59.726Z",
+          "message": "Acessando médico 80/100: https://www.doctoralia.com.br/giovanna-massaud-ribeiro/endocrinologista-medico-clinico-geral/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:09:59.726Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/giovanna-massaud-ribeiro/endocrinologista-medico-clinico-geral/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:04.287Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:10:05.335Z",
+          "message": "Extraído: Giovanna Massaud Ribeiro (5.6s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:05.335Z",
+          "message": "Acessando médico 81/100: https://www.doctoralia.com.br/vitor-torturella/oftalmologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:05.335Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/vitor-torturella/oftalmologista/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:11.175Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:10:12.665Z",
+          "message": "Extraído: Vitor Torturella (7.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:12.666Z",
+          "message": "Acessando médico 82/100: https://www.doctoralia.com.br/marluce-da-costa-mello/ginecologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:12.666Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/marluce-da-costa-mello/ginecologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:17.515Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:10:18.627Z",
+          "message": "Extraído: Marluce Da Costa Mello (6.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:18.628Z",
+          "message": "Acessando médico 83/100: https://www.doctoralia.com.br/thereza-cristina-a-winckler/neurologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:18.628Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/thereza-cristina-a-winckler/neurologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:22.775Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:10:23.689Z",
+          "message": "Extraído: Thereza Cristina A. Winckler (5.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:23.690Z",
+          "message": "Acessando médico 84/100: https://www.doctoralia.com.br/vinicius-rezende-abou-rejaile/coloproctologista-cirurgiao-geral/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:23.691Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/vinicius-rezende-abou-rejaile/coloproctologista-cirurgiao-geral/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:28.294Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:10:29.031Z",
+          "message": "Extraído: Vinícius Rezende Abou Rejaile (5.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:29.031Z",
+          "message": "Acessando médico 85/100: https://www.doctoralia.com.br/judith-pim-nogueira/ginecologista/vitoria"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:29.031Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/judith-pim-nogueira/ginecologista/vitoria"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:34.300Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:10:35.364Z",
+          "message": "Extraído: Judith Pim Nogueira (6.3s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:35.364Z",
+          "message": "Acessando médico 86/100: https://www.doctoralia.com.br/flavia-cunha-gomide-capraro/infectologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:35.365Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/flavia-cunha-gomide-capraro/infectologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:42.390Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:10:43.848Z",
+          "message": "Extraído: Flavia Cunha Gomide Capraro (8.5s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:43.848Z",
+          "message": "Acessando médico 87/100: https://www.doctoralia.com.br/maria-claudia-peixoto-cenci/endocrinologista/balneario-camboriu"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:43.848Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/maria-claudia-peixoto-cenci/endocrinologista/balneario-camboriu"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:48.809Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:10:50.024Z",
+          "message": "Extraído: Maria Claudia Peixoto Cenci (6.2s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:50.024Z",
+          "message": "Acessando médico 88/100: https://www.doctoralia.com.br/miguel-delfes/oftalmologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:50.024Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/miguel-delfes/oftalmologista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:56.579Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:10:58.154Z",
+          "message": "Extraído: Miguel Delfes (8.1s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:58.155Z",
+          "message": "Acessando médico 89/100: https://www.doctoralia.com.br/maria-beatriz-dias/endocrinologista/campinas"
+        },
+        {
+          "timestamp": "2025-12-01T17:10:58.155Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/maria-beatriz-dias/endocrinologista/campinas"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:04.656Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:11:06.150Z",
+          "message": "Extraído: Maria Beatriz Dias (8.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:06.151Z",
+          "message": "Acessando médico 90/100: https://www.doctoralia.com.br/henrique-lemos-2/anestesiologista-especialista-em-dor-psiquiatra/betim"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:06.153Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/henrique-lemos-2/anestesiologista-especialista-em-dor-psiquiatra/betim"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:16.155Z",
+          "message": "Acessando médico 91/100: https://www.doctoralia.com.br/idalena-esteves-2/gastroenterologista-cirurgiao-do-aparelho-digestivo-medico-clinico-geral/aracaju"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:16.156Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/idalena-esteves-2/gastroenterologista-cirurgiao-do-aparelho-digestivo-medico-clinico-geral/aracaju"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:26.263Z",
+          "message": "Acessando médico 92/100: https://www.doctoralia.com.br/karina-coutinho-lelis-dos-santos-ribeiro/medico-do-trabalho-tecnico-em-analises-clinicas/belem-para"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:26.274Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/karina-coutinho-lelis-dos-santos-ribeiro/medico-do-trabalho-tecnico-em-analises-clinicas/belem-para"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:36.364Z",
+          "message": "Acessando médico 93/100: https://www.doctoralia.com.br/anderson-araujo-paiva/ortopedista-traumatologista/ribeirao-preto"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:36.371Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/anderson-araujo-paiva/ortopedista-traumatologista/ribeirao-preto"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:46.495Z",
+          "message": "Acessando médico 94/100: https://www.doctoralia.com.br/bruno-casimiro/cirurgiao-do-aparelho-digestivo-cirurgiao-geral/cambe"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:46.513Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/bruno-casimiro/cirurgiao-do-aparelho-digestivo-cirurgiao-geral/cambe"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:56.591Z",
+          "message": "Acessando médico 95/100: https://www.doctoralia.com.br/natalia-blanco/pneumologista-especialista-em-clinica-medica/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:11:56.591Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/natalia-blanco/pneumologista-especialista-em-clinica-medica/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T17:12:19.147Z",
+          "message": "Acessando médico 96/100: https://www.doctoralia.com.br/felipe-carnevale/psiquiatra/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:12:19.167Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/felipe-carnevale/psiquiatra/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:12:20.711Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:12:29.255Z",
+          "message": "Acessando médico 97/100: https://www.doctoralia.com.br/jonathan-prestes-rodrigues/psiquiatra/porto-alegre"
+        },
+        {
+          "timestamp": "2025-12-01T17:12:29.271Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/jonathan-prestes-rodrigues/psiquiatra/porto-alegre"
+        },
+        {
+          "timestamp": "2025-12-01T17:12:39.734Z",
+          "message": "Acessando médico 98/100: https://www.doctoralia.com.br/larissa-argenau-marques-brunaldi/hematologista/ribeirao-preto"
+        },
+        {
+          "timestamp": "2025-12-01T17:12:39.828Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/larissa-argenau-marques-brunaldi/hematologista/ribeirao-preto"
+        },
+        {
+          "timestamp": "2025-12-01T17:12:49.848Z",
+          "message": "Acessando médico 99/100: https://www.doctoralia.com.br/hamilton-nere/especialista-em-clinica-medica/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:12:49.859Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/hamilton-nere/especialista-em-clinica-medica/sao-paulo"
+        },
+        {
+          "timestamp": "2025-12-01T17:13:00.350Z",
+          "message": "Acessando médico 100/100: https://www.doctoralia.com.br/luiz-gustavo-marin-emed-2/cardiologista-medico-do-esporte/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:13:00.351Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/luiz-gustavo-marin-emed-2/cardiologista-medico-do-esporte/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T17:13:10.362Z",
+          "message": "Salvando resultados..."
+        },
+        {
+          "timestamp": "2025-12-01T17:13:10.407Z",
+          "message": "Scraping concluído!"
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764609190514
+  },
+  {
+    "id": "ad2cc298-d9b9-4aa4-9a71-2547ef2bdf1a",
+    "config": {
+      "specialties": [],
+      "city": "",
+      "quantity": "10"
+    },
+    "result": {
+      "success": true,
+      "count": 10,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-12-01T15-26-58-970Z.csv",
+      "data": [
+        {
+          "nome": "Carolina Couy Dantas",
+          "especialidades": [],
+          "numeroFixo": "(31) 98797-0642",
+          "numeroMovel": "(31) 98797-0642",
+          "enderecos": []
+        },
+        {
+          "nome": "Ricardo Fernandes Carneiro",
+          "especialidades": [],
+          "numeroFixo": "(62) 99153-7997",
+          "numeroMovel": "(62) 98316-9070",
+          "enderecos": []
+        },
+        {
+          "nome": "Leandro Maximiano",
+          "especialidades": [],
+          "numeroFixo": "(11) 93318-2909",
+          "numeroMovel": "(31) 97343-7691",
+          "enderecos": []
+        },
+        {
+          "nome": "Claudia Lopes Santoro Neiva",
+          "especialidades": [],
+          "numeroFixo": "(31) 98426-8601",
+          "numeroMovel": "(31) 98426-8601",
+          "enderecos": []
+        },
+        {
+          "nome": "Wander Malva",
+          "especialidades": [],
+          "numeroFixo": "(61) 3346-1019",
+          "numeroMovel": "(61) 99269-8481",
+          "enderecos": []
+        },
+        {
+          "nome": "Rafael Cofiño de Sá",
+          "especialidades": [],
+          "numeroFixo": "(11) 4014-6279",
+          "numeroMovel": "(19) 98410-8300",
+          "enderecos": []
+        },
+        {
+          "nome": "Gilberto Sousa",
+          "especialidades": [],
+          "numeroFixo": "(81) 99139-1098",
+          "numeroMovel": "(81) 94042-8999",
+          "enderecos": []
+        },
+        {
+          "nome": "Adriana Zanini de Almeida",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Kleber Stelmasuk",
+          "especialidades": [],
+          "numeroFixo": "(41) 3229-2797",
+          "numeroMovel": "(41) 99214-8395",
+          "enderecos": []
+        },
+        {
+          "nome": "Flávia Araújo Milhomem",
+          "especialidades": [],
+          "numeroFixo": "(31) 98309-7254",
+          "numeroMovel": "(31) 98309-7254",
+          "enderecos": []
+        }
+      ],
+      "logs": [
+        {
+          "timestamp": "2025-12-01T15:26:13.958Z",
+          "message": "Buscando Médico (1/1)..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:14.000Z",
+          "message": "Acessando Doctoralia..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:15.981Z",
+          "message": "Navegando para resultados: https://www.doctoralia.com.br/pesquisa?q=Médico"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:23.717Z",
+          "message": "Página 1: Coletados 0/10. Buscando mais..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:27.322Z",
+          "message": "Encontrados 20 na página 1."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:27.323Z",
+          "message": "Iniciando extração de 10 perfis..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:27.323Z",
+          "message": "Acessando médico 1/10: https://www.doctoralia.com.br/carolina-couy-dantas/especialista-em-clinica-medica/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:27.324Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/carolina-couy-dantas/especialista-em-clinica-medica/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:30.738Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:31.346Z",
+          "message": "Extraído: Carolina Couy Dantas (4.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:31.347Z",
+          "message": "Acessando médico 2/10: https://www.doctoralia.com.br/ricardo-fernandes-carneiro-2/psiquiatra/goiania"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:31.348Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/ricardo-fernandes-carneiro-2/psiquiatra/goiania"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:34.158Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:34.718Z",
+          "message": "Extraído: Ricardo Fernandes Carneiro (3.4s)"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:34.718Z",
+          "message": "Acessando médico 3/10: https://www.doctoralia.com.br/leandro-maximiano/otorrino/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:34.719Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/leandro-maximiano/otorrino/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:37.144Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:37.913Z",
+          "message": "Extraído: Leandro Maximiano (3.2s)"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:37.913Z",
+          "message": "Acessando médico 4/10: https://www.doctoralia.com.br/claudia-lopes-santoro-neiva-2/reumatologista/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:37.914Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/claudia-lopes-santoro-neiva-2/reumatologista/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:39.745Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:40.373Z",
+          "message": "Extraído: Claudia Lopes Santoro Neiva (2.5s)"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:40.374Z",
+          "message": "Acessando médico 5/10: https://www.doctoralia.com.br/wander-malva/cardiologista-alergista/brasilia"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:40.374Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/wander-malva/cardiologista-alergista/brasilia"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:42.975Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:43.570Z",
+          "message": "Extraído: Wander Malva (3.2s)"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:43.571Z",
+          "message": "Acessando médico 6/10: https://www.doctoralia.com.br/rafael-cofino-de-sa/psiquiatra-medico-de-familia/campinas"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:43.571Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/rafael-cofino-de-sa/psiquiatra-medico-de-familia/campinas"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:45.969Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:46.620Z",
+          "message": "Extraído: Rafael Cofiño de Sá (3.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:46.621Z",
+          "message": "Acessando médico 7/10: https://www.doctoralia.com.br/gilberto-sousa/cirurgiao-buco-maxilo-facial/recife"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:46.622Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/gilberto-sousa/cirurgiao-buco-maxilo-facial/recife"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:49.532Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:50.095Z",
+          "message": "Extraído: Gilberto Sousa (3.5s)"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:50.095Z",
+          "message": "Acessando médico 8/10: https://www.doctoralia.com.br/adriana-zanini-de-almeida/cirurgiao-geral-cirurgiao-do-aparelho-digestivo/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:50.096Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/adriana-zanini-de-almeida/cirurgiao-geral-cirurgiao-do-aparelho-digestivo/rio-de-janeiro"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:52.510Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:53.139Z",
+          "message": "Extraído: Adriana Zanini de Almeida (3.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:53.139Z",
+          "message": "Acessando médico 9/10: https://www.doctoralia.com.br/kleber-stelmasuk/cirurgiao-vascular-cirurgiao-geral-generalista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:53.141Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/kleber-stelmasuk/cirurgiao-vascular-cirurgiao-geral-generalista/curitiba"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:55.269Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:56.179Z",
+          "message": "Extraído: Kleber Stelmasuk (3.0s)"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:56.179Z",
+          "message": "Acessando médico 10/10: https://www.doctoralia.com.br/flavia-araujo-milhomem/endocrinologista-generalista/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:56.180Z",
+          "message": "Acessando perfil: https://www.doctoralia.com.br/flavia-araujo-milhomem/endocrinologista-generalista/belo-horizonte"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:58.220Z",
+          "message": "Extraindo dados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:58.969Z",
+          "message": "Extraído: Flávia Araújo Milhomem (2.8s)"
+        },
+        {
+          "timestamp": "2025-12-01T15:26:58.969Z",
+          "message": "Salvando resultados..."
+        },
+        {
+          "timestamp": "2025-12-01T15:26:58.982Z",
+          "message": "Scraping concluído!"
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764602818995
+  },
+  {
+    "id": "262a43b4-af21-4297-9d40-c3a7679fe616",
+    "config": {
+      "specialties": [],
+      "city": "",
+      "quantity": "10"
+    },
+    "result": {
+      "success": true,
+      "count": 10,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-12-01T15-12-02-322Z.csv",
+      "data": [
+        {
+          "nome": "Ana Paula Tamarindo",
+          "especialidades": [],
+          "numeroFixo": "(34) 3512-5847",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Ricardo Fernandes Carneiro",
+          "especialidades": [],
+          "numeroFixo": "(62) 99153-7997",
+          "numeroMovel": "(62) 98316-9070",
+          "enderecos": []
+        },
+        {
+          "nome": "Leandro Maximiano",
+          "especialidades": [],
+          "numeroFixo": "(11) 93318-2909",
+          "numeroMovel": "(31) 97343-7691",
+          "enderecos": []
+        },
+        {
+          "nome": "Claudia Lopes Santoro Neiva",
+          "especialidades": [],
+          "numeroFixo": "(31) 98426-8601",
+          "numeroMovel": "(31) 98426-8601",
+          "enderecos": []
+        },
+        {
+          "nome": "Wander Malva",
+          "especialidades": [],
+          "numeroFixo": "(61) 3346-1019",
+          "numeroMovel": "(61) 99269-8481",
+          "enderecos": []
+        },
+        {
+          "nome": "Rafael Cofiño de Sá",
+          "especialidades": [],
+          "numeroFixo": "(11) 4014-6279",
+          "numeroMovel": "(19) 98410-8300",
+          "enderecos": []
+        },
+        {
+          "nome": "Gilberto Sousa",
+          "especialidades": [],
+          "numeroFixo": "(81) 99139-1098",
+          "numeroMovel": "(81) 94042-8999",
+          "enderecos": []
+        },
+        {
+          "nome": "Adriana Zanini de Almeida",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Kleber Stelmasuk",
+          "especialidades": [],
+          "numeroFixo": "(41) 3229-2797",
+          "numeroMovel": "(41) 99214-8395",
+          "enderecos": []
+        },
+        {
+          "nome": "Flávia Araújo Milhomem",
+          "especialidades": [],
+          "numeroFixo": "(31) 98309-7254",
+          "numeroMovel": "(31) 98309-7254",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764601922333
+  },
+  {
+    "id": "20ee1c19-c876-4499-845e-acf04f47324e",
+    "config": {
+      "specialties": [],
+      "city": "",
+      "quantity": "5000"
+    },
+    "result": {
+      "success": false,
+      "message": "Cancelled"
+    },
+    "status": "completed",
+    "timestamp": 1764601573256
+  },
+  {
+    "id": "1d941fae-bbaa-4b56-b4a3-78209936c173",
+    "config": {
+      "specialties": [
+        "Psicólogo"
+      ],
+      "city": "goias",
+      "quantity": "35"
+    },
+    "result": {
+      "success": true,
+      "count": 3,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-12-01T15-02-17-846Z.csv",
+      "data": [
+        {
+          "nome": "Katia Salete Bertoldo",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Bárbara Ferreira Borghi",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Nome não encontrado",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764601337867
+  },
+  {
+    "id": "675232d4-4b57-40de-ab77-f7a7b0df4eb4",
+    "config": {
+      "specialties": [],
+      "city": "",
+      "quantity": "40"
+    },
+    "result": {
+      "success": true,
+      "count": 40,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-12-01T13-27-42-060Z.csv",
+      "data": [
+        {
+          "nome": "Bernardo Oliveira Castro de Medina Coeli",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(21) 3952-6352",
+          "enderecos": []
+        },
+        {
+          "nome": "Ricardo Fernandes Carneiro",
+          "especialidades": [],
+          "numeroFixo": "(62) 99153-7997",
+          "numeroMovel": "(62) 98316-9070",
+          "enderecos": []
+        },
+        {
+          "nome": "Leandro Maximiano",
+          "especialidades": [],
+          "numeroFixo": "(11) 93318-2909",
+          "numeroMovel": "(31) 97343-7691",
+          "enderecos": []
+        },
+        {
+          "nome": "Claudia Lopes Santoro Neiva",
+          "especialidades": [],
+          "numeroFixo": "(31) 98426-8601",
+          "numeroMovel": "(31) 98426-8601",
+          "enderecos": []
+        },
+        {
+          "nome": "Wander Malva",
+          "especialidades": [],
+          "numeroFixo": "(61) 3346-1019",
+          "numeroMovel": "(61) 99269-8481",
+          "enderecos": []
+        },
+        {
+          "nome": "Rafael Cofiño de Sá",
+          "especialidades": [],
+          "numeroFixo": "(11) 4014-6279",
+          "numeroMovel": "(19) 98410-8300",
+          "enderecos": []
+        },
+        {
+          "nome": "Gilberto Sousa",
+          "especialidades": [],
+          "numeroFixo": "(81) 99139-1098",
+          "numeroMovel": "(81) 94042-8999",
+          "enderecos": []
+        },
+        {
+          "nome": "Adriana Zanini de Almeida",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Kleber Stelmasuk",
+          "especialidades": [],
+          "numeroFixo": "(41) 3229-2797",
+          "numeroMovel": "(41) 99214-8395",
+          "enderecos": []
+        },
+        {
+          "nome": "Flávia Araújo Milhomem",
+          "especialidades": [],
+          "numeroFixo": "(31) 98309-7254",
+          "numeroMovel": "(31) 98309-7254",
+          "enderecos": []
+        },
+        {
+          "nome": "Rafaela Milagres Santana",
+          "especialidades": [],
+          "numeroFixo": "(21) 96694-1415",
+          "numeroMovel": "(21) 3977-3124",
+          "enderecos": []
+        },
+        {
+          "nome": "Vivian Proença Lara",
+          "especialidades": [],
+          "numeroFixo": "(31) 99941-2206",
+          "numeroMovel": "(31) 99941-2206",
+          "enderecos": []
+        },
+        {
+          "nome": "Bernardo Welkovic",
+          "especialidades": [],
+          "numeroFixo": "(81) 3095-5204",
+          "numeroMovel": "(81) 99738-5010",
+          "enderecos": []
+        },
+        {
+          "nome": "Ricardo Rezende",
+          "especialidades": [],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Rodrigo Alvarez",
+          "especialidades": [],
+          "numeroFixo": "(41) 3335-0302",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Glenda Morgana Borges",
+          "especialidades": [],
+          "numeroFixo": "(62) 3878-7474",
+          "numeroMovel": "(62) 99414-5685",
+          "enderecos": []
+        },
+        {
+          "nome": "Milena Burégio Galanternick Braga",
+          "especialidades": [],
+          "numeroFixo": "(41) 98870-5521",
+          "numeroMovel": "(21) 97292-1660",
+          "enderecos": []
+        },
+        {
+          "nome": "Thiago Lessa",
+          "especialidades": [],
+          "numeroFixo": "(71) 3512-6477",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Greice Batista",
+          "especialidades": [],
+          "numeroFixo": "(21) 3641-0859",
+          "numeroMovel": "(21) 99733-7408",
+          "enderecos": []
+        },
+        {
+          "nome": "Claudia Caetano Mendes",
+          "especialidades": [],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Rafael Machado De Oliveira Lima",
+          "especialidades": [],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Fernanda Almada",
+          "especialidades": [],
+          "numeroFixo": "(61) 3346-1842",
+          "numeroMovel": "(61) 98404-7641",
+          "enderecos": []
+        },
+        {
+          "nome": "Vinicius Carlos Ribeiro Da Silva",
+          "especialidades": [],
+          "numeroFixo": "(21) 4020-0057",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Mateus Bignotto Bortolozzo",
+          "especialidades": [],
+          "numeroFixo": "(19) 3341-6195",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Vitória Fockink Duarte",
+          "especialidades": [],
+          "numeroFixo": "(31) 3888-2565",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Flávia Santos",
+          "especialidades": [],
+          "numeroFixo": "(16) 99787-7244",
+          "numeroMovel": "(16) 99787-7244",
+          "enderecos": []
+        },
+        {
+          "nome": "Breno Dauster",
+          "especialidades": [],
+          "numeroFixo": "(71) 2108-4988",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Tatiana Peron",
+          "especialidades": [],
+          "numeroFixo": "(61) 3255-0144",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Jonas Spezia",
+          "especialidades": [],
+          "numeroFixo": "(51) 99368-6873",
+          "numeroMovel": "(51) 99368-6873",
+          "enderecos": []
+        },
+        {
+          "nome": "Kyra Harbich Kuster",
+          "especialidades": [],
+          "numeroFixo": "(21) 4063-8447",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Eduardo Rabolini",
+          "especialidades": [],
+          "numeroFixo": "(51) 99208-4231",
+          "numeroMovel": "(51) 99208-4231",
+          "enderecos": []
+        },
+        {
+          "nome": "Rodrigo Silva",
+          "especialidades": [],
+          "numeroFixo": "(41) 3093-4143",
+          "numeroMovel": "(41) 99717-6192",
+          "enderecos": []
+        },
+        {
+          "nome": "Alyne Ornellas Neves",
+          "especialidades": [],
+          "numeroFixo": "(61) 3024-8380",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Carlos Eduardo Mateus",
+          "especialidades": [],
+          "numeroFixo": "(41) 3012-5557",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Michelle Piekarski",
+          "especialidades": [],
+          "numeroFixo": "(11) 93450-0356",
+          "numeroMovel": "(11) 93450-0356",
+          "enderecos": []
+        },
+        {
+          "nome": "Bruna Ribeiro Coutinho Calino",
+          "especialidades": [],
+          "numeroFixo": "(21) 99414-0320",
+          "numeroMovel": "(21) 99458-4945",
+          "enderecos": []
+        },
+        {
+          "nome": "Alan Motter",
+          "especialidades": [],
+          "numeroFixo": "(41) 3320-3500",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Tereza Nigro",
+          "especialidades": [],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Adriano Britto de Campos",
+          "especialidades": [],
+          "numeroFixo": "(71) 2108-4656",
+          "numeroMovel": "(71) 99288-8880",
+          "enderecos": []
+        },
+        {
+          "nome": "Guilherme Capel",
+          "especialidades": [],
+          "numeroFixo": "(11) 5039-6184",
+          "numeroMovel": "(11) 99759-4545",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764595662081
+  },
+  {
+    "id": "478636cc-0e5b-417d-96a3-7286489897f3",
+    "config": {
+      "specialties": [],
+      "city": "",
+      "quantity": "40"
+    },
+    "result": {
+      "success": true,
+      "count": 20,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-12-01T13-21-08-282Z.csv",
+      "data": [
+        {
+          "nome": "Dra. Ana Paula Tamarindo",
+          "especialidades": [],
+          "numeroFixo": "(34) 3512-5847",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Ricardo Fernandes Carneiro",
+          "especialidades": [],
+          "numeroFixo": "(62) 99153-7997",
+          "numeroMovel": "(62) 98316-9070",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Leandro Maximiano",
+          "especialidades": [],
+          "numeroFixo": "(11) 93318-2909",
+          "numeroMovel": "(31) 97343-7691",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Claudia Lopes Santoro Neiva",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(31) 98426-8601",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Wander Malva",
+          "especialidades": [],
+          "numeroFixo": "(61) 3346-1019",
+          "numeroMovel": "(61) 99269-8481",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Rafael Cofiño de Sá",
+          "especialidades": [],
+          "numeroFixo": "(11) 4014-6279",
+          "numeroMovel": "(19) 98410-8300",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Flávia Araújo Milhomem",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(31) 98309-7254",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Adriana Zanini de Almeida",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Kleber Stelmasuk",
+          "especialidades": [],
+          "numeroFixo": "(41) 3229-2797",
+          "numeroMovel": "(41) 99214-8395",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Rafaela Milagres Santana",
+          "especialidades": [],
+          "numeroFixo": "(21) 96694-1415",
+          "numeroMovel": "(21) 3977-3124",
+          "enderecos": []
+        },
+        {
+          "nome": "Erro na extração",
+          "url": "https://www.doctoralia.com.br/vivian-proenca-lara/neurologista/belo-horizonte",
+          "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Gilberto Sousa",
+          "especialidades": [],
+          "numeroFixo": "(81) 99139-1098",
+          "numeroMovel": "(81) 94042-8999",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Bernardo Welkovic",
+          "especialidades": [],
+          "numeroFixo": "(81) 3095-5204",
+          "numeroMovel": "(81) 99738-5010",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Ricardo Rezende",
+          "especialidades": [],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Rodrigo Alvarez",
+          "especialidades": [],
+          "numeroFixo": "(41) 3335-0302",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Glenda Morgana Borges",
+          "especialidades": [],
+          "numeroFixo": "(62) 3878-7474",
+          "numeroMovel": "(62) 99414-5685",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Milena Burégio Galanternick Braga",
+          "especialidades": [],
+          "numeroFixo": "(41) 98870-5521",
+          "numeroMovel": "(21) 97292-1660",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Thiago Lessa",
+          "especialidades": [],
+          "numeroFixo": "(71) 3512-6477",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Dra. Greice Batista",
+          "especialidades": [],
+          "numeroFixo": "(21) 3641-0859",
+          "numeroMovel": "(21) 99733-7408",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Claudia Caetano Mendes",
+          "especialidades": [],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764595268297
+  },
+  {
+    "id": "19d7d533-f01e-4105-8478-7cd718ddf626",
+    "config": {
+      "specialties": [],
+      "city": "",
+      "quantity": "35"
+    },
+    "result": {
+      "success": true,
+      "count": 20,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-12-01T13-02-01-738Z.csv",
+      "data": [
+        {
+          "nome": "Dr. Ademir Jose de Moura Junior",
+          "especialidades": [],
+          "numeroFixo": "(47) 3512-0351",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Ricardo Fernandes Carneiro",
+          "especialidades": [],
+          "numeroFixo": "(62) 99153-7997",
+          "numeroMovel": "(62) 98316-9070",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Leandro Maximiano",
+          "especialidades": [],
+          "numeroFixo": "(11) 93318-2909",
+          "numeroMovel": "(31) 97343-7691",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Claudia Lopes Santoro Neiva",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(31) 98426-8601",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Wander Malva",
+          "especialidades": [],
+          "numeroFixo": "(61) 3346-1019",
+          "numeroMovel": "(61) 99269-8481",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Rafael Cofiño de Sá",
+          "especialidades": [],
+          "numeroFixo": "(11) 4014-6279",
+          "numeroMovel": "(19) 98410-8300",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Flávia Araújo Milhomem",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(31) 98309-7254",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Adriana Zanini de Almeida",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Kleber Stelmasuk",
+          "especialidades": [],
+          "numeroFixo": "(41) 3229-2797",
+          "numeroMovel": "(41) 99214-8395",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Rafaela Milagres Santana",
+          "especialidades": [],
+          "numeroFixo": "(21) 96694-1415",
+          "numeroMovel": "(21) 3977-3124",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Vivian Proença Lara",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(31) 99941-2206",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Gilberto Sousa",
+          "especialidades": [],
+          "numeroFixo": "(81) 99139-1098",
+          "numeroMovel": "(81) 94042-8999",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Bernardo Welkovic",
+          "especialidades": [],
+          "numeroFixo": "(81) 3095-5204",
+          "numeroMovel": "(81) 99738-5010",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Ricardo Rezende",
+          "especialidades": [],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Rodrigo Alvarez",
+          "especialidades": [],
+          "numeroFixo": "(41) 3335-0302",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Glenda Morgana Borges",
+          "especialidades": [],
+          "numeroFixo": "(62) 3878-7474",
+          "numeroMovel": "(62) 99414-5685",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Milena Burégio Galanternick Braga",
+          "especialidades": [],
+          "numeroFixo": "(41) 98870-5521",
+          "numeroMovel": "(21) 97292-1660",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Thiago Lessa",
+          "especialidades": [],
+          "numeroFixo": "(71) 3512-6477",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Dra. Greice Batista",
+          "especialidades": [],
+          "numeroFixo": "(21) 3641-0859",
+          "numeroMovel": "(21) 99733-7408",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Claudia Caetano Mendes",
+          "especialidades": [],
+          "numeroFixo": "(21) 2051-6829",
+          "numeroMovel": "",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764594121765
+  },
+  {
+    "id": "9e2d65b1-6102-4f59-a5b8-133b7f31fc78",
+    "config": {
+      "specialties": [],
+      "city": "Goiania, GO",
+      "quantity": "35"
+    },
+    "result": {
+      "success": false,
+      "message": "Cancelled"
+    },
+    "status": "completed",
+    "timestamp": 1764370604431
+  },
+  {
+    "id": "6d27604c-1197-4871-bfc6-06e97a731913",
+    "config": {
+      "specialties": [
+        "Nefrologista"
+      ],
+      "city": "",
+      "quantity": "3"
+    },
+    "result": {
+      "success": true,
+      "count": 3,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T22-53-11-894Z.csv",
+      "data": [
+        {
+          "nome": "Dra. Joanna Helena Correia",
+          "especialidades": [],
+          "numeroFixo": "(79) 3045-4038",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Carlos Eiji Koga",
+          "especialidades": [],
+          "numeroFixo": "(11) 94232-0056",
+          "numeroMovel": "(11) 92122-4075",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Jose Ferraz de Souza",
+          "especialidades": [],
+          "numeroFixo": "(11) 3337-2014",
+          "numeroMovel": "(11) 95754-1737",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764370391903
+  },
+  {
+    "id": "a222d95d-5846-443f-b8cf-500a3007b0ee",
+    "config": {
+      "specialties": [
+        "Dentista",
+        "Urologista"
+      ],
+      "city": "Goiania, GO",
+      "quantity": "10"
+    },
+    "result": {
+      "success": true,
+      "count": 10,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T22-31-36-631Z.csv",
+      "data": [
+        {
+          "nome": "Dra. Sabrina Fenelon",
+          "especialidades": [],
+          "numeroFixo": "(62) 3241-8090",
+          "numeroMovel": "(62) 99986-7404",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Regis Augusto Aleixo Alves",
+          "especialidades": [],
+          "numeroFixo": "(62) 3225-2779",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Clios Clínica Integrada",
+          "especialidades": [],
+          "numeroFixo": "+5562999556146",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Nubia Andrade Teixeira Campioni",
+          "especialidades": [],
+          "numeroFixo": "(62) 4009-3038",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Daniel de Barros Itikawa",
+          "especialidades": [],
+          "numeroFixo": "0800 575 0057",
+          "numeroMovel": "(62) 98561-1582",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Heder Murari Borba",
+          "especialidades": [],
+          "numeroFixo": "(61) 3299-5419",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Lucas Faisano",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(62) 99385-8747",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Hudson Ribeiro",
+          "especialidades": [],
+          "numeroFixo": "(62) 3142-7285",
+          "numeroMovel": "(62) 99604-9996",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Luciano Pereira Reciputti",
+          "especialidades": [],
+          "numeroFixo": "(62) 3096-3878",
+          "numeroMovel": "(62) 99437-8002",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Marcel Cognette",
+          "especialidades": [],
+          "numeroFixo": "(62) 4009-3027",
+          "numeroMovel": "",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764369096725
+  },
+  {
+    "id": "3efc8eb4-78e7-49cb-a353-3bea578a116e",
+    "config": {
+      "specialties": [
+        "Ortopedista",
+        "Dermatologista"
+      ],
+      "city": "Goiania, GO",
+      "quantity": "4"
+    },
+    "result": {
+      "success": true,
+      "count": 4,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T22-20-49-961Z.csv",
+      "data": [
+        {
+          "nome": "Dr. Sinval Dorneles Filho",
+          "especialidades": [],
+          "numeroFixo": "(62) 3932-3400",
+          "numeroMovel": "(62) 99186-3392",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Leonardo Vieira Santos Moraes",
+          "especialidades": [],
+          "numeroFixo": "(62) 3254-5600",
+          "numeroMovel": "(62) 98216-6089",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Maise Sampaio",
+          "especialidades": [],
+          "numeroFixo": "(62) 3256-6864",
+          "numeroMovel": "(62) 99610-2482",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Fabiane Leonel Utino",
+          "especialidades": [],
+          "numeroFixo": "(62) 3157-2239",
+          "numeroMovel": "(62) 99990-1015",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764368450160
+  },
+  {
+    "id": "c5a4ae2b-e2e6-43aa-81bb-4a0b96a9d1a8",
+    "config": {
+      "specialties": [
+        "Psiquiatra",
+        "Oftalmologista"
+      ],
+      "city": "",
+      "quantity": "2"
+    },
+    "result": {
+      "success": true,
+      "count": 2,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T22-20-31-512Z.csv",
+      "data": [
+        {
+          "nome": "Dra. Camilla Navarro",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(21) 98521-0316",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Fabrício Gomes de Freitas",
+          "especialidades": [],
+          "numeroFixo": "(61) 3255-0122",
+          "numeroMovel": "",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764368431732
+  },
+  {
+    "id": "05e1f851-c495-4389-bb61-0e4854ad8124",
+    "config": {
+      "specialties": [
+        "Psiquiatra",
+        "Oftalmologista",
+        "Ginecologista",
+        "Neurologista",
+        "Endocrinologista"
+      ],
+      "city": "",
+      "quantity": "5"
+    },
+    "result": {
+      "success": true,
+      "count": 5,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T22-08-49-127Z.csv",
+      "data": [
+        {
+          "nome": "Giselda Ribeiro",
+          "especialidades": [],
+          "numeroFixo": "(31) 3517-1302",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Roberto De Souza Tobias",
+          "especialidades": [],
+          "numeroFixo": "(91) 4042-2061",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Cecilia Nessimian",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(21) 3952-7792",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Caroline Suemi Ogusuku",
+          "especialidades": [],
+          "numeroFixo": "(11) 3336-3377",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Ana Paula de Medeiros Sanches",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764367729313
+  },
+  {
+    "id": "0938f45a-727b-4409-a445-04162cdf091b",
+    "config": {
+      "specialties": [
+        "Ortopedista"
+      ],
+      "city": "",
+      "quantity": "5"
+    },
+    "result": {
+      "success": true,
+      "count": 5,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T21-53-11-114Z.csv",
+      "data": [
+        {
+          "nome": "Dr. Marcos Vaz de Lima",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(11) 97874-7217",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Luis Antonio Buendia",
+          "especialidades": [],
+          "numeroFixo": "(11) 2155-1799",
+          "numeroMovel": "(11) 99152-8744",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Matheus S. Costa",
+          "especialidades": [],
+          "numeroFixo": "(11) 3515-2250",
+          "numeroMovel": "(11) 94524-6021",
+          "enderecos": []
+        },
+        {
+          "nome": "Acesso Saúde São José dos Pinhais",
+          "especialidades": [],
+          "numeroFixo": "+554135130767",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Leonardo Vieira Santos Moraes",
+          "especialidades": [],
+          "numeroFixo": "(62) 3254-5600",
+          "numeroMovel": "(62) 98216-6089",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764366791123
+  },
+  {
+    "id": "6fec7b75-5d67-484b-80e4-0c06ed881d28",
+    "config": {
+      "specialties": [
+        "Cardiologista"
+      ],
+      "city": "Goiania, GO",
+      "quantity": "5"
+    },
+    "result": {
+      "success": true,
+      "count": 5,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T20-38-57-307Z.csv",
+      "data": [
+        {
+          "nome": "Dra. Sarah Mariana Renovato Martins Souza",
+          "especialidades": [],
+          "numeroFixo": "(62) 4101-4466",
+          "numeroMovel": "(62) 98346-6907",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Aline Rosa de Castro Carneiro",
+          "especialidades": [],
+          "numeroFixo": "(62) 98189-0984",
+          "numeroMovel": "(62) 98243-6565",
+          "enderecos": []
+        },
+        {
+          "nome": "DR&CIA",
+          "especialidades": [],
+          "numeroFixo": "+556236266546",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Lucas Brito",
+          "especialidades": [],
+          "numeroFixo": "(62) 3412-1117",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Lucas Nolêto de Oliveira",
+          "especialidades": [],
+          "numeroFixo": "(62) 3093-9664",
+          "numeroMovel": "(62) 99606-1816",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764362337314
+  },
+  {
+    "id": "8e5cf9a4-fd20-4325-a03b-d0848237fa8d",
+    "config": {
+      "specialties": [
+        "Cardiologista"
+      ],
+      "city": "São Paulo, SP",
+      "quantity": "2"
+    },
+    "result": {
+      "success": true,
+      "count": 2,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T20-30-17-403Z.csv",
+      "data": [
+        {
+          "nome": "Dr. Alvaro Paiva Oliveira",
+          "especialidades": [],
+          "numeroFixo": "(11) 3848-9208",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Luciano Melo Atanes",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(11) 93213-7572",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764361817409
+  },
+  {
+    "id": "44a108ff-5e24-4054-8c9a-76bdcda8504e",
+    "config": {
+      "specialties": [
+        "Cardiologista"
+      ],
+      "city": "São Paulo, SP",
+      "quantity": "1"
+    },
+    "result": {
+      "success": true,
+      "count": 1,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T19-38-27-364Z.csv",
+      "data": [
+        {
+          "nome": "Dra. Marcela Devido",
+          "especialidades": [],
+          "numeroFixo": "(11) 95070-4134",
+          "numeroMovel": "(11) 96323-8055",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764358707370
+  },
+  {
+    "id": "0d8d94a3-91f0-4f27-9eba-12be5eae38d4",
+    "config": {
+      "specialties": [
+        "Cardiologista"
+      ],
+      "city": "São Paulo, SP",
+      "quantity": "1"
+    },
+    "result": {
+      "success": true,
+      "count": 1,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T19-11-38-389Z.csv",
+      "data": [
+        {
+          "nome": "Dra. Marcela Devido",
+          "especialidades": [],
+          "numeroFixo": "(11) 95070-4134",
+          "numeroMovel": "(11) 96323-8055",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764357098394
+  },
+  {
+    "id": "f08f26b9-60e0-4c44-b160-a4f2409e2d78",
+    "config": {
+      "specialties": [
+        "Cardiologista"
+      ],
+      "city": "São Paulo, SP",
+      "quantity": "1"
+    },
+    "result": {
+      "success": true,
+      "count": 1,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T19-04-32-600Z.csv",
+      "data": [
+        {
+          "nome": "Dra. Marcela Devido",
+          "especialidades": [],
+          "numeroFixo": "(11) 95070-4134",
+          "numeroMovel": "(11) 96323-8055",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764356672610
+  },
+  {
+    "id": "cb1231b0-315b-401e-a755-53c1c698d356",
+    "config": {
+      "specialties": [
+        "Cardiologista"
+      ],
+      "city": "São Paulo, SP",
+      "quantity": "1"
+    },
+    "result": {
+      "success": true,
+      "count": 1,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T19-00-18-273Z.csv",
+      "data": [
+        {
+          "nome": "Dra. Marcela Devido",
+          "especialidades": [],
+          "numeroFixo": "(11) 95070-4134",
+          "numeroMovel": "(11) 96323-8055",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764356418386
+  },
+  {
+    "id": "0a831192-bd82-433c-8ec0-75f3bc03a3fa",
+    "config": {
+      "specialties": [
+        "Cardiologista"
+      ],
+      "city": "SP",
+      "quantity": "1"
+    },
+    "result": {
+      "success": true,
+      "count": 1,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T18-52-34-731Z.csv",
+      "data": [
+        {
+          "nome": "Dr. Heron Rached",
+          "especialidades": [],
+          "numeroFixo": "(11) 5575-9378",
+          "numeroMovel": "(11) 99387-4369",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764355954771
+  },
+  {
+    "id": "db44fc9f-cfeb-43ef-a23b-32062dbda195",
+    "config": {
+      "specialties": [
+        "Pediatra"
+      ],
+      "city": "São Paulo, SP",
+      "quantity": "2"
+    },
+    "result": {
+      "success": true,
+      "count": 2,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T18-45-34-613Z.csv",
+      "data": [
+        {
+          "nome": "Dr. Newton Nakamura",
+          "especialidades": [],
+          "numeroFixo": "(11) 2092-5999",
+          "numeroMovel": "(11) 97392-3269",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Lygia Spassapan de Oliveira Esteves",
+          "especialidades": [],
+          "numeroFixo": "(11) 3051-5759",
+          "numeroMovel": "(11) 96465-4605",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764355534622
+  },
+  {
+    "id": "92d3a7ae-9726-498c-b900-33c91e951cfc",
+    "config": {
+      "specialties": [
+        "Oftalmologista"
+      ],
+      "city": "São Paulo, SP",
+      "quantity": "2"
+    },
+    "result": {
+      "success": true,
+      "count": 2,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T17-37-25-091Z.csv",
+      "data": [
+        {
+          "nome": "Dr. Daniel Kamlot",
+          "especialidades": [],
+          "numeroFixo": "(11) 2050-6535",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dr. Hallim Feres Neto",
+          "especialidades": [],
+          "numeroFixo": "(11) 5571-5475",
+          "numeroMovel": "(11) 98941-5926",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764351445098
+  },
+  {
+    "id": "54e4936e-abb5-496a-9b3b-76b8cb550045",
+    "config": {
+      "specialties": [
+        "Pediatra"
+      ],
+      "city": "Goiania, GO",
+      "quantity": "2"
+    },
+    "result": {
+      "success": true,
+      "count": 2,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T17-11-19-721Z.csv",
+      "data": [
+        {
+          "nome": "Dra. Danielle Maria Martins Carneiro",
+          "especialidades": [],
+          "numeroFixo": "(91) 4042-2062",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Carla Pacheco Lacerda Silva",
+          "especialidades": [],
+          "numeroFixo": "(62) 99189-5307",
+          "numeroMovel": "(62) 99417-5099",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764349879732
+  },
+  {
+    "id": "e4af4d10-f069-4e38-a2a2-056283db119f",
+    "config": {
+      "specialties": [
+        "Cardiologista",
+        "Dermatologista",
+        "Pediatra"
+      ],
+      "city": "São Paulo, SP",
+      "quantity": "2"
+    },
+    "result": {
+      "success": true,
+      "count": 2,
+      "filePath": "C:\\Users\\theja\\Screpy Doctoralia\\results\\doctoralia_results_2025-11-28T17-09-28-435Z.csv",
+      "data": [
+        {
+          "nome": "Dr. Gustavo Salatino",
+          "especialidades": [],
+          "numeroFixo": "(11) 2189-0321",
+          "numeroMovel": "",
+          "enderecos": []
+        },
+        {
+          "nome": "Dra. Paula Sian Lopes",
+          "especialidades": [],
+          "numeroFixo": "",
+          "numeroMovel": "(11) 96958-0215",
+          "enderecos": []
+        }
+      ]
+    },
+    "status": "completed",
+    "timestamp": 1764349768485
+  }
+]

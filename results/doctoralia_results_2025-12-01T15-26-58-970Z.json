@@ -1,0 +1,274 @@
+{
+  "config": {
+    "specialties": [],
+    "city": "",
+    "quantity": 10
+  },
+  "metadata": {
+    "startTime": "2025-12-01T15:26:13.956Z",
+    "endTime": "2025-12-01T15:26:58.977Z",
+    "totalResults": 10
+  },
+  "logs": [
+    {
+      "timestamp": "2025-12-01T15:26:13.958Z",
+      "message": "Buscando Médico (1/1)..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:14.000Z",
+      "message": "Acessando Doctoralia..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:15.981Z",
+      "message": "Navegando para resultados: https://www.doctoralia.com.br/pesquisa?q=Médico"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:23.717Z",
+      "message": "Página 1: Coletados 0/10. Buscando mais..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:27.322Z",
+      "message": "Encontrados 20 na página 1."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:27.323Z",
+      "message": "Iniciando extração de 10 perfis..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:27.323Z",
+      "message": "Acessando médico 1/10: https://www.doctoralia.com.br/carolina-couy-dantas/especialista-em-clinica-medica/belo-horizonte"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:27.324Z",
+      "message": "Acessando perfil: https://www.doctoralia.com.br/carolina-couy-dantas/especialista-em-clinica-medica/belo-horizonte"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:30.738Z",
+      "message": "Extraindo dados..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:31.346Z",
+      "message": "Extraído: Carolina Couy Dantas (4.0s)"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:31.347Z",
+      "message": "Acessando médico 2/10: https://www.doctoralia.com.br/ricardo-fernandes-carneiro-2/psiquiatra/goiania"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:31.348Z",
+      "message": "Acessando perfil: https://www.doctoralia.com.br/ricardo-fernandes-carneiro-2/psiquiatra/goiania"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:34.158Z",
+      "message": "Extraindo dados..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:34.718Z",
+      "message": "Extraído: Ricardo Fernandes Carneiro (3.4s)"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:34.718Z",
+      "message": "Acessando médico 3/10: https://www.doctoralia.com.br/leandro-maximiano/otorrino/belo-horizonte"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:34.719Z",
+      "message": "Acessando perfil: https://www.doctoralia.com.br/leandro-maximiano/otorrino/belo-horizonte"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:37.144Z",
+      "message": "Extraindo dados..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:37.913Z",
+      "message": "Extraído: Leandro Maximiano (3.2s)"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:37.913Z",
+      "message": "Acessando médico 4/10: https://www.doctoralia.com.br/claudia-lopes-santoro-neiva-2/reumatologista/belo-horizonte"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:37.914Z",
+      "message": "Acessando perfil: https://www.doctoralia.com.br/claudia-lopes-santoro-neiva-2/reumatologista/belo-horizonte"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:39.745Z",
+      "message": "Extraindo dados..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:40.373Z",
+      "message": "Extraído: Claudia Lopes Santoro Neiva (2.5s)"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:40.374Z",
+      "message": "Acessando médico 5/10: https://www.doctoralia.com.br/wander-malva/cardiologista-alergista/brasilia"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:40.374Z",
+      "message": "Acessando perfil: https://www.doctoralia.com.br/wander-malva/cardiologista-alergista/brasilia"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:42.975Z",
+      "message": "Extraindo dados..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:43.570Z",
+      "message": "Extraído: Wander Malva (3.2s)"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:43.571Z",
+      "message": "Acessando médico 6/10: https://www.doctoralia.com.br/rafael-cofino-de-sa/psiquiatra-medico-de-familia/campinas"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:43.571Z",
+      "message": "Acessando perfil: https://www.doctoralia.com.br/rafael-cofino-de-sa/psiquiatra-medico-de-familia/campinas"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:45.969Z",
+      "message": "Extraindo dados..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:46.620Z",
+      "message": "Extraído: Rafael Cofiño de Sá (3.0s)"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:46.621Z",
+      "message": "Acessando médico 7/10: https://www.doctoralia.com.br/gilberto-sousa/cirurgiao-buco-maxilo-facial/recife"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:46.622Z",
+      "message": "Acessando perfil: https://www.doctoralia.com.br/gilberto-sousa/cirurgiao-buco-maxilo-facial/recife"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:49.532Z",
+      "message": "Extraindo dados..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:50.095Z",
+      "message": "Extraído: Gilberto Sousa (3.5s)"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:50.095Z",
+      "message": "Acessando médico 8/10: https://www.doctoralia.com.br/adriana-zanini-de-almeida/cirurgiao-geral-cirurgiao-do-aparelho-digestivo/rio-de-janeiro"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:50.096Z",
+      "message": "Acessando perfil: https://www.doctoralia.com.br/adriana-zanini-de-almeida/cirurgiao-geral-cirurgiao-do-aparelho-digestivo/rio-de-janeiro"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:52.510Z",
+      "message": "Extraindo dados..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:53.139Z",
+      "message": "Extraído: Adriana Zanini de Almeida (3.0s)"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:53.139Z",
+      "message": "Acessando médico 9/10: https://www.doctoralia.com.br/kleber-stelmasuk/cirurgiao-vascular-cirurgiao-geral-generalista/curitiba"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:53.141Z",
+      "message": "Acessando perfil: https://www.doctoralia.com.br/kleber-stelmasuk/cirurgiao-vascular-cirurgiao-geral-generalista/curitiba"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:55.269Z",
+      "message": "Extraindo dados..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:56.179Z",
+      "message": "Extraído: Kleber Stelmasuk (3.0s)"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:56.179Z",
+      "message": "Acessando médico 10/10: https://www.doctoralia.com.br/flavia-araujo-milhomem/endocrinologista-generalista/belo-horizonte"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:56.180Z",
+      "message": "Acessando perfil: https://www.doctoralia.com.br/flavia-araujo-milhomem/endocrinologista-generalista/belo-horizonte"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:58.220Z",
+      "message": "Extraindo dados..."
+    },
+    {
+      "timestamp": "2025-12-01T15:26:58.969Z",
+      "message": "Extraído: Flávia Araújo Milhomem (2.8s)"
+    },
+    {
+      "timestamp": "2025-12-01T15:26:58.969Z",
+      "message": "Salvando resultados..."
+    }
+  ],
+  "results": [
+    {
+      "nome": "Carolina Couy Dantas",
+      "especialidades": [],
+      "numeroFixo": "(31) 98797-0642",
+      "numeroMovel": "(31) 98797-0642",
+      "enderecos": []
+    },
+    {
+      "nome": "Ricardo Fernandes Carneiro",
+      "especialidades": [],
+      "numeroFixo": "(62) 99153-7997",
+      "numeroMovel": "(62) 98316-9070",
+      "enderecos": []
+    },
+    {
+      "nome": "Leandro Maximiano",
+      "especialidades": [],
+      "numeroFixo": "(11) 93318-2909",
+      "numeroMovel": "(31) 97343-7691",
+      "enderecos": []
+    },
+    {
+      "nome": "Claudia Lopes Santoro Neiva",
+      "especialidades": [],
+      "numeroFixo": "(31) 98426-8601",
+      "numeroMovel": "(31) 98426-8601",
+      "enderecos": []
+    },
+    {
+      "nome": "Wander Malva",
+      "especialidades": [],
+      "numeroFixo": "(61) 3346-1019",
+      "numeroMovel": "(61) 99269-8481",
+      "enderecos": []
+    },
+    {
+      "nome": "Rafael Cofiño de Sá",
+      "especialidades": [],
+      "numeroFixo": "(11) 4014-6279",
+      "numeroMovel": "(19) 98410-8300",
+      "enderecos": []
+    },
+    {
+      "nome": "Gilberto Sousa",
+      "especialidades": [],
+      "numeroFixo": "(81) 99139-1098",
+      "numeroMovel": "(81) 94042-8999",
+      "enderecos": []
+    },
+    {
+      "nome": "Adriana Zanini de Almeida",
+      "especialidades": [],
+      "numeroFixo": "",
+      "numeroMovel": "",
+      "enderecos": []
+    },
+    {
+      "nome": "Kleber Stelmasuk",
+      "especialidades": [],
+      "numeroFixo": "(41) 3229-2797",
+      "numeroMovel": "(41) 99214-8395",
+      "enderecos": []
+    },
+    {
+      "nome": "Flávia Araújo Milhomem",
+      "especialidades": [],
+      "numeroFixo": "(31) 98309-7254",
+      "numeroMovel": "(31) 98309-7254",
+      "enderecos": []
+    }
+  ]
+}
