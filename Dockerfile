@@ -18,19 +18,6 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json (if available)
 COPY package*.json ./
 
-# Install dependencies
-# If you are building your code for production
-# RUN npm ci --only=production
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-RUN npm config set fetch-retry-maxtimeout 600000 \
-  && npm config set fetch-retry-mintimeout 10000 \
-  && npm install --verbose
-
-# Copy the rest of the application source code
-COPY . .
-
-# Create results directory
-RUN mkdir -p results
 
 # Expose the port the app runs on
 EXPOSE 3000
