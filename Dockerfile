@@ -21,6 +21,7 @@ COPY package*.json ./
 # Install dependencies
 # If you are building your code for production
 # RUN npm ci --only=production
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN npm install
 
 # Copy the rest of the application source code
