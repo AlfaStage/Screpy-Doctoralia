@@ -13,6 +13,7 @@ class BrowserManager {
   async initialize() {
     this.browser = await puppeteer.launch({
       headless: 'new',
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable',
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -25,10 +26,10 @@ class BrowserManager {
     });
 
     this.page = await this.browser.newPage();
-    
+
     // Set viewport
     await this.page.setViewport({ width: 1920, height: 1080 });
-    
+
     // Set extra headers to appear more human-like
     await this.page.setExtraHTTPHeaders({
       'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
