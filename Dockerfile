@@ -22,7 +22,9 @@ COPY package*.json ./
 # If you are building your code for production
 # RUN npm ci --only=production
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-RUN npm install
+RUN npm config set fetch-retry-maxtimeout 600000 \
+  && npm config set fetch-retry-mintimeout 10000 \
+  && npm install --verbose
 
 # Copy the rest of the application source code
 COPY . .
