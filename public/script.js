@@ -243,6 +243,7 @@ form.addEventListener('submit', (e) => {
 
     const city = document.getElementById('city').value;
     const quantity = document.getElementById('quantity').value;
+    const onlyWithPhone = document.getElementById('only-with-phone').checked;
 
     // Get selected specialties from the cards
     const specialties = Array.from(selectedSpecialties);
@@ -288,7 +289,8 @@ form.addEventListener('submit', (e) => {
     socket.emit('start-scrape', {
         specialties,
         city,
-        quantity
+        quantity,
+        onlyWithPhone
     });
 });
 

@@ -12,7 +12,11 @@ class ProfileExtractor {
 
         // Timeout promise
         const timeout = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout de extração (10s)')), 10000)
+            setTimeout(() => {
+                const error = new Error('Timeout de extração (10s)');
+                error.type = 'TIMEOUT';
+                reject(error);
+            }, 10000)
         );
 
         try {
@@ -35,17 +39,31 @@ class ProfileExtractor {
             return profileData;
 
         } catch (error) {
-            console.error(`Error extracting profile ${url}:`, error.message);
-            // Return empty structure to allow continuation (skip to next)
-            return {
-                nome: 'Erro - Pular',
-                url: url,
-                error: error.message,
-                especialidades: [],
-                numeroFixo: '',
-                numeroMovel: '',
-                enderecos: []
-            };
+            // Detect error type
+            let errorType = 'UNKNOWN';
+            let errorMessage = error.message;
+
+            if (error.type === 'TIMEOUT' || error.message.includes('Timeout')) {
+                errorType = 'TIMEOUT';
+                errorMessage = 'Timeout na extração do perfil';
+            } else if (error.message.includes('ERR_PROXY') || error.message.includes('ECONNREFUSED')) {
+                errorType = 'PROXY_ERROR';
+                errorMessage = 'Erro de conexão com proxy';
+            } else if (error.message.includes('blocked') || error.message.includes('403') || error.message.includes('429')) {
+                errorType = 'BLOCKED';
+                errorMessage = 'Página bloqueada ou CAPTCHA detectado';
+            } else if (error.message.includes('net::ERR')) {
+                errorType = 'NETWORK_ERROR';
+                errorMessage = 'Erro de rede';
+            }
+
+            console.error(`❌ Erro [${errorType}] ao extrair ${url}: ${errorMessage}`);
+
+            // Throw error with type for upper layer to handle
+            const enrichedError = new Error(errorMessage);
+            enrichedError.type = errorType;
+            enrichedError.url = url;
+            throw enrichedError;
         }
     }
 
@@ -160,6 +178,13 @@ class ProfileExtractor {
         }
 
         return profileData;
+    }
+
+    /**
+     * Check if profile has phone number
+     */
+    hasPhoneNumber(profileData) {
+        return !!(profileData.numeroFixo || profileData.numeroMovel);
     }
 }
 

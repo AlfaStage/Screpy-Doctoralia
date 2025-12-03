@@ -38,8 +38,8 @@ io.on('connection', (socket) => {
 
     socket.on('start-scrape', async (data) => {
         try {
-            const { specialties, city, quantity } = data;
-            console.log('Starting scrape:', { specialties, city, quantity });
+            const { specialties, city, quantity, onlyWithPhone } = data;
+            console.log('Starting scrape:', { specialties, city, quantity, onlyWithPhone });
 
             // Validate input (specialties can be empty array, will default to "Médico")
             if (!quantity || quantity < 1) {

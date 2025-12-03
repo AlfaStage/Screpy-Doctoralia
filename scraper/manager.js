@@ -9,27 +9,67 @@ class ScraperManager {
         this.scrapers = new Map(); // Map<id, DoctoraliaScraper>
         this.history = [];
         this.MAX_CONCURRENT_SCRAPES = 3;
-        this.historyFile = path.join(__dirname, '..', 'data', 'history.json');
+        this.resultsDir = path.join(__dirname, '..', 'results');
 
         this.loadHistory();
     }
 
     async loadHistory() {
         try {
-            await fs.mkdir(path.dirname(this.historyFile), { recursive: true });
-            const data = await fs.readFile(this.historyFile, 'utf8');
-            this.history = JSON.parse(data);
+            // Ensure results directory exists
+            await fs.mkdir(this.resultsDir, { recursive: true });
+
+            // Read all JSON files from results directory
+            const files = await fs.readdir(this.resultsDir);
+            const jsonFiles = files.filter(f => f.endsWith('.json'));
+
+            const historyItems = [];
+
+            for (const file of jsonFiles) {
+                try {
+                    const filePath = path.join(this.resultsDir, file);
+                    const data = await fs.readFile(filePath, 'utf8');
+                    const jsonData = JSON.parse(data);
+
+                    // Extract ID from filename (format: doctoralia_results_TIMESTAMP.json)
+                    const id = file.replace('.json', '').replace('doctoralia_results_', '');
+
+                    // Get file stats for timestamp
+                    const stats = await fs.stat(filePath);
+
+                    historyItems.push({
+                        id,
+                        config: jsonData.config || {},
+                        result: {
+                            success: true,
+                            count: jsonData.results ? jsonData.results.length : 0,
+                            filePath: filePath.replace('.json', '.csv'),
+                            data: jsonData.results || [],
+                            logs: jsonData.logs || []
+                        },
+                        status: 'completed',
+                        timestamp: stats.mtimeMs
+                    });
+                } catch (err) {
+                    console.warn(`Erro ao carregar ${file}:`, err.message);
+                }
+            }
+
+            // Sort by timestamp (newest first)
+            historyItems.sort((a, b) => b.timestamp - a.timestamp);
+
+            this.history = historyItems;
+            console.log(`📚 Histórico carregado: ${this.history.length} registros de /results`);
         } catch (error) {
+            console.warn('Erro ao carregar histórico:', error.message);
             this.history = [];
         }
     }
 
     async saveHistory() {
-        try {
-            await fs.writeFile(this.historyFile, JSON.stringify(this.history, null, 2));
-        } catch (error) {
-            console.error('Error saving history:', error);
-        }
+        // No longer save to history.json - history is now based on /results files
+        // This method is kept for compatibility but does nothing
+        return;
     }
 
     async startScrape(config) {
@@ -51,23 +91,45 @@ class ScraperManager {
         });
 
         // Start scraping asynchronously
-        this.runScraper(id, scraper, config);
+        this.runScraper(id, config);
 
         return id;
     }
 
-    async runScraper(id, scraper, config) {
-        console.log(`[Manager] Running scraper ${id} with config:`, config);
+    async runScraper(id, config) {
+        const scraper = this.scrapers.get(id);
+        if (!scraper) {
+            throw new Error('Scraper not found');
+        }
+
         try {
+            console.log(`[Manager] Running scraper ${id} with config:`, config);
+
+            // Emit manager log to frontend
+            this.io.emit('scraper-progress', {
+                id: id,
+                message: `[Manager] Iniciando scraper com ${config.quantity} médicos...`,
+                status: 'initializing'
+            });
+
             await scraper.initialize();
             console.log(`[Manager] Scraper ${id} initialized`);
 
+            scraper.status = 'running'; // Update scraper status
             const result = await scraper.scrape(
                 config.specialties,
                 config.city,
-                parseInt(config.quantity)
+                parseInt(config.quantity),
+                config.onlyWithPhone || false
             );
             console.log(`[Manager] Scraper ${id} completed. Result:`, result);
+
+            // Emit completion log
+            this.io.emit('scraper-progress', {
+                id: id,
+                message: `[Manager] Scraper concluído com sucesso`,
+                status: 'completed'
+            });
 
             // Add to history
             const historyItem = {

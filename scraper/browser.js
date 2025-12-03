@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const ProxyChain = require('proxy-chain');
 
 // Add stealth plugin to avoid detection
 puppeteer.use(StealthPlugin());
@@ -8,22 +9,58 @@ class BrowserManager {
   constructor() {
     this.browser = null;
     this.page = null;
+    this.proxyServer = null; // For SOCKS proxies
   }
 
-  async initialize() {
-    this.browser = await puppeteer.launch({
+  async initialize(proxyUrl = null) {
+    const launchArgs = [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--disable-gpu',
+      '--window-size=1920x1080',
+      '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    ];
+
+    let actualProxyUrl = proxyUrl;
+
+    // If proxy is SOCKS, create local HTTP server using proxy-chain
+    if (proxyUrl && (proxyUrl.includes('socks4://') || proxyUrl.includes('socks5://'))) {
+      console.log(`🔗 Criando servidor local para proxy SOCKS: ${proxyUrl}`);
+
+      // Create anonymous proxy server that forwards to SOCKS proxy
+      this.proxyServer = new ProxyChain.Server({
+        port: 0, // Use random available port
+        prepareRequestFunction: () => {
+          return {
+            upstreamProxyUrl: proxyUrl
+          };
+        }
+      });
+
+      await this.proxyServer.listen();
+      actualProxyUrl = `http://127.0.0.1:${this.proxyServer.port}`;
+      console.log(`✅ Servidor proxy local criado em ${actualProxyUrl} -> ${proxyUrl}`);
+    }
+
+    // Add proxy if provided
+    if (actualProxyUrl) {
+      launchArgs.push(`--proxy-server=${actualProxyUrl}`);
+      console.log(`🌐 Configurando browser com proxy: ${actualProxyUrl}`);
+    }
+
+    const launchOptions = {
       headless: 'new',
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable',
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--disable-gpu',
-        '--window-size=1920x1080',
-        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      ]
-    });
+      args: launchArgs
+    };
+
+    // Only set executablePath if explicitly defined in environment
+    if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+      launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+    }
+
+    this.browser = await puppeteer.launch(launchOptions);
 
     this.page = await this.browser.newPage();
 
@@ -42,6 +79,13 @@ class BrowserManager {
   async close() {
     if (this.browser) {
       await this.browser.close();
+    }
+
+    // Close proxy server if it was created for SOCKS
+    if (this.proxyServer) {
+      await this.proxyServer.close();
+      console.log('🔌 Servidor proxy local fechado');
+      this.proxyServer = null;
     }
   }
 
