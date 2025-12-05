@@ -36,30 +36,41 @@ const selectedSpecialties = new Set();
 
 // Common specialties to display
 const commonSpecialties = [
-    { name: 'Cardiologista', icon: 'fa-heart' },
-    { name: 'Dermatologista', icon: 'fa-hand-sparkles' },
-    { name: 'Pediatra', icon: 'fa-baby' },
+    { name: 'Cardiologista', icon: 'fa-heart-pulse' },
+    { name: 'Dermatologista', icon: 'fa-hand-dots' },
+    { name: 'Pediatra', icon: 'fa-baby-carriage' },
     { name: 'Ortopedista', icon: 'fa-bone' },
     { name: 'Ginecologista', icon: 'fa-venus' },
     { name: 'Neurologista', icon: 'fa-brain' },
     { name: 'Psiquiatra', icon: 'fa-head-side-virus' },
     { name: 'Oftalmologista', icon: 'fa-eye' },
     { name: 'Endocrinologista', icon: 'fa-flask' },
-    { name: 'Psicólogo', icon: 'fa-user-md' },
-    { name: 'Nutricionista', icon: 'fa-apple-alt' },
-    { name: 'Fisioterapeuta', icon: 'fa-running' },
+    { name: 'Psicólogo', icon: 'fa-user-nurse' },
+    { name: 'Nutricionista', icon: 'fa-apple-whole' },
+    { name: 'Fisioterapeuta', icon: 'fa-walking' },
     { name: 'Dentista', icon: 'fa-tooth' },
     { name: 'Urologista', icon: 'fa-mars' },
     { name: 'Otorrinolaringologista', icon: 'fa-ear-listen' },
     { name: 'Pneumologista', icon: 'fa-lungs' },
-    { name: 'Gastroenterologista', icon: 'fa-stomach' },
+    { name: 'Gastroenterologista', icon: 'fa-bacteria' },
     { name: 'Reumatologista', icon: 'fa-person-cane' },
     { name: 'Oncologista', icon: 'fa-ribbon' },
     { name: 'Infectologista', icon: 'fa-virus' },
-    { name: 'Geriatra', icon: 'fa-person-walking-cane' },
+    { name: 'Geriatra', icon: 'fa-blind' },
     { name: 'Nefrologista', icon: 'fa-droplet' },
     { name: 'Anestesiologista', icon: 'fa-syringe' },
-    { name: 'Radiologista', icon: 'fa-x-ray' }
+    { name: 'Radiologista', icon: 'fa-x-ray' },
+    { name: 'Cirurgião Plástico', icon: 'fa-wand-magic-sparkles' },
+    { name: 'Cirurgião Geral', icon: 'fa-user-doctor' },
+    { name: 'Homeopata', icon: 'fa-leaf' },
+    { name: 'Acupunturista', icon: 'fa-arrows-to-circle' },
+    { name: 'Alergista', icon: 'fa-virus-covid' },
+    { name: 'Hematologista', icon: 'fa-vial' },
+    { name: 'Mastologista', icon: 'fa-person-dress' },
+    { name: 'Nutrólogo', icon: 'fa-carrot' },
+    { name: 'Proctologista', icon: 'fa-notes-medical' },
+    { name: 'Angiologista', icon: 'fa-heart-crack' },
+    { name: 'Neurocirurgião', icon: 'fa-brain' }
 ];
 
 // Load specialties into grid
@@ -515,6 +526,12 @@ function updateModal(item) {
 
     // Progresso: sucesso comparado com quantidade pedida
     const progressPercent = quantityRequested > 0 ? Math.round((successCount / quantityRequested) * 100) : 0;
+
+    // Sucesso Text (New)
+    const modalSuccessText = document.getElementById('modal-success-text'); // Dynamically get it safely
+    if (modalSuccessText) modalSuccessText.textContent = successCount;
+
+    // Totais (Progresso)
     modalProgressText.textContent = `${successCount}/${quantityRequested} (${progressPercent}%)`;
 
     // Erros: quantidade de erros / total extraído
