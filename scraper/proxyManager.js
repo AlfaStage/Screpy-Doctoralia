@@ -32,16 +32,23 @@ class ProxyManager {
 
                 res.on('end', () => {
                     try {
-                        const lines = data.trim().split('\n');
-                        const proxies = lines
-                            .map(line => line.trim())
-                            .filter(line => line.length > 0 && line.startsWith('http://'))
-                            .map(proxy => ({
-                                url: proxy,
+                        const response = JSON.parse(data);
+
+                        // ProxyScrape v4 API returns {proxies: [{proxy: "protocol://ip:port", ...}, ...]}
+                        if (!response.proxies || !Array.isArray(response.proxies)) {
+                            this.log('⚠️ ProxyScrape: formato de resposta inválido');
+                            resolve([]);
+                            return;
+                        }
+
+                        const proxies = response.proxies
+                            .filter(p => p.proxy && (p.proxy.startsWith('http://') || p.proxy.startsWith('https://')))
+                            .map(p => ({
+                                url: p.proxy,
                                 source: 'proxyscrape',
                                 score: 80, // HTTP proxies get higher base score
-                                upTime: 50,
-                                speed: 2
+                                upTime: p.uptime || 50,
+                                speed: p.speed || 2
                             }));
 
                         this.log(`✅ ProxyScrape: ${proxies.length} proxies HTTP encontrados`);
@@ -64,7 +71,7 @@ class ProxyManager {
                 resolve([]);
             });
 
-            req.setTimeout(5000); // 5 second timeout
+            req.setTimeout(5000);
         });
     }
 
@@ -89,12 +96,10 @@ class ProxyManager {
                             const proxies = response.map(p => {
                                 const protocol = p.protocol || 'http';
 
-                                // Calculate score based on quality metrics
                                 let score = 0;
                                 score += (p.uptimeRating || 50);
-                                score += (100 - (p.responseTimeRating || 50)); // Lower response time is better
+                                score += (100 - (p.responseTimeRating || 50));
 
-                                // BIG bonus for HTTP proxies (much more stable)
                                 if (protocol === 'http' || protocol === 'https') {
                                     score += 40;
                                 }
@@ -166,7 +171,6 @@ class ProxyManager {
                                 score += (p.speed || 1) * 10;
                                 score -= (p.latency || 1000) / 10;
 
-                                // BIG bonus for HTTP (more stable than SOCKS)
                                 if (protocol === 'http' || protocol === 'https') {
                                     score += 40;
                                 }
@@ -203,17 +207,132 @@ class ProxyManager {
         });
     }
 
+    async fetch911Proxy() {
+        this.log('📡 Buscando proxies do 911Proxy...');
+
+        return new Promise((resolve) => {
+            const url = 'https://www.911proxy.com/web_v1/free-proxy/list?page_size=60&page=1&country_code=BR';
+
+            const req = https.get(url, (res) => {
+                let data = '';
+
+                res.on('data', (chunk) => {
+                    data += chunk;
+                });
+
+                res.on('end', () => {
+                    try {
+                        const response = JSON.parse(data);
+
+                        if (response.code === 200 && response.data && Array.isArray(response.data.list)) {
+                            const proxies = response.data.list
+                                .filter(p => p.status === 1) // Apenas proxies ativos
+                                .map(p => {
+                                    // protocol: 2 = HTTP, 4 = SOCKS4, 5 = SOCKS5
+                                    let protocol = 'http';
+                                    if (p.protocol === 4) protocol = 'socks4';
+                                    else if (p.protocol === 5) protocol = 'socks5';
+
+                                    let score = 0;
+                                    score += (p.uptime || 50);
+                                    score += (100 - (p.latency || 50));
+                                    if (protocol === 'http') score += 40;
+
+                                    return {
+                                        url: `${protocol}://${p.ip}:${p.port}`,
+                                        source: '911proxy',
+                                        score: Math.max(0, score),
+                                        upTime: p.uptime || 0,
+                                        latency: p.latency || 999
+                                    };
+                                });
+
+                            this.log(`✅ 911Proxy: ${proxies.length} proxies encontrados`);
+                            resolve(proxies);
+                        } else {
+                            this.log('⚠️ 911Proxy: nenhum proxy retornado');
+                            resolve([]);
+                        }
+                    } catch (error) {
+                        this.log(`⚠️ Erro ao parsear 911Proxy: ${error.message}`);
+                        resolve([]);
+                    }
+                });
+            });
+
+            req.on('error', (error) => {
+                this.log(`⚠️ Erro ao buscar 911Proxy: ${error.message}`);
+                resolve([]);
+            });
+
+            req.setTimeout(5000);
+        });
+    }
+
+    async fetchBrightData() {
+        // Verificar se credenciais do BrightData estão configuradas
+        const host = process.env.BRIGHTDATA_HOST;
+        const port = process.env.BRIGHTDATA_PORT;
+        const username = process.env.BRIGHTDATA_USERNAME;
+        const password = process.env.BRIGHTDATA_PASSWORD;
+
+        if (!host || !port || !username || !password) {
+            // BrightData não configurado, pular silenciosamente
+            return [];
+        }
+
+        this.log('📡 Testando proxy BrightData...');
+
+        return new Promise((resolve) => {
+            const { exec } = require('child_process');
+            const proxyUrl = `http://${username}-country-br:${password}@${host}:${port}`;
+
+            // Testar se o proxy funciona
+            const testCmd = `curl --proxy ${host}:${port} --proxy-user ${username}-country-br:${password} "https://geo.brdtest.com/mygeo.json" --max-time 10`;
+
+            exec(testCmd, (error, stdout, stderr) => {
+                if (error) {
+                    this.log(`⚠️ BrightData: falha no teste - ${error.message}`);
+                    resolve([]);
+                    return;
+                }
+
+                try {
+                    const geoData = JSON.parse(stdout);
+                    if (geoData.country === 'BR') {
+                        this.log(`✅ BrightData: proxy BR funcionando! IP: ${geoData.ip} (${geoData.country})`);
+                        resolve([{
+                            url: proxyUrl,
+                            source: 'brightdata',
+                            score: -10, // Última prioridade - usar apenas se todos gratuitos falharem
+                            upTime: 99,
+                            latency: 50
+                        }]);
+                    } else {
+                        this.log(`⚠️ BrightData: resposta inválida`);
+                        resolve([]);
+                    }
+                } catch (e) {
+                    this.log(`⚠️ BrightData: erro ao parsear resposta - ${e.message}`);
+                    resolve([]);
+                }
+            });
+        });
+    }
+
     async fetchProxies() {
         this.log('🔍 Iniciando busca de proxies...');
 
         try {
-            const [proxyscrape, litport, geonode] = await Promise.all([
+            const [brightdata, proxyscrape, litport, geonode, proxy911] = await Promise.all([
+                this.fetchBrightData().catch(() => []),
                 this.fetchProxyScrape().catch(() => []),
                 this.fetchLitport().catch(() => []),
-                this.fetchGeonode().catch(() => [])
+                this.fetchGeonode().catch(() => []),
+                this.fetch911Proxy().catch(() => [])
             ]);
 
-            const allProxies = [...proxyscrape, ...litport, ...geonode];
+            const allProxies = [...brightdata, ...proxyscrape, ...litport, ...geonode, ...proxy911];
 
             if (allProxies.length === 0) {
                 this.log('⚠️ Nenhum provedor retornou proxies.');
@@ -223,9 +342,10 @@ class ProxyManager {
             // Sort by score (higher = better, HTTP will be first)
             allProxies.sort((a, b) => b.score - a.score);
 
+            // Guardar objetos com url e source
+            this.proxyData = allProxies;
             this.proxies = allProxies.map(p => p.url);
 
-            // FIX: Use allProxies instead of this.proxies to access .url
             const httpCount = allProxies.filter(p => p.url.startsWith('http')).length;
             const socksCount = allProxies.length - httpCount;
 
@@ -242,6 +362,8 @@ class ProxyManager {
     }
 
     async testProxy(proxyUrl) {
+        // Simple fast TCP test - just check if proxy is reachable
+        // We test quickly and fall back to no-proxy mode if it fails in browser
         return new Promise((resolve) => {
             const proxyMatch = proxyUrl.match(/(https?|socks[45]):\/\/([^:]+):(\d+)/);
             if (!proxyMatch) {
@@ -249,62 +371,31 @@ class ProxyManager {
                 return;
             }
 
-            const protocol = proxyMatch[1];
             const proxyHost = proxyMatch[2];
             const proxyPort = parseInt(proxyMatch[3]);
 
-            // Test SOCKS proxies via TCP socket
-            if (protocol === 'socks4' || protocol === 'socks5') {
-                const net = require('net');
-                const socket = new net.Socket();
+            const net = require('net');
+            const socket = new net.Socket();
 
-                socket.setTimeout(3000);
+            // Fast timeout - if proxy doesn't respond in 2s, skip it
+            socket.setTimeout(2000);
 
-                socket.on('connect', () => {
-                    socket.destroy();
-                    resolve(true);
-                });
-
-                socket.on('timeout', () => {
-                    socket.destroy();
-                    resolve(false);
-                });
-
-                socket.on('error', () => {
-                    socket.destroy();
-                    resolve(false);
-                });
-
-                socket.connect(proxyPort, proxyHost);
-                return;
-            }
-
-            // Test HTTP proxies via CONNECT
-            const options = {
-                host: proxyHost,
-                port: proxyPort,
-                method: 'CONNECT',
-                path: 'www.doctoralia.com.br:443',
-                timeout: 3000
-            };
-
-            const req = http.request(options);
-
-            req.on('connect', (res, socket) => {
-                socket.end();
+            socket.on('connect', () => {
+                socket.destroy();
                 resolve(true);
             });
 
-            req.on('timeout', () => {
-                req.destroy();
+            socket.on('timeout', () => {
+                socket.destroy();
                 resolve(false);
             });
 
-            req.on('error', () => {
+            socket.on('error', () => {
+                socket.destroy();
                 resolve(false);
             });
 
-            req.end();
+            socket.connect(proxyPort, proxyHost);
         });
     }
 
@@ -315,20 +406,35 @@ class ProxyManager {
             });
         }
 
-        // If still no proxies and allowNoProxy is true, return null (no proxy mode)
-        if (this.proxies.length === 0 && allowNoProxy) {
+        // If still no proxies, return null (no proxy mode)
+        if (this.proxies.length === 0) {
             this.log('⚠️ Nenhum proxy disponível. Modo SEM PROXY ativado.');
             return null;
         }
 
-        let attempts = 0;
-        const maxAttempts = Math.min(15, this.proxies.length);
+        // Contar proxies gratuitos não testados/falhos
+        const freeProxies = this.proxyData ? this.proxyData.filter(p => p.source !== 'brightdata') : [];
+        const untested = freeProxies.filter(p => !this.failedProxies.has(p.url));
 
-        while (attempts < maxAttempts) {
+        this.log(`📊 Proxies: ${untested.length} gratuitos disponíveis de ${freeProxies.length} total`);
+
+        // Testar TODOS os proxies gratuitos disponíveis
+        let attempts = 0;
+        const totalFreeProxies = freeProxies.length;
+
+        while (attempts < totalFreeProxies) {
             const proxy = this.proxies[this.currentIndex];
+            const proxyInfo = this.proxyData ? this.proxyData.find(p => p.url === proxy) : null;
+            const source = proxyInfo ? proxyInfo.source : 'unknown';
+
+            // Pular BrightData nesta fase (será testado depois)
+            if (source === 'brightdata') {
+                this.currentIndex = (this.currentIndex + 1) % this.proxies.length;
+                continue;
+            }
 
             if (!this.failedProxies.has(proxy)) {
-                this.log(`🔍 Testando proxy ${attempts + 1}/${maxAttempts}: ${proxy}`);
+                this.log(`🔍 Testando proxy gratuito ${attempts + 1}/${totalFreeProxies}: ${proxy} (${source})`);
 
                 const isWorking = await this.testProxy(proxy);
 
@@ -336,11 +442,11 @@ class ProxyManager {
                     const ipMatch = proxy.match(/\/\/([^:]+):/);
                     const proxyIP = ipMatch ? ipMatch[1] : proxy;
 
-                    this.log(`✅ Proxy conectado com sucesso! IP: ${proxyIP}`);
-                    this.log(`🌐 Usando proxy: ${proxy}`);
+                    this.log(`✅ Proxy conectado! IP: ${proxyIP} (${source})`);
+                    this.log(`🌐 Usando proxy: ${proxy} (${source})`);
                     return proxy;
                 } else {
-                    this.log(`❌ Proxy falhou no teste: ${proxy}`);
+                    this.log(`❌ Proxy falhou: ${proxy} (${source})`);
                     this.markProxyAsFailed(proxy);
                 }
             }
@@ -349,15 +455,24 @@ class ProxyManager {
             attempts++;
         }
 
-        // All proxies failed
-        if (allowNoProxy) {
-            this.log('⚠️ Todos os proxies falharam. Modo SEM PROXY ativado.');
-            return null;
+        // Todos os proxies gratuitos falharam - tentar BrightData se configurado
+        const brightdataProxy = this.proxyData ? this.proxyData.find(p => p.source === 'brightdata') : null;
+        if (brightdataProxy && !this.failedProxies.has(brightdataProxy.url)) {
+            this.log('💰 Todos proxies gratuitos falharam. Tentando BrightData (pago)...');
+            return brightdataProxy.url;
         }
 
-        const error = new Error('❌ Nenhum proxy funcional.');
-        this.log(error.message);
-        throw error;
+        // Fallback para modo sem proxy
+        this.log('⚠️ Todos os proxies falharam. Modo SEM PROXY ativado.');
+        return null;
+    }
+
+    // Método para resetar proxies falhos (para tentar novamente após erros no modo sem proxy)
+    resetFailedProxies() {
+        const count = this.failedProxies.size;
+        this.failedProxies.clear();
+        this.currentIndex = 0;
+        this.log(`🔄 ${count} proxies resetados para nova tentativa`);
     }
 
     markProxyAsFailed(proxyUrl) {

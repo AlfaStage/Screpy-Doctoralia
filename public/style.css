@@ -723,6 +723,17 @@ small {
     margin-bottom: 28px;
 }
 
+.stats-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.stats-row .stat-card {
+    flex: 1;
+    text-align: center;
+}
+
 .stat-card {
     background: var(--input-bg);
     padding: 20px;

@@ -1,4 +1,5 @@
 const { randomDelay, scrollPage } = require('./utils');
+const { formatProfilePhones } = require('./phoneFormatter');
 
 class ProfileExtractor {
     constructor(page) {
@@ -177,7 +178,8 @@ class ProfileExtractor {
             console.log('Error parsing URL for fallback data:', e.message);
         }
 
-        return profileData;
+        // Format phone numbers to E.164 before returning
+        return formatProfilePhones(profileData);
     }
 
     /**

@@ -1,6 +1,6 @@
 node_modules/
-results/*.csv
-results/*.json
 .env
 *.log
 .DS_Store
+results/*.csv
+results/*.json

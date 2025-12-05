@@ -25,7 +25,8 @@ class BrowserManager {
 
     let actualProxyUrl = proxyUrl;
 
-    // If proxy is SOCKS, create local HTTP server using proxy-chain
+    // Use proxy-chain ONLY for SOCKS proxies (they need tunneling)
+    // HTTP proxies go directly to the browser (they worked before)
     if (proxyUrl && (proxyUrl.includes('socks4://') || proxyUrl.includes('socks5://'))) {
       console.log(`🔗 Criando servidor local para proxy SOCKS: ${proxyUrl}`);
 
@@ -40,8 +41,28 @@ class BrowserManager {
       });
 
       await this.proxyServer.listen();
-      actualProxyUrl = `http://127.0.0.1:${this.proxyServer.port}`;
-      console.log(`✅ Servidor proxy local criado em ${actualProxyUrl} -> ${proxyUrl}`);
+      const localProxyUrl = `http://127.0.0.1:${this.proxyServer.port}`;
+      console.log(`✅ Servidor proxy local criado em ${localProxyUrl} -> ${proxyUrl}`);
+
+      // Testar se o túnel está funcionando antes de usar
+      console.log(`🧪 Testando túnel SOCKS...`);
+      const tunnelWorks = await this.testProxyTunnel(localProxyUrl);
+
+      if (tunnelWorks) {
+        console.log(`✅ Túnel SOCKS funcionando corretamente!`);
+        actualProxyUrl = localProxyUrl;
+      } else {
+        console.log(`❌ Túnel SOCKS falhou no teste!`);
+        // Fechar servidor que não funcionou
+        await this.proxyServer.close();
+        this.proxyServer = null;
+        // Lançar erro para que o chamador saiba que precisa tentar outro proxy
+        throw new Error(`TUNNEL_FAILED: Túnel SOCKS para ${proxyUrl} não funcionou`);
+      }
+    } else if (proxyUrl) {
+      // HTTP proxy - use directly (no proxy-chain overhead)
+      console.log(`🌐 Usando proxy HTTP direto: ${proxyUrl}`);
+      actualProxyUrl = proxyUrl;
     }
 
     // Add proxy if provided
@@ -81,16 +102,74 @@ class BrowserManager {
       await this.browser.close();
     }
 
-    // Close proxy server if it was created for SOCKS
+    // Close SOCKS proxy server if it was created
     if (this.proxyServer) {
       await this.proxyServer.close();
-      console.log('🔌 Servidor proxy local fechado');
+      console.log('🔌 Servidor proxy SOCKS local fechado');
       this.proxyServer = null;
     }
   }
 
   getPage() {
     return this.page;
+  }
+
+  // Testar se o túnel do proxy está funcionando
+  async testProxyTunnel(localProxyUrl) {
+    return new Promise((resolve) => {
+      const http = require('http');
+      const { URL } = require('url');
+
+      try {
+        const proxyUrlParsed = new URL(localProxyUrl);
+
+        // Fazer requisição HTTP simples através do proxy
+        const options = {
+          hostname: proxyUrlParsed.hostname,
+          port: proxyUrlParsed.port,
+          path: 'http://httpbin.org/ip', // Serviço simples para teste
+          method: 'GET',
+          timeout: 10000, // 10 segundos
+          headers: {
+            'Host': 'httpbin.org'
+          }
+        };
+
+        const req = http.request(options, (res) => {
+          let data = '';
+
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+
+          res.on('end', () => {
+            if (res.statusCode === 200) {
+              console.log(`🧪 Teste do túnel: resposta recebida (${res.statusCode})`);
+              resolve(true);
+            } else {
+              console.log(`🧪 Teste do túnel: código inesperado (${res.statusCode})`);
+              resolve(false);
+            }
+          });
+        });
+
+        req.on('error', (error) => {
+          console.log(`🧪 Teste do túnel: erro - ${error.message}`);
+          resolve(false);
+        });
+
+        req.on('timeout', () => {
+          console.log(`🧪 Teste do túnel: timeout`);
+          req.destroy();
+          resolve(false);
+        });
+
+        req.end();
+      } catch (error) {
+        console.log(`🧪 Teste do túnel: exceção - ${error.message}`);
+        resolve(false);
+      }
+    });
   }
 }
 

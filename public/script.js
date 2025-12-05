@@ -16,8 +16,12 @@ const closeModalBtn = document.getElementById('close-modal');
 const modalTitle = document.getElementById('modal-title');
 const modalStatus = document.getElementById('modal-status');
 const modalProgressText = document.getElementById('modal-progress-text');
+const modalSuccessRate = document.getElementById('modal-success-rate');
+const modalPhonesFound = document.getElementById('modal-phones-found');
+const modalErrors = document.getElementById('modal-errors');
+const modalSkipped = document.getElementById('modal-skipped');
+const modalSpeed = document.getElementById('modal-speed');
 const modalTimeRemaining = document.getElementById('modal-time-remaining');
-const modalTotalExtracted = document.getElementById('modal-total-extracted');
 const modalLogs = document.getElementById('modal-logs');
 const modalResultsBody = document.getElementById('modal-results-body');
 const btnPause = document.getElementById('btn-pause');
@@ -98,30 +102,42 @@ socket.on('initial-state', (data) => {
 });
 
 socket.on('scrape-started', ({ id }) => {
-    // We'll get the full data on initial-state or we can fetch it
-    // For now, just mark it as active and it will be populated by progress events
-    const config = { city: '', specialties: [], quantity: 0 }; // Placeholder
-    activeScrapers.set(id, {
+    // Criar scraper com dados iniciais
+    const config = { city: document.getElementById('city').value || '', specialties: Array.from(selectedSpecialties), quantity: parseInt(document.getElementById('quantity').value) || 10 };
+    const scraper = {
         id,
         config,
         status: 'running',
         current: 0,
-        total: 0,
+        total: config.quantity,
         logs: [],
         results: [],
-        startTime: Date.now()
-    });
+        startTime: Date.now(),
+        successCount: 0,
+        errorCount: 0,
+        skippedCount: 0,
+        phonesFound: 0
+    };
+    activeScrapers.set(id, scraper);
     renderActiveScrapers();
+
+    // Abrir modal automaticamente ao iniciar
+    currentModalScraperId = id;
+    openModal(scraper);
 });
 
-socket.on('scraper-progress', ({ id, current, total }) => {
-    const scraper = activeScrapers.get(id);
+socket.on('scraper-progress', (data) => {
+    const scraper = activeScrapers.get(data.id);
     if (scraper) {
-        scraper.current = current;
-        scraper.total = total;
-        scraper.progress = { current, total };
+        scraper.current = data.current;
+        scraper.total = data.total;
+        scraper.successCount = data.successCount || 0;
+        scraper.errorCount = data.errorCount || 0;
+        scraper.skippedCount = data.skippedCount || 0;
+        scraper.phonesFound = data.phonesFound || 0;
+        scraper.progress = data;
         renderActiveScrapers();
-        if (currentModalScraperId === id) {
+        if (currentModalScraperId === data.id) {
             updateModal(scraper);
         }
     }
@@ -383,8 +399,35 @@ function openModal(id, isActive) {
     const item = isActive ? activeScrapers.get(id) : history.find(h => h.id === id);
     if (!item) return;
 
+    // Limpar logs anteriores ao abrir modal
+    modalLogs.innerHTML = '';
+
+    // Limpar resultados anteriores
+    modalResultsBody.innerHTML = '';
+
     modal.classList.remove('hidden');
+
+    // Carregar logs existentes desta extração (verificar múltiplas fontes)
+    const logs = item.logs || (item.result ? item.result.logs : null) || [];
+    if (logs && logs.length > 0) {
+        logs.forEach(log => appendLogToModal(log));
+    } else {
+        // Se não há logs, mostrar mensagem
+        const noLogsDiv = document.createElement('div');
+        noLogsDiv.className = 'log-entry';
+        noLogsDiv.style.fontStyle = 'italic';
+        noLogsDiv.textContent = 'Nenhum log disponível para esta extração';
+        modalLogs.appendChild(noLogsDiv);
+    }
+
+    // Carregar resultados existentes desta extração
+    const results = item.results || (item.result ? item.result.data : null) || [];
+    if (results && results.length > 0) {
+        results.forEach(r => appendResultToModal(r));
+    }
+
     updateModal(item);
+    updateModalControls(item);
 }
 
 function closeModal() {
@@ -406,56 +449,107 @@ function updateModal(item) {
     modalStatus.textContent = item.status;
     modalStatus.className = `status-badge ${item.status}`;
 
-    const current = item.current || (item.result ? item.result.count : 0);
-    const total = item.total || item.config.quantity;
+    const quantityRequested = item.config?.quantity || item.total || 0;
+    const successCount = item.successCount || item.progress?.successCount || (item.result ? item.result.count : 0) || 0;
+    const errorCount = item.errorCount || item.progress?.errorCount || (item.result ? item.result.errorCount : 0) || 0;
+    const skippedCount = item.skippedCount || item.progress?.skippedCount || (item.result ? item.result.skippedCount : 0) || 0;
+    const phonesFound = item.phonesFound || item.progress?.phonesFound || (item.result ? item.result.phonesFound : 0) || 0;
+    const totalExtracted = successCount + errorCount + skippedCount;
 
-    // Update progress text
-    modalProgressText.textContent = `${current}/${total}`;
-    modalTotalExtracted.textContent = current;
+    // Progresso: sucesso comparado com quantidade pedida
+    const progressPercent = quantityRequested > 0 ? Math.round((successCount / quantityRequested) * 100) : 0;
+    modalProgressText.textContent = `${successCount}/${quantityRequested} (${progressPercent}%)`;
 
-    // Time remaining or duration
+    // Erros: quantidade de erros / total extraído
+    const errorPercent = totalExtracted > 0 ? Math.round((errorCount / totalExtracted) * 100) : 0;
+    modalErrors.textContent = `${errorCount} (${errorPercent}%)`;
+
+    // Pulados: pulados / total extraído
+    const skippedPercent = totalExtracted > 0 ? Math.round((skippedCount / totalExtracted) * 100) : 0;
+    modalSkipped.textContent = `${skippedCount} (${skippedPercent}%)`;
+
+    // Taxa de sucesso: médicos que deram certo / total extraídos
+    const successRate = totalExtracted > 0 ? Math.round((successCount / totalExtracted) * 100) : 0;
+    modalSuccessRate.textContent = `${successRate}%`;
+
+    // Color coding for success rate
+    modalSuccessRate.className = 'stat-value';
+    if (totalExtracted > 0) {
+        if (successRate >= 90) modalSuccessRate.classList.add('text-success');
+        else if (successRate >= 70) modalSuccessRate.classList.add('text-warning');
+        else modalSuccessRate.classList.add('text-danger');
+    }
+
+    // Telefones: médicos com telefone
+    modalPhonesFound.textContent = phonesFound;
+
+    // Time and speed calculations
     const isCompleted = item.status === 'completed' || item.status === 'error';
 
     if (isCompleted) {
+        // Tempo de duração: tempo total que levou
         if (modalTimeLabel) modalTimeLabel.textContent = 'Tempo de Duração';
 
-        // Try to find duration in various places
         let durationSecs = item.duration;
-
         if (!durationSecs && item.metadata?.startTime && item.metadata?.endTime) {
             const start = new Date(item.metadata.startTime).getTime();
             const end = new Date(item.metadata.endTime).getTime();
             durationSecs = Math.floor((end - start) / 1000);
         } else if (!durationSecs && item.startTime && item.timestamp) {
             durationSecs = Math.floor((item.timestamp - item.startTime) / 1000);
+        } else if (!durationSecs && item.startTime) {
+            durationSecs = Math.floor((Date.now() - item.startTime) / 1000);
         }
 
         if (durationSecs) {
             const mins = Math.floor(durationSecs / 60);
             const secs = durationSecs % 60;
             modalTimeRemaining.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+            // Velocidade média: extrações por minuto
+            const avgSpeed = durationSecs > 0 ? ((successCount / durationSecs) * 60).toFixed(1) : 0;
+            modalSpeed.textContent = `${avgSpeed}/min`;
         } else {
             modalTimeRemaining.textContent = 'N/A';
+            modalSpeed.textContent = '0/min';
         }
     } else {
+        // Tempo restante: estimativa baseada na velocidade atual (sem contar erros/pulados)
         if (modalTimeLabel) modalTimeLabel.textContent = 'Tempo Restante';
 
-        if (item.estimatedTimeRemaining) {
-            const mins = Math.floor(item.estimatedTimeRemaining / 60);
-            const secs = item.estimatedTimeRemaining % 60;
-            modalTimeRemaining.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+        if (item.startTime && successCount > 0) {
+            const elapsedSecs = (Date.now() - item.startTime) / 1000;
+            const currentSpeed = successCount / elapsedSecs; // extrações por segundo
+            const remaining = quantityRequested - successCount;
+            const estimatedSecs = currentSpeed > 0 ? Math.ceil(remaining / currentSpeed) : 0;
+
+            if (estimatedSecs > 0) {
+                const mins = Math.floor(estimatedSecs / 60);
+                const secs = estimatedSecs % 60;
+                modalTimeRemaining.textContent = `~${mins}:${secs.toString().padStart(2, '0')}`;
+            } else {
+                modalTimeRemaining.textContent = '--:--';
+            }
+
+            // Velocidade atual: extrações por minuto
+            const speed = (currentSpeed * 60).toFixed(1);
+            modalSpeed.textContent = `${speed}/min`;
         } else {
             modalTimeRemaining.textContent = '--:--';
+            modalSpeed.textContent = '--/min';
         }
     }
 
-    // Results
-    modalResultsBody.innerHTML = '';
-    const results = item.results || (item.result ? item.result.data : []);
-    if (results && results.length > 0) {
-        results.forEach(r => appendResultToModal(r));
-    } else {
-        modalResultsBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-tertiary); font-style: italic;">Nenhum resultado disponível</td></tr>';
+    // Resultados são adicionados ao vivo via evento scraper-result
+    // Só recarregar se for modal de histórico (extração já concluída)
+    const isCompletedOrError = item.status === 'completed' || item.status === 'error';
+    if (isCompletedOrError && modalResultsBody.children.length === 0) {
+        const results = item.results || (item.result ? item.result.data : []);
+        if (results && results.length > 0) {
+            results.forEach(r => appendResultToModal(r));
+        } else {
+            modalResultsBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-tertiary); font-style: italic;">Nenhum resultado disponível</td></tr>';
+        }
     }
 }
 
@@ -492,19 +586,12 @@ function appendLogToModal(log) {
 
 function appendResultToModal(data) {
     const tr = document.createElement('tr');
+    const especialidades = data.especialidades && data.especialidades.length > 0
+        ? data.especialidades.join(', ')
+        : '-';
     tr.innerHTML = `
         <td>${data.nome}</td>
-        <td>${data.especialidades && data.especialidades.length > 0 ? data.especialidades.join(', ') : '-'}</td>
-        <td>${data.numeroMovel || data.numeroFixo || '-'}</td>
-    `;
-    modalResultsBody.appendChild(tr);
-}
-
-function appendResultToModal(data) {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-        <td>${data.nome}</td>
-        <td>${data.especialidades.join(', ')}</td>
+        <td>${especialidades}</td>
         <td>${data.numeroMovel || data.numeroFixo || '-'}</td>
     `;
     modalResultsBody.appendChild(tr);

@@ -34,6 +34,7 @@ class DoctoraliaScraper {
             successCount: 0,
             errorCount: 0,
             skippedCount: 0,
+            phonesFound: 0,
             message: '',
             startTime: null,
             estimatedTimeRemaining: null
@@ -41,8 +42,14 @@ class DoctoraliaScraper {
     }
 
     async initialize() {
+        // Small delay to ensure frontend is connected and listening to logs
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        this.proxyManager = new ProxyManager((msg) => this.emitProgress(msg));
+
         // Try to get proxy, fallback to no proxy if all fail
-        this.currentProxy = await this.proxyManager.getNextProxy(true); // allowNoProxy=true
+        // Pass true to allowNoProxy fallback
+        this.currentProxy = await this.proxyManager.getNextProxy(true);
 
         if (this.currentProxy === null) {
             this.emitProgress('⚠️ Modo SEM PROXY ativado. Usando rate limiting.');
@@ -53,16 +60,56 @@ class DoctoraliaScraper {
             this.currentDelay = 0; // No delay with proxy
         }
 
-        this.browserManager = new BrowserManager();
-        const page = await this.browserManager.initialize(this.currentProxy);
+        // Tentar inicializar o browser com o proxy
+        // Se for SOCKS e o túnel falhar, tentar próximo proxy
+        let initAttempts = 0;
+        const maxInitAttempts = 5;
 
-        this.searchHandler = new SearchHandler(page);
-        this.profileExtractor = new ProfileExtractor(page);
+        while (initAttempts < maxInitAttempts) {
+            try {
+                this.browserManager = new BrowserManager();
+                const page = await this.browserManager.initialize(this.currentProxy);
+
+                this.searchHandler = new SearchHandler(page);
+                this.profileExtractor = new ProfileExtractor(page);
+                break; // Sucesso, sair do loop
+
+            } catch (error) {
+                initAttempts++;
+
+                // Se foi erro de túnel SOCKS, marcar como falho e tentar próximo
+                if (error.message && error.message.includes('TUNNEL_FAILED')) {
+                    this.emitProgress(`❌ Túnel falhou. Tentando próximo proxy... (${initAttempts}/${maxInitAttempts})`);
+
+                    if (this.currentProxy) {
+                        this.proxyManager.markProxyAsFailed(this.currentProxy);
+                    }
+
+                    // Tentar próximo proxy
+                    this.currentProxy = await this.proxyManager.getNextProxy(true);
+
+                    if (this.currentProxy === null) {
+                        this.emitProgress('⚠️ Sem mais proxies. Modo SEM PROXY ativado.');
+                        this.usingProxy = false;
+                        this.currentDelay = 3000;
+                    }
+
+                    continue; // Tentar novamente com novo proxy
+                }
+
+                // Se não foi erro de túnel ou esgotou tentativas, propagar erro
+                if (initAttempts >= maxInitAttempts) {
+                    throw error;
+                }
+            }
+        }
+
         this.status = 'running';
         this.progress.startTime = Date.now();
         this.startTime = this.progress.startTime;
 
         const mode = this.usingProxy ? `proxy ${this.currentProxy}` : 'SEM PROXY';
+        this.emitProgress(`Scraper inicializado com ${mode}`);
         console.log(`Scraper ${this.id} initialized with ${mode}`);
     }
 
@@ -105,14 +152,28 @@ class DoctoraliaScraper {
         await this.close();
     }
 
+    getTimestamp() {
+        // Always use Brazil timezone (America/Sao_Paulo, UTC-3)
+        const now = new Date();
+        const brazilTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+
+        const hours = String(brazilTime.getHours()).padStart(2, '0');
+        const minutes = String(brazilTime.getMinutes()).padStart(2, '0');
+        const seconds = String(brazilTime.getSeconds()).padStart(2, '0');
+        return `[${hours}:${minutes}:${seconds}]`;
+    }
+
     emitProgress(message, data = {}) {
         this.progress.message = message;
         Object.assign(this.progress, data);
 
-        // Store log
+        // Store log with Brazil timestamp
+        const timestamp = this.getTimestamp();
+        const fullMessage = `${timestamp} ${message}`;
+
         this.logs.push({
             timestamp: new Date().toISOString(),
-            message: message
+            message: fullMessage
         });
 
         // Calculate estimation
@@ -140,14 +201,30 @@ class DoctoraliaScraper {
 
         this.io.emit('scraper-log', {
             id: this.id,
-            message: `[${new Date().toLocaleTimeString()}] ${message}`
+            message: fullMessage
         });
+
+        // Also log to terminal with timestamp
+        console.log(fullMessage);
+    }
+
+    // Public method to add external logs (e.g., from Manager)
+    addLog(message) {
+        const timestamp = this.getTimestamp();
+        const fullMessage = `${timestamp} ${message}`;
+
+        this.logs.push({
+            timestamp: new Date().toISOString(),
+            message: fullMessage
+        });
+
+        console.log(fullMessage);
     }
 
     async scrape(specialties, city, quantity, onlyWithPhone = false) {
         try {
             this.results = [];
-            this.logs = [];
+            // Do NOT clear logs here to preserve initialization logs
             this.config = { specialties, city, quantity, onlyWithPhone };
             this.progress.total = quantity;
             this.progress.successCount = 0;
@@ -167,6 +244,7 @@ class DoctoraliaScraper {
                 const specialty = specialties[i];
                 this.emitProgress(`Buscando ${specialty} (${i + 1}/${specialties.length})...`);
 
+                this.emitProgress(`Acessando Doctoralia...`);
                 await this.searchHandler.performSearch(specialty, city, (msg) => this.emitProgress(msg.message));
 
                 await this.checkState();
@@ -238,6 +316,10 @@ class DoctoraliaScraper {
                         this.emitProgress(`⏭️ Médico pulado (sem telefone): ${profileData.nome}`);
                         console.log(`⏭️ Skipping ${profileData.nome} - no phone number`);
                         continue; // Don't count as success, continue to next
+                    }
+
+                    if (this.profileExtractor.hasPhoneNumber(profileData)) {
+                        this.progress.phonesFound++;
                     }
 
                     // Success!
@@ -366,11 +448,18 @@ class DoctoraliaScraper {
                 error.message.includes('ERR_TUNNEL_CONNECTION_FAILED') ||
                 error.message.includes('ERR_PROXY_CONNECTION_FAILED') ||
                 error.message.includes('ERR_CONNECTION_CLOSED') ||
-                error.message.includes('ERR_CONNECTION_REFUSED')
+                error.message.includes('ERR_CONNECTION_REFUSED') ||
+                error.message.includes('ERR_TIMED_OUT') ||
+                error.message.includes('ERR_NAME_NOT_RESOLVED')
             );
 
-            if (isProxyError) {
-                this.emitProgress('⚠️ Erro de proxy detectado, tentando próximo proxy...');
+            // Limitar tentativas de retry (máximo 3 retries)
+            if (!this.retryCount) this.retryCount = 0;
+            const maxRetries = 3;
+
+            if (isProxyError && this.retryCount < maxRetries) {
+                this.retryCount++;
+                this.emitProgress(`⚠️ Erro de proxy detectado. Tentativa ${this.retryCount}/${maxRetries}...`);
 
                 // Mark current proxy as failed
                 if (this.currentProxy) {
@@ -380,25 +469,122 @@ class DoctoraliaScraper {
                 // Close current browser
                 await this.browserManager.close();
 
-                // Try to get a new proxy
-                try {
+                // Try to get a new proxy (pode retornar null para modo sem proxy)
+                this.currentProxy = await this.proxyManager.getNextProxy();
+
+                if (this.currentProxy === null) {
+                    this.emitProgress('🔄 Reiniciando em modo SEM PROXY...');
+                    this.usingProxy = false;
+                    this.currentDelay = 3000; // Delay para modo sem proxy
+                } else {
+                    this.emitProgress(`🔄 Reiniciando com proxy: ${this.currentProxy}`);
+                    this.usingProxy = true;
+                }
+
+                this.browserManager = new BrowserManager();
+                const page = await this.browserManager.initialize(this.currentProxy);
+
+                this.searchHandler = new SearchHandler(page);
+                this.profileExtractor = new ProfileExtractor(page);
+
+                // Retry the scrape
+                this.emitProgress('🔄 Tentando novamente...');
+                return await this.scrape(
+                    this.config.specialties,
+                    this.config.city,
+                    this.config.quantity,
+                    this.config.onlyWithPhone
+                );
+            }
+
+            // Se esgotou os retries COM PROXY, ir para modo sem proxy
+            if (isProxyError && this.retryCount >= maxRetries && this.usingProxy) {
+                this.emitProgress('⚠️ Esgotadas tentativas com proxy. Iniciando modo SEM PROXY...');
+
+                await this.browserManager.close();
+
+                this.currentProxy = null;
+                this.usingProxy = false;
+                this.currentDelay = 3000;
+                this.retryCount = 0; // Reset contador
+                this.noProxyErrors = 0; // Contador de erros no modo sem proxy
+
+                this.browserManager = new BrowserManager();
+                const page = await this.browserManager.initialize(null);
+
+                this.searchHandler = new SearchHandler(page);
+                this.profileExtractor = new ProfileExtractor(page);
+
+                this.emitProgress('🔄 Tentando em modo SEM PROXY...');
+                return await this.scrape(
+                    this.config.specialties,
+                    this.config.city,
+                    this.config.quantity,
+                    this.config.onlyWithPhone
+                );
+            }
+
+            // Se está no modo sem proxy e deu erro, contar erros
+            if (isProxyError && !this.usingProxy) {
+                if (!this.noProxyErrors) this.noProxyErrors = 0;
+                this.noProxyErrors++;
+
+                this.emitProgress(`⚠️ Erro sem proxy ${this.noProxyErrors}/2...`);
+
+                // Após 2 erros no modo sem proxy, voltar a tentar proxies
+                if (this.noProxyErrors >= 2) {
+                    this.emitProgress('🔄 2 erros sem proxy. Resetando proxies para nova tentativa...');
+
+                    await this.browserManager.close();
+
+                    // Resetar proxies falhos para tentar novamente
+                    this.proxyManager.resetFailedProxies();
+                    this.noProxyErrors = 0;
+                    this.retryCount = 0;
+
+                    // Tentar obter um novo proxy
                     this.currentProxy = await this.proxyManager.getNextProxy();
 
-                    this.emitProgress('🔄 Reiniciando com novo proxy...');
+                    if (this.currentProxy) {
+                        this.usingProxy = true;
+                        this.currentDelay = 0;
+                        this.emitProgress(`🔄 Novo proxy obtido: ${this.currentProxy}`);
+                    } else {
+                        this.usingProxy = false;
+                        this.currentDelay = 3000;
+                        this.emitProgress('⚠️ Nenhum proxy disponível, continuando sem proxy...');
+                    }
+
                     this.browserManager = new BrowserManager();
                     const page = await this.browserManager.initialize(this.currentProxy);
 
                     this.searchHandler = new SearchHandler(page);
                     this.profileExtractor = new ProfileExtractor(page);
 
-                    // Retry the scrape with new proxy
-                    this.emitProgress('🔄 Tentando novamente com novo proxy...');
-                    return await this.scrape(config);
-
-                } catch (proxyError) {
-                    this.emitProgress(`❌ Erro fatal: ${proxyError.message}`);
-                    throw proxyError;
+                    return await this.scrape(
+                        this.config.specialties,
+                        this.config.city,
+                        this.config.quantity,
+                        this.config.onlyWithPhone
+                    );
                 }
+
+                // Se ainda não chegou a 2 erros, tenta novamente sem proxy
+                await this.browserManager.close();
+
+                this.browserManager = new BrowserManager();
+                const page = await this.browserManager.initialize(null);
+
+                this.searchHandler = new SearchHandler(page);
+                this.profileExtractor = new ProfileExtractor(page);
+
+                this.emitProgress('🔄 Tentando novamente sem proxy...');
+                return await this.scrape(
+                    this.config.specialties,
+                    this.config.city,
+                    this.config.quantity,
+                    this.config.onlyWithPhone
+                );
             }
 
             throw error;

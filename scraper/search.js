@@ -3,17 +3,40 @@ const { randomDelay, humanType, scrollPage } = require('./utils');
 class SearchHandler {
     constructor(page) {
         this.page = page;
+        this.currentPage = 1;
+        this.baseSearchUrl = '';
     }
 
     async performSearch(specialty, city, progressCallback) {
         console.log(`Searching for: ${specialty} in ${city}`);
-        if (progressCallback) progressCallback({ status: 'searching', message: `Acessando Doctoralia...` });
 
-        // Navigate to Doctoralia homepage
-        await this.page.goto('https://www.doctoralia.com.br/', {
-            waitUntil: 'domcontentloaded',
-            timeout: 60000
-        });
+        // Navigate to Doctoralia homepage with retry
+        let homeSuccess = false;
+        let homeAttempts = 0;
+        const maxAttempts = 3;
+
+        while (!homeSuccess && homeAttempts < maxAttempts) {
+            homeAttempts++;
+            try {
+                if (homeAttempts > 1) {
+                    const delay = 3000 * homeAttempts;
+                    if (progressCallback) progressCallback({ message: `⚠️ Tentativa de conexão ${homeAttempts}/${maxAttempts} em ${delay / 1000}s...` });
+                    await randomDelay(delay, delay + 2000);
+                }
+
+                await this.page.goto('https://www.doctoralia.com.br/', {
+                    waitUntil: 'domcontentloaded',
+                    timeout: 90000
+                });
+                homeSuccess = true;
+            } catch (e) {
+                console.log(`Homepage navigation error (Attempt ${homeAttempts}):`, e.message);
+                if (homeAttempts === maxAttempts) {
+                    if (progressCallback) progressCallback({ message: `❌ Falha ao acessar home após ${maxAttempts} tentativas.` });
+                    throw e;
+                }
+            }
+        }
 
         await randomDelay(1000, 2000);
 
@@ -36,30 +59,95 @@ class SearchHandler {
         }
 
         console.log('Navigating to search URL:', searchUrl);
+        this.baseSearchUrl = searchUrl;
         if (progressCallback) progressCallback({ status: 'searching', message: `Navegando para resultados: ${searchUrl}` });
 
-        await this.page.goto(searchUrl, {
-            waitUntil: 'networkidle2',
-            timeout: 60000
-        });
+        // Retry loop for search URL navigation
+        let searchSuccess = false;
+        let searchAttempts = 0;
+
+        while (!searchSuccess && searchAttempts < maxAttempts) {
+            searchAttempts++;
+            try {
+                if (searchAttempts > 1) {
+                    const delay = 3000 * searchAttempts;
+                    if (progressCallback) progressCallback({ message: `⚠️ Tentativa de busca ${searchAttempts}/${maxAttempts} em ${delay / 1000}s...` });
+                    await randomDelay(delay, delay + 2000);
+                }
+
+                await this.page.goto(searchUrl, {
+                    waitUntil: 'domcontentloaded',
+                    timeout: 120000
+                });
+                searchSuccess = true;
+            } catch (error) {
+                console.log(`Search navigation error (Attempt ${searchAttempts}):`, error.message);
+                if (searchAttempts === maxAttempts) throw error;
+            }
+        }
 
         return true;
     }
 
     async collectProfileUrls(targetQuantity, progressCallback) {
+        // Buscar 20% a mais para ter margem de erros e pulados
+        const adjustedTarget = Math.ceil(targetQuantity * 1.20);
+
+        // Restore search context if we are not on a search page
+        if (!this.page.url().includes('/pesquisa') && this.baseSearchUrl) {
+            console.log('Restoring search context...');
+            if (progressCallback) progressCallback({ message: `🔄 Restaurando busca na página ${this.currentPage}...` });
+
+            let targetUrl = this.baseSearchUrl;
+            if (this.currentPage > 1) {
+                targetUrl += (targetUrl.includes('?') ? '&' : '?') + `page=${this.currentPage}`;
+            }
+
+            try {
+                await this.page.goto(targetUrl, {
+                    waitUntil: 'domcontentloaded',
+                    timeout: 60000
+                });
+            } catch (e) {
+                console.log('Error restoring search context:', e.message);
+                if (progressCallback) progressCallback({ message: '⚠️ Erro ao restaurar busca, tentando continuar...' });
+            }
+        }
+
         const profileUrls = new Set();
-        let currentPage = 1;
         let noMoreResults = false;
         let consecutiveEmptyPages = 0;
 
-        console.log(`Collecting up to ${targetQuantity} profile URLs...`);
+        // Detectar total de páginas disponíveis
+        const totalPages = await this.page.evaluate(() => {
+            const paginationLinks = document.querySelectorAll('a[data-test-id^="pagination-page-"]');
+            let maxPage = 1;
+            paginationLinks.forEach(link => {
+                const pageNum = parseInt(link.textContent);
+                if (!isNaN(pageNum) && pageNum > maxPage) {
+                    maxPage = pageNum;
+                }
+            });
+            // Também verificar se há indicador de "..." e última página
+            const lastPageLink = document.querySelector('a[data-test-id="pagination-page-last"]');
+            if (lastPageLink) {
+                const lastNum = parseInt(lastPageLink.textContent);
+                if (!isNaN(lastNum) && lastNum > maxPage) {
+                    maxPage = lastNum;
+                }
+            }
+            return maxPage;
+        });
 
-        while (profileUrls.size < targetQuantity && !noMoreResults) {
-            console.log(`Page ${currentPage}: Collected ${profileUrls.size}/${targetQuantity} profiles`);
+        console.log(`Collecting up to ${adjustedTarget} profile URLs (${targetQuantity} + 20% margem)...`);
+        if (progressCallback) progressCallback({ message: `📋 Buscando ${adjustedTarget} perfis (${targetQuantity} + 20% margem). Páginas disponíveis: ${totalPages}` });
+
+        while (profileUrls.size < adjustedTarget && !noMoreResults) {
+            console.log(`Page ${this.currentPage}: Collected ${profileUrls.size}/${targetQuantity} profiles`);
 
             if (progressCallback) progressCallback({
                 status: 'collecting',
-                message: `Página ${currentPage}: Coletados ${profileUrls.size}/${targetQuantity}. Buscando mais...`
+                message: `Página ${this.currentPage}: Coletados ${profileUrls.size}/${targetQuantity}. Buscando mais...`
             });
 
             await randomDelay(1500, 3000);
@@ -101,7 +189,7 @@ class SearchHandler {
 
             if (newUrls.length === 0) {
                 consecutiveEmptyPages++;
-                console.log(`No profiles found on page ${currentPage} (Attempt ${consecutiveEmptyPages})`);
+                console.log(`No profiles found on page ${this.currentPage} (Attempt ${consecutiveEmptyPages})`);
 
                 if (consecutiveEmptyPages >= 3) {
                     console.log('No more results found after multiple attempts');
@@ -110,17 +198,24 @@ class SearchHandler {
                 }
             } else {
                 consecutiveEmptyPages = 0;
-                if (progressCallback) progressCallback({ status: 'collecting', message: `Encontrados ${newUrls.length} na página ${currentPage}.` });
 
+                // Contar quantos são novos (não duplicados)
+                const sizeBefore = profileUrls.size;
                 newUrls.forEach(url => {
-                    if (profileUrls.size < targetQuantity) {
+                    if (profileUrls.size < adjustedTarget) {
                         profileUrls.add(url);
                     }
                 });
+                const addedCount = profileUrls.size - sizeBefore;
+
+                if (progressCallback) progressCallback({
+                    status: 'collecting',
+                    message: `Página ${this.currentPage}: +${addedCount} novos (${newUrls.length - addedCount} duplicados). Total: ${profileUrls.size}/${adjustedTarget}`
+                });
             }
 
-            // Check if we have enough
-            if (profileUrls.size >= targetQuantity) {
+            // Check if we have enough (with margin)
+            if (profileUrls.size >= adjustedTarget) {
                 break;
             }
 
@@ -129,13 +224,32 @@ class SearchHandler {
                 const nextButton = await this.page.$('a[data-test-id="pagination-next"]');
 
                 if (nextButton) {
-                    if (progressCallback) progressCallback({ status: 'collecting', message: `Indo para página ${currentPage + 1}...` });
+                    if (progressCallback) progressCallback({ status: 'collecting', message: `Indo para página ${this.currentPage + 1}...` });
+
+                    const previousUrl = this.page.url();
 
                     await Promise.all([
                         this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }).catch(() => { }),
                         nextButton.click()
                     ]);
-                    currentPage++;
+
+                    // Esperar a URL mudar para garantir que navegou
+                    await randomDelay(2000, 3000);
+
+                    // Verificar se a URL realmente mudou
+                    const newUrl = this.page.url();
+                    if (newUrl === previousUrl) {
+                        console.log('URL não mudou após navegação, tentando novamente...');
+                        // Tentar novamente com goto direto
+                        const nextPageUrl = previousUrl.includes('page=')
+                            ? previousUrl.replace(/page=(\d+)/, (m, p) => `page=${parseInt(p) + 1}`)
+                            : previousUrl + (previousUrl.includes('?') ? '&' : '?') + `page=${this.currentPage + 1}`;
+
+                        await this.page.goto(nextPageUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+                        await randomDelay(1000, 2000);
+                    }
+
+                    this.currentPage++;
                 } else {
                     // Fallback: Try to construct URL manually if button not found
                     console.log('Next button not found, trying URL construction...');
@@ -145,11 +259,11 @@ class SearchHandler {
                     if (currentUrl.includes('page=')) {
                         nextUrl = currentUrl.replace(/page=(\d+)/, (match, p1) => `page=${parseInt(p1) + 1}`);
                     } else {
-                        nextUrl = currentUrl.includes('?') ? `${currentUrl}&page=${currentPage + 1}` : `${currentUrl}?page=${currentPage + 1}`;
+                        nextUrl = currentUrl.includes('?') ? `${currentUrl}&page=${this.currentPage + 1}` : `${currentUrl}?page=${this.currentPage + 1}`;
                     }
 
                     console.log(`Navigating manually to: ${nextUrl}`);
-                    if (progressCallback) progressCallback({ status: 'collecting', message: `Navegação manual para página ${currentPage + 1}...` });
+                    if (progressCallback) progressCallback({ status: 'collecting', message: `Navegação manual para página ${this.currentPage + 1}...` });
 
                     await this.page.goto(nextUrl, { waitUntil: 'networkidle2', timeout: 30000 });
 
@@ -159,7 +273,7 @@ class SearchHandler {
                         console.log('Manual navigation yielded no results.');
                         noMoreResults = true;
                     } else {
-                        currentPage++;
+                        this.currentPage++;
                     }
                 }
             } catch (error) {
@@ -169,7 +283,7 @@ class SearchHandler {
         }
 
         const finalUrls = Array.from(profileUrls).slice(0, targetQuantity);
-        console.log(`Collected ${finalUrls.length} profile URLs from ${currentPage} pages`);
+        console.log(`Collected ${finalUrls.length} profile URLs from ${this.currentPage} pages`);
 
         return finalUrls;
     }
