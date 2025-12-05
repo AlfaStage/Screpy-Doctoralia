@@ -18,9 +18,14 @@
                     <i class="fas fa-robot logo-icon"></i>
                     <h1>Scraper Pro</h1>
                 </div>
-                <button id="theme-toggle" class="btn-icon" title="Alternar Tema">
-                    <i class="fas fa-moon"></i>
-                </button>
+                <div class="header-actions">
+                    <button id="api-key-toggle" class="btn-icon" title="API Key">
+                        <i class="fas fa-key"></i>
+                    </button>
+                    <button id="theme-toggle" class="btn-icon" title="Alternar Tema">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="sidebar-section">
@@ -161,6 +166,28 @@
                 <button id="btn-cancel" class="btn-danger"><i class="fas fa-stop"></i> Cancelar</button>
                 <a id="btn-download" href="#" class="btn-secondary hidden" target="_blank"><i
                         class="fas fa-download"></i> Baixar CSV</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Modal -->
+    <div id="api-key-modal" class="modal-overlay hidden">
+        <div class="modal-content api-key-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h2><i class="fas fa-key"></i> API Key</h2>
+                </div>
+                <button id="close-api-key-modal" class="btn-icon"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>Use esta chave para autenticar requisições à API:</p>
+                <div class="api-key-display">
+                    <code id="api-key-value">Carregando...</code>
+                    <button id="copy-api-key" class="btn-icon" title="Copiar">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <small>Inclua no header: <code>X-API-Key: &lt;sua-chave&gt;</code></small>
             </div>
         </div>
     </div>

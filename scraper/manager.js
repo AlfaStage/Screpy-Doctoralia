@@ -2,6 +2,7 @@ const DoctoraliaScraper = require('./index');
 const fs = require('fs').promises;
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const webhookService = require('../api/webhookService');
 
 class ScraperManager {
     constructor(io) {
@@ -147,6 +148,29 @@ class ScraperManager {
             this.io.emit('scraper-completed', { id, result });
             console.log(`[Manager] Emitted scraper-completed for ${id}`);
 
+            // Send webhook if configured (from API request)
+            if (config.webhook) {
+                const csvFilename = result.filePath ? result.filePath.split(/[\\/]/).pop() : null;
+                await webhookService.send(config.webhook, {
+                    id,
+                    status: 'completed',
+                    config: {
+                        specialties: config.specialties,
+                        city: config.city,
+                        quantity: config.quantity,
+                        onlyWithPhone: config.onlyWithPhone
+                    },
+                    metadata: {
+                        startTime: scraper.startTime,
+                        endTime: new Date().toISOString(),
+                        totalResults: result.count || 0
+                    },
+                    csvUrl: csvFilename ? `/results/${csvFilename}` : null,
+                    results: result.data || [],
+                    logs: result.logs || []
+                }, config.jsonLogs || false);
+            }
+
         } catch (error) {
             console.error(`[Manager] Scraper ${id} failed:`, error);
 
@@ -162,6 +186,21 @@ class ScraperManager {
             await this.saveHistory();
 
             this.io.emit('scraper-error', { id, error: error.message });
+
+            // Send webhook error notification if configured
+            if (config.webhook) {
+                await webhookService.send(config.webhook, {
+                    id,
+                    status: 'error',
+                    error: error.message,
+                    config: {
+                        specialties: config.specialties,
+                        city: config.city,
+                        quantity: config.quantity,
+                        onlyWithPhone: config.onlyWithPhone
+                    }
+                }, false);
+            }
         } finally {
             await scraper.close();
             this.scrapers.delete(id);

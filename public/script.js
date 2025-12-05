@@ -335,6 +335,50 @@ themeToggleBtn.addEventListener('click', () => {
     }
 });
 
+// API Key Modal
+const apiKeyToggle = document.getElementById('api-key-toggle');
+const apiKeyModal = document.getElementById('api-key-modal');
+const closeApiKeyModal = document.getElementById('close-api-key-modal');
+const apiKeyValue = document.getElementById('api-key-value');
+const copyApiKeyBtn = document.getElementById('copy-api-key');
+
+apiKeyToggle.addEventListener('click', async () => {
+    apiKeyModal.classList.remove('hidden');
+    try {
+        const response = await fetch('/api/v1/key');
+        const data = await response.json();
+        apiKeyValue.textContent = data.apiKey || 'Erro ao carregar';
+    } catch (error) {
+        apiKeyValue.textContent = 'Erro ao carregar';
+        console.error('Error fetching API key:', error);
+    }
+});
+
+closeApiKeyModal.addEventListener('click', () => {
+    apiKeyModal.classList.add('hidden');
+});
+
+apiKeyModal.addEventListener('click', (e) => {
+    if (e.target === apiKeyModal) {
+        apiKeyModal.classList.add('hidden');
+    }
+});
+
+copyApiKeyBtn.addEventListener('click', async () => {
+    const key = apiKeyValue.textContent;
+    if (key && key !== 'Carregando...' && key !== 'Erro ao carregar') {
+        try {
+            await navigator.clipboard.writeText(key);
+            copyApiKeyBtn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                copyApiKeyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    }
+});
+
 function renderActiveScrapers() {
     activeList.innerHTML = '';
     if (activeScrapers.size === 0) {

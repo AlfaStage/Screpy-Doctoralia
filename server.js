@@ -6,6 +6,11 @@ const { Server } = require('socket.io');
 const path = require('path');
 const ScraperManager = require('./scraper/manager');
 const SpecialtyFetcher = require('./scraper/specialties');
+const { getOrCreateApiKey } = require('./api/apiMiddleware');
+const createApiRoutes = require('./api/apiRoutes');
+
+// Initialize API Key (auto-generate if not set)
+const apiKey = getOrCreateApiKey();
 
 const app = express();
 const server = http.createServer(app);
@@ -26,6 +31,9 @@ app.use('/results', express.static('results'));
 
 // Initialize Scraper Manager
 const scraperManager = new ScraperManager(io);
+
+// API v1 routes
+app.use('/api/v1', createApiRoutes(scraperManager));
 
 // Socket.io connection
 io.on('connection', (socket) => {
@@ -74,7 +82,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// REST API endpoints
+// REST API endpoints (legacy)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -103,6 +111,9 @@ app.get('/api/health', (req, res) => {
 
 // Start server
 server.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Open your browser and navigate to http://localhost:${PORT}`);
+    console.log(`\n🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📖 Open your browser and navigate to http://localhost:${PORT}`);
+    console.log(`\n🔑 API Key: ${apiKey}`);
+    console.log(`📡 API Base URL: http://localhost:${PORT}/api/v1\n`);
 });
+

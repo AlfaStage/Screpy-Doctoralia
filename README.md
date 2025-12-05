@@ -5,12 +5,14 @@ Um scraper de alta velocidade para extrair dados de médicos do site Doctoralia.
 ## 🚀 Características
 
 - **Interface Web Moderna**: Interface intuitiva com tema dark e atualizações em tempo real
+- **API REST**: API completa para integração com outros sistemas
 - **Filtros Personalizados**: Busca por especialidade e cidade
 - **Alta Velocidade**: Extração rápida e eficiente de dados
 - **Anti-Detecção**: Utiliza Puppeteer Extra com Stealth Plugin para evitar bloqueios
 - **Comportamento Humano**: Simula ações humanas com delays aleatórios e movimentos de mouse
 - **Progresso em Tempo Real**: Acompanhe o progresso da extração via Socket.io
-- **Exportação CSV**: Resultados exportados em formato CSV pronto para uso
+- **Webhooks**: Receba notificações automáticas ao finalizar extrações
+- **Exportação CSV/JSON**: Resultados exportados em múltiplos formatos
 
 ## 📋 Pré-requisitos
 
@@ -99,21 +101,69 @@ O arquivo CSV conterá as seguintes colunas:
 
 ```
 Screpy Doctoralia/
+├── api/
+│   ├── apiMiddleware.js  # Autenticação via API Key
+│   ├── apiRoutes.js      # Endpoints REST
+│   └── webhookService.js # Serviço de webhooks
 ├── scraper/
-│   ├── browser.js       # Gerenciamento do navegador com Stealth
-│   ├── search.js        # Lógica de busca e coleta de URLs
-│   ├── profile.js       # Extração de dados dos perfis
-│   ├── utils.js         # Funções utilitárias (delays, comportamento humano)
-│   └── index.js         # Controlador principal do scraper
+│   ├── browser.js        # Gerenciamento do navegador com Stealth
+│   ├── search.js         # Lógica de busca e coleta de URLs
+│   ├── profile.js        # Extração de dados dos perfis
+│   ├── manager.js        # Gerenciador de múltiplos scrapers
+│   ├── utils.js          # Funções utilitárias (delays, comportamento humano)
+│   └── index.js          # Controlador principal do scraper
 ├── public/
-│   ├── index.html       # Interface web
-│   ├── script.js        # Lógica do cliente (Socket.io)
-│   └── style.css        # Estilos da interface
-├── results/             # Pasta onde os CSVs são salvos
-├── server.js            # Servidor Express + Socket.io
-├── package.json         # Configurações e dependências
-└── README.md            # Este arquivo
+│   ├── index.html        # Interface web
+│   ├── script.js         # Lógica do cliente (Socket.io)
+│   └── style.css         # Estilos da interface
+├── docs/
+│   ├── API.md            # Documentação da API
+│   └── DEPLOY.md         # Guias de deploy
+├── results/              # Pasta onde os CSVs são salvos
+├── server.js             # Servidor Express + Socket.io
+├── Dockerfile            # Configuração Docker
+├── package.json          # Configurações e dependências
+└── README.md             # Este arquivo
 ```
+
+## 📡 API REST
+
+O sistema inclui uma API REST completa para integração com outros sistemas.
+
+### Autenticação
+
+Todas as requisições requerem uma API Key no header:
+```
+X-API-Key: sua-api-key-aqui
+```
+
+A API Key é gerada automaticamente na primeira execução e exibida:
+- No terminal ao iniciar o servidor
+- Na interface web (clique no ícone 🔑)
+
+### Endpoints Principais
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/api/v1/scrape` | Iniciar extração |
+| GET | `/api/v1/scrape/:id` | Consultar status/resultado |
+| GET | `/api/v1/history` | Listar histórico |
+
+### Exemplo de Uso
+
+```bash
+# Iniciar extração
+curl -X POST http://localhost:3000/api/v1/scrape \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: sua-api-key" \
+  -d '{"city":"São Paulo","quantity":10,"onlyWithPhone":true}'
+
+# Consultar resultado
+curl http://localhost:3000/api/v1/scrape/ID_DA_EXTRACAO \
+  -H "X-API-Key: sua-api-key"
+```
+
+📚 **Documentação completa**: [docs/API.md](docs/API.md)
 
 ## ⚙️ Configurações Avançadas
 
@@ -213,11 +263,12 @@ npm install --global windows-build-tools
 Possíveis melhorias:
 
 - [ ] Suporte a múltiplos navegadores simultâneos
-- [ ] Proxy rotation para evitar bloqueios
-- [ ] Exportação em JSON e Excel
+- [x] ~~Proxy rotation para evitar bloqueios~~
+- [x] ~~Exportação em JSON~~
 - [ ] Filtros adicionais (avaliações, preço, etc.)
 - [ ] Agendamento de scraping automático
 - [ ] Dashboard com estatísticas
+- [x] ~~API REST para integração~~
 
 ## 📝 Licença
 
