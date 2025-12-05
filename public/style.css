@@ -571,6 +571,12 @@ small {
     display: none !important;
 }
 
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    display: flex !important;
+}
+
 .modal-section {
     margin-bottom: 28px;
 }
