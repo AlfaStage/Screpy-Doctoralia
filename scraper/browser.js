@@ -24,9 +24,27 @@ class BrowserManager {
     ];
 
     let actualProxyUrl = proxyUrl;
+    let proxyAuth = null;
+
+    // Helper to parse proxy URL and separate credentials
+    if (proxyUrl && !proxyUrl.includes('socks')) {
+      try {
+        const parsed = new URL(proxyUrl);
+        if (parsed.username && parsed.password) {
+          proxyAuth = {
+            username: decodeURIComponent(parsed.username),
+            password: decodeURIComponent(parsed.password)
+          };
+          // Reconstruct URL without credentials
+          actualProxyUrl = `${parsed.protocol}//${parsed.host}`;
+          console.log(`🔒 Credenciais de proxy detectadas (separadas para autenticação via page.authenticate)`);
+        }
+      } catch (e) {
+        console.error('Erro ao analisar URL do proxy:', e);
+      }
+    }
 
     // Use proxy-chain ONLY for SOCKS proxies (they need tunneling)
-    // HTTP proxies go directly to the browser (they worked before)
     if (proxyUrl && (proxyUrl.includes('socks4://') || proxyUrl.includes('socks5://'))) {
       console.log(`🔗 Criando servidor local para proxy SOCKS: ${proxyUrl}`);
 
@@ -44,7 +62,7 @@ class BrowserManager {
       const localProxyUrl = `http://127.0.0.1:${this.proxyServer.port}`;
       console.log(`✅ Servidor proxy local criado em ${localProxyUrl} -> ${proxyUrl}`);
 
-      // Testar se o túnel está funcionando antes de usar
+      // Test request through tunnel
       console.log(`🧪 Testando túnel SOCKS...`);
       const tunnelWorks = await this.testProxyTunnel(localProxyUrl);
 
@@ -53,19 +71,16 @@ class BrowserManager {
         actualProxyUrl = localProxyUrl;
       } else {
         console.log(`❌ Túnel SOCKS falhou no teste!`);
-        // Fechar servidor que não funcionou
         await this.proxyServer.close();
         this.proxyServer = null;
-        // Lançar erro para que o chamador saiba que precisa tentar outro proxy
         throw new Error(`TUNNEL_FAILED: Túnel SOCKS para ${proxyUrl} não funcionou`);
       }
-    } else if (proxyUrl) {
-      // HTTP proxy - use directly (no proxy-chain overhead)
-      console.log(`🌐 Usando proxy HTTP direto: ${proxyUrl}`);
-      actualProxyUrl = proxyUrl;
+    } else if (actualProxyUrl) {
+      // HTTP proxy
+      console.log(`🌐 Usando proxy HTTP direto: ${actualProxyUrl}`);
     }
 
-    // Add proxy if provided
+    // Add proxy to launch args
     if (actualProxyUrl) {
       launchArgs.push(`--proxy-server=${actualProxyUrl}`);
       console.log(`🌐 Configurando browser com proxy: ${actualProxyUrl}`);
@@ -84,6 +99,12 @@ class BrowserManager {
     this.browser = await puppeteer.launch(launchOptions);
 
     this.page = await this.browser.newPage();
+
+    // Authenticate if credentials were extracted
+    if (proxyAuth) {
+      console.log('🔑 Autenticando proxy...');
+      await this.page.authenticate(proxyAuth);
+    }
 
     // Set viewport
     await this.page.setViewport({ width: 1920, height: 1080 });

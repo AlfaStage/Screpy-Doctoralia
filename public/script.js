@@ -134,7 +134,7 @@ socket.on('scrape-started', ({ id }) => {
 
     // Abrir modal automaticamente ao iniciar
     currentModalScraperId = id;
-    openModal(scraper);
+    openModal(id, true);
 });
 
 socket.on('scraper-progress', (data) => {

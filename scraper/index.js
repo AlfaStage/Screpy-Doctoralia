@@ -64,15 +64,16 @@ class DoctoraliaScraper {
         // Se for SOCKS e o túnel falhar, tentar próximo proxy
         let initAttempts = 0;
         const maxInitAttempts = 5;
+        let initSuccess = false;
 
-        while (initAttempts < maxInitAttempts) {
+        while (initAttempts < maxInitAttempts && !initSuccess) {
             try {
                 this.browserManager = new BrowserManager();
                 const page = await this.browserManager.initialize(this.currentProxy);
 
                 this.searchHandler = new SearchHandler(page);
                 this.profileExtractor = new ProfileExtractor(page);
-                break; // Sucesso, sair do loop
+                initSuccess = true; // Sucesso, sair do loop
 
             } catch (error) {
                 initAttempts++;
@@ -85,16 +86,19 @@ class DoctoraliaScraper {
                         this.proxyManager.markProxyAsFailed(this.currentProxy);
                     }
 
+                    // Fechar browser que falhou
+                    await this.browserManager.close().catch(() => { });
+
                     // Tentar próximo proxy
                     this.currentProxy = await this.proxyManager.getNextProxy(true);
 
                     if (this.currentProxy === null) {
-                        this.emitProgress('⚠️ Sem mais proxies. Modo SEM PROXY ativado.');
+                        this.emitProgress('⚠️ Sem mais proxies. Tentando modo SEM PROXY...');
                         this.usingProxy = false;
                         this.currentDelay = 3000;
                     }
 
-                    continue; // Tentar novamente com novo proxy
+                    continue; // Tentar novamente com novo proxy (ou sem proxy)
                 }
 
                 // Se não foi erro de túnel ou esgotou tentativas, propagar erro
@@ -102,6 +106,19 @@ class DoctoraliaScraper {
                     throw error;
                 }
             }
+        }
+
+        // Fallback final: se não conseguiu inicializar, tentar sem proxy
+        if (!initSuccess) {
+            this.emitProgress('⚠️ Falha em todas as tentativas. Iniciando sem proxy...');
+            this.currentProxy = null;
+            this.usingProxy = false;
+            this.currentDelay = 3000;
+
+            this.browserManager = new BrowserManager();
+            const page = await this.browserManager.initialize(null);
+            this.searchHandler = new SearchHandler(page);
+            this.profileExtractor = new ProfileExtractor(page);
         }
 
         this.status = 'running';
@@ -283,6 +300,7 @@ class DoctoraliaScraper {
                     // Try to collect more URLs from next pages
                     const additionalUrls = await this.searchHandler.collectProfileUrls(
                         quantity - this.progress.successCount + 10, // Get a bit extra
+                        processedUrls, // Pass the Set of already processed URLs to exclude
                         (msg) => this.emitProgress(msg.message)
                     );
 
@@ -429,6 +447,10 @@ class DoctoraliaScraper {
             return {
                 success: true,
                 count: this.results.length,
+                successCount: this.progress.successCount,
+                errorCount: this.progress.errorCount,
+                skippedCount: this.progress.skippedCount,
+                phonesFound: this.progress.phonesFound,
                 filePath,
                 data: this.results,
                 logs: this.logs
@@ -445,6 +467,7 @@ class DoctoraliaScraper {
 
             // Check if it's a proxy/connection error that requires immediate proxy change
             const isProxyError = error.message && (
+                error.message.includes('TUNNEL_FAILED') ||
                 error.message.includes('ERR_TUNNEL_CONNECTION_FAILED') ||
                 error.message.includes('ERR_PROXY_CONNECTION_FAILED') ||
                 error.message.includes('ERR_CONNECTION_CLOSED') ||
@@ -482,10 +505,32 @@ class DoctoraliaScraper {
                 }
 
                 this.browserManager = new BrowserManager();
-                const page = await this.browserManager.initialize(this.currentProxy);
 
-                this.searchHandler = new SearchHandler(page);
-                this.profileExtractor = new ProfileExtractor(page);
+                // Wrap initialization in try-catch to handle TUNNEL_FAILED and fallback
+                try {
+                    const page = await this.browserManager.initialize(this.currentProxy);
+                    this.searchHandler = new SearchHandler(page);
+                    this.profileExtractor = new ProfileExtractor(page);
+                } catch (initError) {
+                    // If tunnel failed, try without proxy
+                    if (initError.message && initError.message.includes('TUNNEL_FAILED')) {
+                        this.emitProgress('⚠️ Túnel falhou novamente. Tentando SEM PROXY...');
+                        if (this.currentProxy) {
+                            this.proxyManager.markProxyAsFailed(this.currentProxy);
+                        }
+                        this.currentProxy = null;
+                        this.usingProxy = false;
+                        this.currentDelay = 3000;
+
+                        await this.browserManager.close().catch(() => { });
+                        this.browserManager = new BrowserManager();
+                        const page = await this.browserManager.initialize(null);
+                        this.searchHandler = new SearchHandler(page);
+                        this.profileExtractor = new ProfileExtractor(page);
+                    } else {
+                        throw initError;
+                    }
+                }
 
                 // Retry the scrape
                 this.emitProgress('🔄 Tentando novamente...');
