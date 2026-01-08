@@ -1097,6 +1097,69 @@ small {
     gap: 12px;
 }
 
+/* Standardize all modal footer buttons */
+.modal-footer button,
+.modal-footer a.btn-secondary,
+.modal-footer .btn-primary,
+.modal-footer .btn-secondary,
+.modal-footer .btn-danger {
+    min-width: 130px !important;
+    padding: 12px 18px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+    height: 42px !important;
+    border-radius: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.3s !important;
+}
+
+.modal-footer .btn-primary {
+    width: auto !important;
+    margin-top: 0 !important;
+    background: var(--text-primary) !important;
+    color: #000 !important;
+    border: 1px solid var(--text-primary) !important;
+}
+
+.modal-footer .btn-primary:hover {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+}
+
+.modal-footer .btn-primary:disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+}
+
+.modal-footer .btn-secondary {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.modal-footer .btn-secondary:hover {
+    border-color: var(--text-primary) !important;
+}
+
+.modal-footer .btn-danger {
+    background: transparent !important;
+    color: #ff4444 !important;
+    border: 1px solid #ff4444 !important;
+}
+
+.modal-footer .btn-danger:hover {
+    background: #ff4444 !important;
+    color: #000 !important;
+}
+
 .btn-secondary {
     padding: 14px 28px;
     /* Larger touch area */

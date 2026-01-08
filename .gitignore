@@ -4,3 +4,4 @@ node_modules/
 .DS_Store
 results/*.csv
 results/*.json
+results/*.png

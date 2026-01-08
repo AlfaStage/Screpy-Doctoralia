@@ -1,9 +1,10 @@
 const { randomDelay } = require('../utils');
 
 class WebsiteInvestigator {
-    constructor(page, logCallback = null) {
+    constructor(page, logCallback = null, screenshotCallback = null) {
         this.page = page;
         this.logCallback = logCallback;
+        this.screenshotCallback = screenshotCallback;
         this.maxDepth = 5;
 
         // Regex patterns for extraction
@@ -408,6 +409,11 @@ class WebsiteInvestigator {
                 timeout: 15000
             });
 
+            // Capture screenshot after navigation
+            if (this.screenshotCallback) {
+                await this.screenshotCallback('NAVIGATE_PAGE');
+            }
+
             await randomDelay(1000, 2000);
 
             // Check redirects
@@ -539,14 +545,40 @@ class WebsiteInvestigator {
             const bodyText = document.body?.innerText || '';
             const html = document.documentElement?.outerHTML || '';
 
-            // Extract emails
+            // Extract emails - multiple sources
             const emailPattern = new RegExp(patterns.email.source, patterns.email.flags);
+
+            // From body text
             const emails = bodyText.match(emailPattern) || [];
+
+            // From mailto links
+            const mailtoLinks = document.querySelectorAll('a[href^="mailto:"]');
+            for (const link of mailtoLinks) {
+                const href = link.href || link.getAttribute('href') || '';
+                const emailMatch = href.replace('mailto:', '').split('?')[0];
+                if (emailMatch && !emails.includes(emailMatch)) {
+                    emails.push(emailMatch);
+                }
+            }
+
+            // From HTML attributes
+            const allLinks = document.querySelectorAll('a[href]');
+            for (const link of allLinks) {
+                const href = link.href || '';
+                const emailsInHref = href.match(emailPattern) || [];
+                emails.push(...emailsInHref);
+            }
+
             // Filter out common non-email patterns
-            const validEmails = emails.filter(e =>
+            const validEmails = [...new Set(emails)].filter(e =>
+                e &&
                 !e.includes('example.com') &&
                 !e.includes('youremail') &&
-                !e.includes('email@')
+                !e.includes('email@') &&
+                !e.includes('sentry.io') &&
+                !e.includes('wixpress') &&
+                e.includes('@') &&
+                e.includes('.')
             );
             if (validEmails.length > 0) {
                 result.email = validEmails[0];
@@ -580,24 +612,52 @@ class WebsiteInvestigator {
                 }
             }
 
-            // Extract Instagram - from links first
-            const instagramLinks = document.querySelectorAll('a[href*="instagram.com"]');
+            // Extract Instagram - multiple sources
+            // 1. From links with instagram.com
+            const instagramLinks = document.querySelectorAll('a[href*="instagram.com"], a[href*="instagr.am"]');
             for (const link of instagramLinks) {
-                const match = link.href.match(/instagram\.com\/([a-zA-Z0-9_.]{3,30})/i);
-                if (match && !['p', 'reel', 'stories', 'explore'].includes(match[1])) {
+                const href = link.href || link.getAttribute('href') || '';
+                const match = href.match(/instagram\.com\/([a-zA-Z0-9_.]{2,30})/i) ||
+                    href.match(/instagr\.am\/([a-zA-Z0-9_.]{2,30})/i);
+                if (match && !['p', 'reel', 'reels', 'stories', 'explore', 'accounts', 'direct', 'about', 'legal'].includes(match[1].toLowerCase())) {
                     result.instagram = match[1];
                     break;
                 }
             }
 
-            // If no Instagram from links, try text patterns
+            // 2. From HTML with instagram href anywhere
             if (!result.instagram) {
-                // Look for @username patterns
-                const atMatches = bodyText.match(/@([a-zA-Z0-9_.]{3,30})/g) || [];
+                const htmlContent = document.documentElement.outerHTML;
+                const igMatches = htmlContent.match(/instagram\.com\/([a-zA-Z0-9_.]{2,30})/gi) || [];
+                for (const match of igMatches) {
+                    const username = match.replace(/instagram\.com\//i, '');
+                    if (!['p', 'reel', 'reels', 'stories', 'explore', 'accounts', 'direct', 'about', 'legal'].includes(username.toLowerCase())) {
+                        result.instagram = username;
+                        break;
+                    }
+                }
+            }
+
+            // 3. From text with @username patterns
+            if (!result.instagram) {
+                // Look near "instagram" text
+                const igTextMatches = bodyText.match(/instagram[:\s]*@?([a-zA-Z0-9_.]{2,30})/gi) || [];
+                for (const match of igTextMatches) {
+                    const username = match.replace(/instagram[:\s]*@?/gi, '');
+                    if (username && username.length > 1 && !username.includes('@')) {
+                        result.instagram = username;
+                        break;
+                    }
+                }
+            }
+
+            // 4. From @username patterns in text (careful to avoid emails)
+            if (!result.instagram) {
+                const atMatches = bodyText.match(/@([a-zA-Z0-9_]{3,30})/g) || [];
                 for (const match of atMatches) {
                     const username = match.substring(1);
-                    // Skip if looks like an email
-                    if (!username.includes('.') || username.match(/^[a-zA-Z0-9_]+$/)) {
+                    // Skip if looks like an email domain part
+                    if (username && !username.match(/\.(com|br|org|net|io)/i)) {
                         result.instagram = username;
                         break;
                     }

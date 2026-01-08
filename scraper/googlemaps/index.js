@@ -117,7 +117,7 @@ class GoogleMapsScraper {
 
                 this.searchHandler = new MapsSearchHandler(page);
                 this.businessExtractor = new BusinessExtractor(page);
-                this.websiteInvestigator = new WebsiteInvestigator(page, (msg) => this.emitProgress(msg));
+                this.websiteInvestigator = new WebsiteInvestigator(page, (msg) => this.emitProgress(msg), (action) => this.captureScreenshot(action));
                 initSuccess = true;
 
             } catch (error) {
@@ -159,7 +159,7 @@ class GoogleMapsScraper {
             const page = await this.browserManager.initialize(null);
             this.searchHandler = new MapsSearchHandler(page);
             this.businessExtractor = new BusinessExtractor(page);
-            this.websiteInvestigator = new WebsiteInvestigator(page, (msg) => this.emitProgress(msg));
+            this.websiteInvestigator = new WebsiteInvestigator(page, (msg) => this.emitProgress(msg), (action) => this.captureScreenshot(action));
         }
 
         this.status = 'running';
@@ -250,7 +250,7 @@ class GoogleMapsScraper {
 
                 this.searchHandler = new MapsSearchHandler(page);
                 this.businessExtractor = new BusinessExtractor(page);
-                this.websiteInvestigator = new WebsiteInvestigator(page, (msg) => this.emitProgress(msg));
+                this.websiteInvestigator = new WebsiteInvestigator(page, (msg) => this.emitProgress(msg), (action) => this.captureScreenshot(action));
 
                 this.consecutiveErrors = 0;
                 this.emitProgress('✅ Proxy trocado com sucesso');
@@ -542,6 +542,9 @@ class GoogleMapsScraper {
                             try {
                                 // Investigate website with max depth 5 (always, regardless of required fields)
                                 const websiteData = await this.websiteInvestigator.investigate(businessData.website);
+
+                                // Screenshot after visiting website
+                                await this.captureScreenshot('INVESTIGATE_WEBSITE');
 
                                 // Finalize results (format phones, determine whatsapp)
                                 this.websiteInvestigator.finalizeResult(websiteData);

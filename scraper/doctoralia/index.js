@@ -39,6 +39,43 @@ class DoctoraliaScraper {
             startTime: null,
             estimatedTimeRemaining: null
         };
+        this.lastScreenshotTime = null;
+        this.screenshotPath = null;
+    }
+
+    // Capture screenshot and emit via Socket.io for live view
+    async captureScreenshot(actionName = 'ACTION') {
+        if (!this.browserManager || !this.browserManager.page) return;
+
+        try {
+            const page = this.browserManager.page;
+            const timestamp = Date.now();
+            const filename = `live_${this.id}.png`;
+            const filepath = path.join('./results', filename);
+
+            // Take screenshot
+            await page.screenshot({ path: filepath, type: 'png' });
+
+            // Read as base64 for Socket.io emission
+            const imageBuffer = await fs.readFile(filepath);
+            const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
+
+            // Emit to frontend
+            this.io.emit('scraper-screenshot', {
+                id: this.id,
+                action: actionName,
+                timestamp: timestamp,
+                image: base64Image,
+                url: `/results/${filename}?t=${timestamp}`
+            });
+
+            this.lastScreenshotTime = timestamp;
+            this.screenshotPath = filepath;
+
+        } catch (e) {
+            // Silently fail - screenshot is optional
+            console.log(`Screenshot capture failed: ${e.message}`);
+        }
     }
 
     async initialize(useProxy = true) {
@@ -271,6 +308,7 @@ class DoctoraliaScraper {
 
                 this.emitProgress(`Acessando Doctoralia...`);
                 await this.searchHandler.performSearch(specialty, city, (msg) => this.emitProgress(msg.message));
+                await this.captureScreenshot('SEARCH_COMPLETE');
 
                 await this.checkState();
 
@@ -335,6 +373,7 @@ class DoctoraliaScraper {
 
                 try {
                     const profileData = await this.profileExtractor.extractProfile(url, (msg) => this.emitProgress(msg.message));
+                    await this.captureScreenshot('EXTRACT_PROFILE');
 
                     // Check required fields
                     if (requiredFields && requiredFields.length > 0) {

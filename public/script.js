@@ -1196,6 +1196,9 @@ socket.on('scraper-screenshot', (data) => {
                 'SEARCH_COMPLETE': 'Busca OK',
                 'COLLECT_COMPLETE': 'Coletando...',
                 'EXTRACT_BUSINESS': 'Extraindo',
+                'EXTRACT_PROFILE': 'Extraindo Perfil',
+                'INVESTIGATE_WEBSITE': 'Investigando',
+                'NAVIGATE_PAGE': 'Navegando...',
                 'ERROR': 'ERRO'
             };
             liveActionBadge.textContent = actionLabels[action] || action;
