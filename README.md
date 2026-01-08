@@ -1,18 +1,29 @@
-# Doctoralia Scraper
+# Doctoralia & Google Maps Scraper
 
-Um scraper de alta velocidade para extrair dados de médicos do site Doctoralia.com.br. Esta ferramenta permite buscar médicos por especialidade e cidade, extraindo informações detalhadas como nome, especialidades, telefones e endereços.
+Um sistema avançado de extração de leads capaz de coletar dados de médicos e estabelecimentos comerciais do **Doctoralia** e **Google Maps**. O scraper investiga profundamente cada resultado, acessando websites e redes sociais para encontrar contatos valiosos como WhatsApp, E-mail e Instagram.
 
 ## 🚀 Características
 
-- **Interface Web Moderna**: Interface intuitiva com tema dark e atualizações em tempo real
-- **API REST**: API completa para integração com outros sistemas
-- **Filtros Personalizados**: Busca por especialidade e cidade
-- **Alta Velocidade**: Extração rápida e eficiente de dados
-- **Anti-Detecção**: Utiliza Puppeteer Extra com Stealth Plugin para evitar bloqueios
-- **Comportamento Humano**: Simula ações humanas com delays aleatórios e movimentos de mouse
-- **Progresso em Tempo Real**: Acompanhe o progresso da extração via Socket.io
-- **Webhooks**: Receba notificações automáticas ao finalizar extrações
-- **Exportação CSV/JSON**: Resultados exportados em múltiplos formatos
+### 🏥 Doctoralia
+- **Busca Especializada**: Filtros por especialidade e cidade.
+- **Paginação Automática**: Coleta milhares de perfis de uma só vez.
+
+### 🗺️ Google Maps (NOVO)
+- **Modo Expansão Inteligente**: Busca automática em 20+ capitais se a cidade não for definida (ideal para metas de 5000+ leads).
+- **Investigação de Websites**: Acessa o site do estabelecimento para extrair:
+  - 📧 E-mail
+  - 📸 Instagram (username direto)
+  - 📱 WhatsApp / Telefone
+  - 🏢 CNPJ
+- **Extração via URL**: Otimização que extrai dados diretamente do link sem precisar carregar a página (mais rápido).
+- **Filtro Inteligente**: Ignora páginas irrelevantes (Login, Privacy Policy) e prioriza páginas de Contato e Bio.
+
+### ⚙️ Core System
+- **Rotação de Proxy Robusta**: Suporte a SOCKS5 com retry automático e fallback.
+- **Interface Web Moderna**: Painel de controle com resultados ao vivo (WebSocket).
+- **Exportação Flexível**: Dados em CSV e JSON.
+- **Anti-Detecção Avançada**: Simula comportamento humano e rotaciona fingerprint do navegador.
+
 
 ## 📋 Pré-requisitos
 
@@ -69,14 +80,22 @@ O servidor será iniciado em `http://localhost:3000`
 
 1. **Abra seu navegador** e acesse `http://localhost:3000`
 
-2. **Preencha os campos do formulário**:
-   - **Especialidade**: Digite a especialidade médica (ex: Cardiologista, Dermatologista)
-   - **Cidade**: Digite a cidade desejada (ex: São Paulo, Rio de Janeiro)
-   - **Quantidade**: Defina quantos perfis deseja extrair (máximo: 500)
+2. **Escolha o Modo**:
+   - **Doctoralia**: Ideal para médicos e profissionais de saúde.
+   - **Google Maps**: Ideal para clínicas, estéticas e qualquer comércio local.
 
-3. **Clique em "Iniciar Scraping"**
+3. **Preencha os filtros**:
+   - **Termo/Especialidade**: O que você procura?
+   - **Cidade**: Deixe **EM BRANCO** para ativar o **Modo Expansão** (busca no Brasil todo).
+   - **Quantidade**: Defina a meta (até 5000).
 
-4. **Acompanhe o progresso** em tempo real:
+4. **Configurações Extras (Maps)**:
+   - "Investigar websites": Ative para o robô entrar nos sites e buscar WhatsApp/Instagram.
+   - "Dados Obrigatórios": Marque "WhatsApp" para salvar apenas leads que tenham Zap.
+
+5. **Clique em "Iniciar Extração"**
+
+6. **Acompanhe o progresso** em tempo real:
    - Status atual da operação
    - Barra de progresso
    - Log detalhado de atividades
@@ -262,13 +281,14 @@ npm install --global windows-build-tools
 
 Possíveis melhorias:
 
-- [ ] Suporte a múltiplos navegadores simultâneos
-- [x] ~~Proxy rotation para evitar bloqueios~~
-- [x] ~~Exportação em JSON~~
-- [ ] Filtros adicionais (avaliações, preço, etc.)
-- [ ] Agendamento de scraping automático
-- [ ] Dashboard com estatísticas
-- [x] ~~API REST para integração~~
+- [x] Suporte a múltiplos navegadores simultâneos (via Manager)
+- [x] Proxy rotation para evitar bloqueios
+- [x] Exportação em JSON
+- [x] API REST para integração
+- [x] Google Maps Scraper
+- [x] Investigação de Websites (Deep Crawl)
+- [x] Modo Expansão Global
+
 
 ## 📝 Licença
 

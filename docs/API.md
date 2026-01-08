@@ -90,7 +90,55 @@ curl -X POST http://localhost:3000/api/v1/scrape \
 
 ---
 
-### 2. Consultar Status/Resultado
+### 2. Iniciar Extração (Google Maps)
+
+**POST** `/api/v1/maps/scrape`
+
+Inicia uma nova extração do Google Maps com suporte a investigação de websites.
+
+#### Request Body
+
+```json
+{
+  "searchTerm": "Clínica de Estética",
+  "city": "São Paulo",
+  "quantity": 100,
+  "investigateWebsites": true,
+  "requiredFields": ["whatsapp", "email"]
+}
+```
+
+| Campo | Tipo | Obrigatório | Descrição |
+|-------|------|-------------|-----------|
+| `searchTerm` | string | Sim | O que buscar (ex: "Advogado", "Padaria") |
+| `city` | string | Não | Cidade. **Deixe vazio + quantity > 200 para Modo Expansão** |
+| `quantity` | number | Sim | Meta de leads (até 5000) |
+| `investigateWebsites` | boolean | Não | Se true, acessa o site para coletar contatos (default: true) |
+| `requiredFields` | array | Não | Lista de campos obrigatórios: `whatsapp`, `email`, `instagram`, `phone`, `website` |
+
+#### Modo Expansão Global
+Para buscar em todo o Brasil (20+ capitais), envie:
+- `city`: `""` (string vazia) ou `null`
+- `quantity`: `500` ou mais
+
+#### cURL Exemplo
+
+```bash
+curl -X POST http://localhost:3000/api/v1/maps/scrape \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: sk_abc123..." \
+  -d '{
+    "searchTerm": "Dermatologista",
+    "city": "",
+    "quantity": 1000,
+    "investigateWebsites": true,
+    "requiredFields": ["whatsapp"]
+  }'
+```
+
+---
+
+### 3. Consultar Status/Resultado
 
 **GET** `/api/v1/scrape/:id`
 
@@ -151,7 +199,7 @@ curl http://localhost:3000/api/v1/scrape/550e8400-e29b-41d4-a716-446655440000 \
 
 ---
 
-### 3. Listar Histórico
+### 4. Listar Histórico
 
 **GET** `/api/v1/history`
 
@@ -199,7 +247,7 @@ curl http://localhost:3000/api/v1/history \
 
 ---
 
-### 4. Obter API Key
+### 5. Obter API Key
 
 **GET** `/api/v1/key`
 
