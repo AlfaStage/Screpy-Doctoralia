@@ -1083,3 +1083,163 @@ if (confirmClearHistory) {
         }
     });
 }
+
+// ========== Live View Modal ==========
+const liveViewModal = document.getElementById('live-view-modal');
+const closeLiveViewBtn = document.getElementById('close-live-view');
+const btnLiveView = document.getElementById('btn-live-view');
+const liveScreenshot = document.getElementById('live-screenshot');
+const screenshotPlaceholder = document.getElementById('screenshot-placeholder');
+const liveActionBadge = document.getElementById('live-action-badge');
+const liveLogs = document.getElementById('live-logs');
+
+// Per-scraper screenshot storage: Map<scraperId, { image, timestamp, expiryTimer }>
+const scraperScreenshots = new Map();
+let liveViewActive = false;
+
+// Enable/disable Ao Vivo button based on available screenshot
+function updateLiveViewButtonState() {
+    if (!btnLiveView || !currentModalScraperId) return;
+
+    const screenshotData = scraperScreenshots.get(currentModalScraperId);
+    if (screenshotData && screenshotData.image) {
+        btnLiveView.disabled = false;
+        btnLiveView.title = 'Visualizar ao vivo';
+    } else {
+        btnLiveView.disabled = true;
+        btnLiveView.title = 'Aguardando screenshot...';
+    }
+}
+
+// Open live view modal
+function openLiveView() {
+    if (!currentModalScraperId) return;
+
+    const screenshotData = scraperScreenshots.get(currentModalScraperId);
+    if (!screenshotData || !screenshotData.image) return;
+
+    liveViewModal.classList.remove('hidden');
+    liveViewActive = true;
+
+    // Load existing screenshot for this scraper
+    liveScreenshot.src = screenshotData.image;
+    liveScreenshot.style.display = 'block';
+    screenshotPlaceholder.style.display = 'none';
+
+    // Copy existing logs from main modal
+    const mainLogs = document.getElementById('modal-logs');
+    if (mainLogs && liveLogs) {
+        liveLogs.innerHTML = mainLogs.innerHTML;
+        liveLogs.scrollTop = liveLogs.scrollHeight;
+    }
+}
+
+// Close live view modal
+function closeLiveView() {
+    liveViewModal.classList.add('hidden');
+    liveViewActive = false;
+}
+
+// Handle Ao Vivo button click
+if (btnLiveView) {
+    btnLiveView.addEventListener('click', openLiveView);
+}
+
+// Handle close button
+if (closeLiveViewBtn) {
+    closeLiveViewBtn.addEventListener('click', closeLiveView);
+}
+
+// Close on overlay click
+if (liveViewModal) {
+    liveViewModal.addEventListener('click', (e) => {
+        if (e.target === liveViewModal) {
+            closeLiveView();
+        }
+    });
+}
+
+// Socket listener for screenshots - stores per scraper
+socket.on('scraper-screenshot', (data) => {
+    const { id, image, action, timestamp } = data;
+
+    // Get or create screenshot data for this scraper
+    let screenshotData = scraperScreenshots.get(id);
+
+    // Clear any existing expiry timer for this scraper
+    if (screenshotData && screenshotData.expiryTimer) {
+        clearTimeout(screenshotData.expiryTimer);
+    }
+
+    // Store new screenshot
+    scraperScreenshots.set(id, {
+        image: image,
+        action: action,
+        timestamp: timestamp,
+        expiryTimer: null
+    });
+
+    // Update button state if viewing this scraper
+    if (id === currentModalScraperId) {
+        updateLiveViewButtonState();
+    }
+
+    // If live view is open for this scraper, update it
+    if (liveViewActive && id === currentModalScraperId && image) {
+        liveScreenshot.src = image;
+        liveScreenshot.style.display = 'block';
+        screenshotPlaceholder.style.display = 'none';
+
+        // Update action badge
+        if (liveActionBadge) {
+            const actionLabels = {
+                'SEARCH_COMPLETE': 'Busca OK',
+                'COLLECT_COMPLETE': 'Coletando...',
+                'EXTRACT_BUSINESS': 'Extraindo',
+                'ERROR': 'ERRO'
+            };
+            liveActionBadge.textContent = actionLabels[action] || action;
+            liveActionBadge.className = 'status-badge ' + (action === 'ERROR' ? 'status-error' : 'status-running');
+        }
+    }
+});
+
+// Start 10-minute expiry timer when scraper completes
+socket.on('scraper-complete', (data) => {
+    const screenshotData = scraperScreenshots.get(data.id);
+    if (screenshotData) {
+        // Set 10 minute expiry timer
+        screenshotData.expiryTimer = setTimeout(() => {
+            scraperScreenshots.delete(data.id);
+            // Update button if currently viewing this scraper
+            if (data.id === currentModalScraperId) {
+                updateLiveViewButtonState();
+                if (liveViewActive) {
+                    closeLiveView();
+                }
+            }
+        }, 10 * 60 * 1000); // 10 minutes
+    }
+});
+
+// Sync logs to live view when log is appended
+const originalAppendLogToModal = appendLogToModal;
+appendLogToModal = function (log) {
+    originalAppendLogToModal(log);
+
+    // Also append to live logs if active
+    if (liveViewActive && liveLogs) {
+        const logEntry = document.createElement('div');
+        logEntry.className = 'log-entry';
+        logEntry.textContent = log.message;
+        liveLogs.appendChild(logEntry);
+        liveLogs.scrollTop = liveLogs.scrollHeight;
+    }
+};
+
+// Update button state when modal opens for a scraper
+const originalOpenModal = openModal;
+openModal = function (id, isActive) {
+    originalOpenModal(id, isActive);
+    setTimeout(updateLiveViewButtonState, 100);
+};

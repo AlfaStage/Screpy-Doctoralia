@@ -1077,12 +1077,24 @@ small {
 
 /* Footer */
 .modal-footer {
-    padding: 24px 40px;
+    padding: 20px 32px;
     border-top: 1px solid var(--border-color);
     display: flex;
-    justify-content: flex-end;
-    gap: 16px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
     background: #050505;
+    flex-wrap: wrap;
+}
+
+.modal-footer .footer-left {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-footer .footer-right {
+    display: flex;
+    gap: 12px;
 }
 
 .btn-secondary {
@@ -1228,4 +1240,95 @@ small {
 
 .hidden {
     display: none !important;
+}
+
+/* ========== Live View Modal ========== */
+.live-view-modal-content {
+    width: 95vw;
+    max-width: 1400px;
+    height: 640px;
+}
+
+.live-view-body {
+    height: calc(100% - 60px);
+    padding: 0 !important;
+}
+
+.live-view-split {
+    display: flex;
+    height: 100%;
+    gap: 1px;
+    background: var(--border-color);
+}
+
+.live-logs-panel,
+.live-screenshot-panel {
+    flex: 1;
+    background: var(--modal-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.live-logs-panel h4,
+.live-screenshot-panel h4 {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.live-logs-panel .logs-container {
+    flex: 1;
+    overflow-y: auto;
+    font-size: 12px;
+}
+
+.live-screenshot-panel {
+    flex: 1.2;
+}
+
+.screenshot-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    position: relative;
+}
+
+.screenshot-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.screenshot-placeholder {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    gap: 12px;
+}
+
+.screenshot-placeholder i {
+    font-size: 48px;
+}
+
+.screenshot-placeholder p {
+    font-size: 14px;
+}
+
+#live-action-badge {
+    margin-left: 12px;
+    font-size: 11px;
+    padding: 4px 10px;
 }

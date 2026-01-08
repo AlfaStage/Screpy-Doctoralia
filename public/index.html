@@ -313,11 +313,19 @@
             </div>
 
             <div class="modal-footer">
-                <button id="btn-pause" class="btn-secondary"><i class="fas fa-pause"></i> Pausar</button>
-                <button id="btn-resume" class="btn-secondary hidden"><i class="fas fa-play"></i> Retomar</button>
-                <button id="btn-cancel" class="btn-danger"><i class="fas fa-stop"></i> Cancelar</button>
-                <a id="btn-download" href="#" class="btn-secondary hidden" target="_blank"><i
-                        class="fas fa-download"></i> Baixar CSV</a>
+                <div class="footer-left">
+                    <button id="btn-live-view" class="btn-primary" disabled title="Aguardando screenshot...">
+                        <i class="fas fa-satellite-dish"></i> Ao Vivo
+                    </button>
+                </div>
+                <div class="footer-right">
+                    <button id="btn-pause" class="btn-secondary"><i class="fas fa-pause"></i> Pausar</button>
+                    <button id="btn-resume" class="btn-secondary hidden"><i class="fas fa-play"></i> Retomar</button>
+                    <button id="btn-cancel" class="btn-danger"><i class="fas fa-stop"></i> Cancelar</button>
+                    <a id="btn-download" href="#" class="btn-secondary hidden" target="_blank">
+                        <i class="fas fa-download"></i> Baixar CSV
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -360,6 +368,37 @@
             <div class="modal-footer">
                 <button id="cancel-clear-history" class="btn-secondary">Cancelar</button>
                 <button id="confirm-clear-history" class="btn-danger">Limpar Tudo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live View Modal -->
+    <div id="live-view-modal" class="modal-overlay hidden">
+        <div class="modal-content live-view-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h2><i class="fas fa-satellite-dish"></i> Visualização Ao Vivo</h2>
+                    <span id="live-action-badge" class="status-badge status-running">Aguardando...</span>
+                </div>
+                <button id="close-live-view" class="btn-icon"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body live-view-body">
+                <div class="live-view-split">
+                    <div class="live-logs-panel">
+                        <h4><i class="fas fa-terminal"></i> Logs</h4>
+                        <div id="live-logs" class="logs-container"></div>
+                    </div>
+                    <div class="live-screenshot-panel">
+                        <h4><i class="fas fa-camera"></i> Screenshot</h4>
+                        <div class="screenshot-wrapper">
+                            <img id="live-screenshot" src="" alt="Live Screenshot" />
+                            <div id="screenshot-placeholder" class="screenshot-placeholder">
+                                <i class="fas fa-image"></i>
+                                <p>Aguardando screenshot...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

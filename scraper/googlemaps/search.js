@@ -25,8 +25,8 @@ class MapsSearchHandler {
                 }
 
                 await this.page.goto('https://www.google.com/maps', {
-                    waitUntil: 'domcontentloaded',
-                    timeout: 60000
+                    waitUntil: ['domcontentloaded', 'networkidle2'],
+                    timeout: 90000
                 });
                 success = true;
             } catch (e) {
@@ -168,8 +168,22 @@ class MapsSearchHandler {
                 } catch (e) { console.log('Screenshot failed:', e.message); }
             }
 
-            // Extra wait to ensure elements are fully rendered
-            await randomDelay(2000, 3000);
+            // Extra wait to ensure elements are fully rendered (Google Maps is heavily JS-driven)
+            await randomDelay(4000, 6000);
+
+            // Additional check: wait for specific container
+            try {
+                await this.page.waitForFunction(() => {
+                    // Wait for any visible business-related element
+                    const feed = document.querySelector('div[role="feed"]');
+                    const links = document.querySelectorAll('a[href*="/maps/place/"]');
+                    const articles = document.querySelectorAll('[role="article"]');
+                    return (feed && feed.children.length > 0) || links.length > 0 || articles.length > 0;
+                }, { timeout: 15000 });
+                console.log('Business elements detected via waitForFunction');
+            } catch (e) {
+                console.log('waitForFunction timeout - continuing anyway');
+            }
 
             if (progressCallback) progressCallback({ message: `✅ Resultados carregados` });
 
@@ -230,7 +244,12 @@ class MapsSearchHandler {
                     'div[class*="bfdHYe"] a[href*="maps"]',
                     // Very generic but effective fallback
                     '[jsaction*="mouseover:pane"] a[href*="/maps/place/"]',
-                    'div[jscontroller] > a[href*="/maps/place/"]'
+                    'div[jscontroller] > a[href*="/maps/place/"]',
+                    // Article-based selectors (2025 structure)
+                    '[role="article"] a[href*="/maps/place/"]',
+                    '[role="article"] a[aria-label]',
+                    // Direct search for any links with place in href
+                    'a[href*="google.com/maps/place/"]'
                 ];
 
                 let elements = [];

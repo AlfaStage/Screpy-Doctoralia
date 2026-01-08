@@ -40,6 +40,43 @@ class GoogleMapsScraper {
             startTime: null,
             estimatedTimeRemaining: null
         };
+        this.lastScreenshotTime = null;
+        this.screenshotPath = null;
+    }
+
+    // Capture screenshot and emit via Socket.io for live view
+    async captureScreenshot(actionName = 'ACTION') {
+        if (!this.browserManager || !this.browserManager.page) return;
+
+        try {
+            const page = this.browserManager.page;
+            const timestamp = Date.now();
+            const filename = `live_${this.id}.png`;
+            const filepath = path.join('./results', filename);
+
+            // Take screenshot
+            await page.screenshot({ path: filepath, type: 'png' });
+
+            // Read as base64 for Socket.io emission
+            const imageBuffer = await fs.readFile(filepath);
+            const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
+
+            // Emit to frontend
+            this.io.emit('scraper-screenshot', {
+                id: this.id,
+                action: actionName,
+                timestamp: timestamp,
+                image: base64Image,
+                url: `/results/${filename}?t=${timestamp}`
+            });
+
+            this.lastScreenshotTime = timestamp;
+            this.screenshotPath = filepath;
+
+        } catch (e) {
+            // Silently fail - screenshot is optional
+            console.log(`Screenshot capture failed: ${e.message}`);
+        }
     }
 
     async initialize(useProxy = true) {
@@ -380,6 +417,7 @@ class GoogleMapsScraper {
                         this.emitProgress(`🔍 Buscando: "${searchQuery}"... (tentativa ${searchAttempts})`);
 
                         await this.searchHandler.performSearch(searchQuery, (msg) => this.emitProgress(msg.message));
+                        await this.captureScreenshot('SEARCH_COMPLETE');
                         searchSuccess = true;
 
                     } catch (searchError) {
@@ -405,7 +443,7 @@ class GoogleMapsScraper {
                 let collectSuccess = false;
                 let collectAttempts = 0;
                 const maxCollectAttempts = 5;
-                const adjustedTarget = quantity * 2; // Initial batch
+                const adjustedTarget = Math.min(quantity * 2, 5000); // Cap at 5000
                 let businesses = [];
 
                 while (!collectSuccess && collectAttempts < maxCollectAttempts) {
@@ -415,6 +453,7 @@ class GoogleMapsScraper {
                             this.emitProgress(msg.message);
                         });
                         collectSuccess = true;
+                        await this.captureScreenshot('COLLECT_COMPLETE');
 
                     } catch (collectError) {
                         if (this.isProxyError(collectError)) {
@@ -494,6 +533,7 @@ class GoogleMapsScraper {
                             business,
                             (msg) => this.emitProgress(msg.message)
                         );
+                        await this.captureScreenshot('EXTRACT_BUSINESS');
 
                         // If website exists and investigation is enabled
                         if (investigateWebsites && businessData.website) {
@@ -679,6 +719,9 @@ class GoogleMapsScraper {
                 console.log(`Scraper ${this.id} cancelled`);
                 return { success: false, message: 'Cancelled', data: this.results, logs: this.logs };
             }
+
+            // Capture error screenshot for debugging
+            await this.captureScreenshot('ERROR');
 
             console.error('Scraping error:', error);
             this.emitProgress(`❌ Erro: ${error.message}`);
