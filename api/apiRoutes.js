@@ -160,6 +160,23 @@ function createApiRoutes(scraperManager) {
         }
     });
 
+    // DELETE /api/v1/clear-history - Clear all history
+    router.delete('/clear-history', async (req, res) => {
+        try {
+            await scraperManager.clearHistory();
+            res.json({
+                success: true,
+                message: 'Histórico limpo com sucesso'
+            });
+        } catch (error) {
+            console.error('API Error clearing history:', error);
+            res.status(500).json({
+                error: 'Internal Server Error',
+                message: error.message
+            });
+        }
+    });
+
     return router;
 }
 

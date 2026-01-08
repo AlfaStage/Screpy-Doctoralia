@@ -1,4 +1,4 @@
-const { randomDelay, humanType, scrollPage } = require('./utils');
+const { randomDelay, humanType, scrollPage } = require('../utils');
 
 class SearchHandler {
     constructor(page) {

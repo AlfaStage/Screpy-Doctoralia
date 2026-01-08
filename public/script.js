@@ -4,6 +4,27 @@ const socket = io();
 let activeScrapers = new Map();
 let history = [];
 let currentModalScraperId = null;
+let cachedApiKey = null;
+
+// Fetch API key on load
+async function fetchApiKey() {
+    try {
+        const res = await fetch('/api/v1/key');
+        const data = await res.json();
+        cachedApiKey = data.apiKey;
+    } catch (err) {
+        console.warn('Failed to fetch API key:', err);
+    }
+}
+fetchApiKey();
+
+// Helper: Format date for display
+function formatDate(dateInput) {
+    if (!dateInput) return 'N/A';
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
 
 // DOM Elements
 const form = document.getElementById('scrape-form');
@@ -102,6 +123,141 @@ function toggleSpecialty(name, card) {
 // Initialize on load
 loadSpecialties();
 
+// Tab Switching Logic
+const tabButtons = document.querySelectorAll('.tab-btn');
+const tabContents = document.querySelectorAll('.tab-content');
+
+tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const targetTab = btn.dataset.tab;
+
+        // Update active button
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Update active content
+        tabContents.forEach(content => {
+            if (content.dataset.tab === targetTab) {
+                content.classList.add('active');
+            } else {
+                content.classList.remove('active');
+            }
+        });
+    });
+});
+
+// Google Maps Form Handler
+const mapsForm = document.getElementById('maps-form');
+if (mapsForm) {
+    mapsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (!socket.connected) {
+            alert('Erro de conexão com o servidor. Tentando reconectar...');
+            socket.connect();
+            return;
+        }
+
+        const searchTerm = document.getElementById('search-term').value;
+        const city = document.getElementById('maps-city').value;
+        const quantity = document.getElementById('maps-quantity').value;
+        const investigateWebsites = document.getElementById('investigate-websites').checked;
+        const proxyMode = document.querySelector('input[name="maps-proxy-mode"]:checked')?.value || 'proxy';
+        const useProxy = proxyMode === 'proxy';
+
+        // Collect required fields
+        const requiredFields = Array.from(document.querySelectorAll('input[name="maps-required"]:checked'))
+            .map(cb => cb.value);
+
+        if (!searchTerm || searchTerm.trim().length === 0) {
+            alert('Por favor, informe um termo de busca');
+            return;
+        }
+
+        // Visual feedback
+        const btn = mapsForm.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
+
+        // Timeout to re-enable button if server doesn't respond
+        const timeoutId = setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert('O servidor demorou para responder. Tente novamente.');
+        }, 5000);
+
+        // Listen for confirmation to clear timeout
+        const onStarted = (data) => {
+            if (data.type === 'googlemaps') {
+                clearTimeout(timeoutId);
+                socket.off('scrape-started', onStarted);
+                socket.off('error', onError);
+
+                // Reset form and button
+                mapsForm.reset();
+                document.getElementById('investigate-websites').checked = true; // Keep default
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        };
+
+        const onError = (err) => {
+            clearTimeout(timeoutId);
+            socket.off('scrape-started', onStarted);
+            socket.off('error', onError);
+
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert(err.message);
+        };
+
+        socket.on('scrape-started', onStarted);
+        socket.once('error', onError);
+
+        socket.emit('start-maps-scrape', {
+            searchTerm,
+            city,
+            quantity: parseInt(quantity),
+            investigateWebsites,
+            useProxy,
+            requiredFields
+        });
+    });
+}
+
+// Handle Maps scrape-started event
+socket.on('scrape-started', ({ id, type }) => {
+    if (type === 'googlemaps') {
+        const config = {
+            searchTerm: document.getElementById('search-term')?.value || '',
+            city: document.getElementById('maps-city')?.value || '',
+            quantity: parseInt(document.getElementById('maps-quantity')?.value) || 10,
+            investigateWebsites: document.getElementById('investigate-websites')?.checked ?? true
+        };
+        const scraper = {
+            id,
+            type: 'googlemaps',
+            config,
+            status: 'running',
+            current: 0,
+            total: config.quantity,
+            logs: [],
+            results: [],
+            startTime: Date.now(),
+            successCount: 0,
+            errorCount: 0,
+            websitesInvestigated: 0
+        };
+        activeScrapers.set(id, scraper);
+        renderActiveScrapers();
+
+        // Open modal automatically
+        currentModalScraperId = id;
+        openModal(id, true);
+    }
+});
+
 // Socket.io Events
 socket.on('initial-state', (data) => {
     console.log('Received initial-state:', data);
@@ -112,11 +268,15 @@ socket.on('initial-state', (data) => {
     renderHistory();
 });
 
-socket.on('scrape-started', ({ id }) => {
+socket.on('scrape-started', ({ id, type }) => {
+    // Only handle Doctoralia type here (googlemaps is handled above)
+    if (type === 'googlemaps') return;
+
     // Criar scraper com dados iniciais
     const config = { city: document.getElementById('city').value || '', specialties: Array.from(selectedSpecialties), quantity: parseInt(document.getElementById('quantity').value) || 10 };
     const scraper = {
         id,
+        type: 'doctoralia',
         config,
         status: 'running',
         current: 0,
@@ -172,7 +332,27 @@ socket.on('scraper-result', (data) => {
         scraper.results.push(data.data);
 
         if (currentModalScraperId === data.id) {
-            appendResultToModal(data.data);
+            // Ensure headers are created if this is the first result
+            const thead = document.querySelector('#modal-results-table thead tr');
+            if (thead && thead.children.length === 0) {
+                const isMaps = scraper.type === 'googlemaps';
+                const keys = isMaps
+                    ? ['nome', 'categoria', 'telefone', 'whatsapp', 'website', 'email', 'instagram', 'endereco']
+                    : ['nome', 'especialidades', 'numeroFixo', 'numeroMovel', 'enderecos'];
+
+                keys.forEach(key => {
+                    const th = document.createElement('th');
+                    th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+                    thead.appendChild(th);
+                });
+
+                // Clear the "no results" message if present
+                if (modalResultsBody.querySelector('td[colspan]')) {
+                    modalResultsBody.innerHTML = '';
+                }
+            }
+
+            appendResultToModal(data.data, scraper.type || data.type || 'doctoralia');
         }
     }
 });
@@ -270,7 +450,13 @@ form.addEventListener('submit', (e) => {
 
     const city = document.getElementById('city').value;
     const quantity = document.getElementById('quantity').value;
-    const onlyWithPhone = document.getElementById('only-with-phone').checked;
+
+    // Get required fields for Doctoralia
+    const requiredFields = Array.from(document.querySelectorAll('input[name="doc-required"]:checked'))
+        .map(cb => cb.value);
+
+    const proxyMode = document.querySelector('input[name="proxy-mode"]:checked')?.value || 'proxy';
+    const useProxy = proxyMode === 'proxy';
 
     // Get selected specialties from the cards
     const specialties = Array.from(selectedSpecialties);
@@ -296,6 +482,11 @@ form.addEventListener('submit', (e) => {
 
         // Reset form and button
         form.reset();
+
+        // Clearing specialties also might be good, but user might want to reuse them
+        // selectedSpecialties.clear();
+        // document.querySelectorAll('.specialty-card.selected').forEach(c => c.classList.remove('selected'));
+
         btn.disabled = false;
         btn.innerHTML = originalText;
     };
@@ -317,7 +508,73 @@ form.addEventListener('submit', (e) => {
         specialties,
         city,
         quantity,
-        onlyWithPhone
+        requiredFields,
+        useProxy
+    });
+});
+
+// Maps Form Logic
+mapsForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    if (!socket.connected) {
+        alert('Erro de conexão com o servidor. Tentando reconectar...');
+        socket.connect();
+        return;
+    }
+
+    const searchTerm = document.getElementById('maps-search-term').value;
+    const city = document.getElementById('maps-city').value;
+    const quantity = document.getElementById('maps-quantity').value;
+    const proxyMode = document.querySelector('input[name="maps-proxy-mode"]:checked')?.value || 'proxy';
+    const useProxy = proxyMode === 'proxy';
+
+    // Get required fields for Google Maps
+    const requiredFields = Array.from(document.querySelectorAll('input[name="maps-required"]:checked'))
+        .map(cb => cb.value);
+
+    // Visual feedback
+    const btn = mapsForm.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
+
+    // Timeout to re-enable button if server doesn't respond
+    const timeoutId = setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        alert('O servidor demorou para responder. Tente novamente.');
+    }, 5000);
+
+    const onStarted = () => {
+        clearTimeout(timeoutId);
+        socket.off('scrape-started', onStarted);
+        socket.off('error', onError);
+
+        mapsForm.reset();
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    };
+
+    const onError = (err) => {
+        clearTimeout(timeoutId);
+        socket.off('scrape-started', onStarted);
+        socket.off('error', onError);
+
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        alert(err.message);
+    };
+
+    socket.once('scrape-started', onStarted);
+    socket.once('error', onError);
+
+    socket.emit('start-maps-scrape', {
+        searchTerm,
+        city,
+        quantity,
+        requiredFields,
+        useProxy
     });
 });
 
@@ -418,12 +675,34 @@ function renderActiveScrapers() {
 
 function renderHistory() {
     historyList.innerHTML = '';
-    if (history.length === 0) {
-        historyList.innerHTML = '<div class="empty-state">Histórico vazio</div>';
+
+    // Get filter values
+    const statusFilter = document.getElementById('filter-status')?.value || '';
+    const typeFilter = document.getElementById('filter-type')?.value || '';
+
+    // Filter history
+    let filteredHistory = history.filter(item => {
+        // Status filter
+        if (statusFilter) {
+            if (statusFilter === 'completed' && item.status !== 'completed') return false;
+            if (statusFilter === 'error' && item.status !== 'error' && item.status !== 'failed') return false;
+        }
+
+        // Type filter
+        if (typeFilter) {
+            const itemType = item.type || 'doctoralia';
+            if (typeFilter !== itemType) return false;
+        }
+
+        return true;
+    });
+
+    if (filteredHistory.length === 0) {
+        historyList.innerHTML = '<div class="empty-state">Nenhum resultado encontrado</div>';
         return;
     }
 
-    history.forEach(item => {
+    filteredHistory.forEach(item => {
         const card = createScraperCard(item, false);
         historyList.appendChild(card);
     });
@@ -434,23 +713,41 @@ function createScraperCard(item, isActive) {
     div.className = `scraper-card ${isActive ? 'active' : ''}`;
     div.onclick = () => openModal(item.id, isActive);
 
-    const specialties = item.config?.specialties?.join(', ') || 'Todos';
+    // Determine type and display title
+    const scraperType = item.type || 'doctoralia';
+    let cardTitle = '';
+    let typeBadgeClass = scraperType;
+    let typeBadgeText = '';
+
+    if (scraperType === 'googlemaps') {
+        cardTitle = item.config?.searchTerm || 'Google Maps';
+        typeBadgeText = '<i class="fas fa-map-marker-alt"></i> Maps';
+    } else {
+        const specialties = item.config?.specialties?.join(', ') || 'Médico';
+        cardTitle = specialties;
+        typeBadgeText = '<i class="fas fa-user-md"></i> Doctoralia';
+    }
+
     const city = item.config?.city || 'Qualquer lugar';
-    const progress = isActive ? (item.current || 0) : (item.result?.count || 0);
-    const total = isActive ? (item.total || item.config.quantity) : (item.result?.count || item.config.quantity);
-    const percent = total > 0 ? (progress / total) * 100 : 0;
+    const isMaps = item.type === 'googlemaps';
+    const title = isMaps ? (item.config?.searchTerm || 'Busca Maps') : (Array.isArray(item.config?.specialties) ? item.config.specialties.join(', ') : 'Especialidade');
+    const subtitle = item.config?.city || 'Local não definido';
+    const badgeClass = isMaps ? 'badge-maps' : 'badge-doctoralia';
+    const badgeText = isMaps ? 'Google Maps' : 'Doctoralia';
+    const iconClass = isMaps ? 'fa-map-marker-alt' : 'fa-user-md';
 
     div.innerHTML = `
-        <div class="card-header">
-            <div class="card-title">${specialties} em ${city}</div>
-            <div class="status-dot ${item.status}"></div>
+        <div class="history-header">
+            <span class="history-title"><i class="fas ${iconClass}"></i> ${title}</span>
+            <span class="scraper-type-badge ${badgeClass}">${badgeText}</span>
         </div>
-        <div class="card-meta">
-            <span>${progress}/${total} perfis</span>
-            <span>${item.status}</span>
+        <div class="history-details">
+            <span><i class="fas fa-map-marker-alt"></i> ${subtitle}</span>
+            <span><i class="fas fa-users"></i> ${item.total || item.config?.quantity || 0} leads</span>
         </div>
-        <div class="mini-progress">
-            <div class="mini-progress-bar" style="width: ${percent}%"></div>
+        <div class="history-meta">
+            <span class="status-badge ${item.status}">${item.status}</span>
+            <span class="date">${formatDate(item.startTime)}</span>
         </div>
     `;
     return div;
@@ -467,20 +764,23 @@ function openModal(id, isActive) {
     const item = isActive ? activeScrapers.get(id) : history.find(h => h.id === id);
     if (!item) return;
 
-    // Limpar logs anteriores ao abrir modal
+    // Clear previous logs
     modalLogs.innerHTML = '';
 
-    // Limpar resultados anteriores
+    // Clear previous results body
     modalResultsBody.innerHTML = '';
+
+    // Clear previous table headers for fresh start
+    const thead = document.querySelector('#modal-results-table thead tr');
+    if (thead) thead.innerHTML = '';
 
     modal.classList.remove('hidden');
 
-    // Carregar logs existentes desta extração (verificar múltiplas fontes)
+    // Load existing logs (check multiple sources)
     const logs = item.logs || (item.result ? item.result.logs : null) || [];
     if (logs && logs.length > 0) {
         logs.forEach(log => appendLogToModal(log));
     } else {
-        // Se não há logs, mostrar mensagem
         const noLogsDiv = document.createElement('div');
         noLogsDiv.className = 'log-entry';
         noLogsDiv.style.fontStyle = 'italic';
@@ -488,12 +788,7 @@ function openModal(id, isActive) {
         modalLogs.appendChild(noLogsDiv);
     }
 
-    // Carregar resultados existentes desta extração
-    const results = item.results || (item.result ? item.result.data : null) || [];
-    if (results && results.length > 0) {
-        results.forEach(r => appendResultToModal(r));
-    }
-
+    // updateModal will handle loading results
     updateModal(item);
     updateModalControls(item);
 }
@@ -511,8 +806,13 @@ modal.onclick = (e) => {
 
 
 function updateModal(item) {
-    const specialties = item.config?.specialties?.join(', ') || 'Todos';
-    modalTitle.textContent = `${specialties} em ${item.config?.city || 'Qualquer lugar'}`;
+    const isMaps = item.type === 'googlemaps';
+    const typeLabel = isMaps ? 'Google Maps' : 'Doctoralia';
+    const term = isMaps ? (item.config?.searchTerm || 'Busca') : (item.config?.specialties?.join(', ') || 'Todas');
+    const city = item.config?.city || 'Qualquer lugar';
+    const quantityLabel = item.config?.quantity || item.total || 0;
+
+    modalTitle.textContent = `${typeLabel} | ${term} | ${city} | ${quantityLabel}`;
 
     modalStatus.textContent = item.status;
     modalStatus.className = `status-badge ${item.status}`;
@@ -614,16 +914,39 @@ function updateModal(item) {
         }
     }
 
-    // Resultados são adicionados ao vivo via evento scraper-result
-    // Só recarregar se for modal de histórico (extração já concluída)
-    const isCompletedOrError = item.status === 'completed' || item.status === 'error';
-    if (isCompletedOrError && modalResultsBody.children.length === 0) {
-        const results = item.results || (item.result ? item.result.data : []);
-        if (results && results.length > 0) {
-            results.forEach(r => appendResultToModal(r));
-        } else {
-            modalResultsBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-tertiary); font-style: italic;">Nenhum resultado disponível</td></tr>';
-        }
+    // Results Table Handling
+    const isCompletedOrError = item.status === 'completed' || item.status === 'error' || item.status === 'failed';
+    const isRunning = item.status === 'running' || item.status === 'paused';
+
+    // Get results from various possible sources
+    const results = item.results || (item.result ? (item.result.data || item.result.results) : []) || [];
+
+    // Clear table body first
+    modalResultsBody.innerHTML = '';
+
+    // Setup headers if not already present
+    const thead = document.querySelector('#modal-results-table thead tr');
+    if (thead && thead.children.length === 0) {
+        const keys = isMaps
+            ? ['nome', 'categoria', 'telefone', 'whatsapp', 'website', 'email', 'instagram', 'endereco']
+            : ['nome', 'especialidades', 'numeroFixo', 'numeroMovel', 'enderecos'];
+
+        keys.forEach(key => {
+            const th = document.createElement('th');
+            th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+            thead.appendChild(th);
+        });
+    }
+
+    // Load results
+    if (results.length > 0) {
+        results.forEach(r => appendResultToModal(r, item.type));
+    } else if (isRunning) {
+        // For running scrapers, show waiting message
+        modalResultsBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--text-tertiary); font-style: italic; padding: 24px;">⏳ Aguardando resultados...</td></tr>';
+    } else {
+        // For completed with no results
+        modalResultsBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--text-tertiary); font-style: italic; padding: 24px;">Nenhum resultado encontrado</td></tr>';
     }
 }
 
@@ -658,16 +981,30 @@ function appendLogToModal(log) {
     modalLogs.scrollTop = modalLogs.scrollHeight;
 }
 
-function appendResultToModal(data) {
+function appendResultToModal(data, type) {
     const tr = document.createElement('tr');
-    const especialidades = data.especialidades && data.especialidades.length > 0
-        ? data.especialidades.join(', ')
-        : '-';
-    tr.innerHTML = `
-        <td>${data.nome}</td>
-        <td>${especialidades}</td>
-        <td>${data.numeroMovel || data.numeroFixo || '-'}</td>
-    `;
+
+    // Determine columns based on type (must match header definition in updateModal)
+    const isMaps = type === 'googlemaps';
+    const keys = isMaps
+        ? ['nome', 'categoria', 'telefone', 'whatsapp', 'website', 'email', 'instagram', 'endereco']
+        : ['nome', 'especialidades', 'numeroFixo', 'numeroMovel', 'enderecos'];
+
+    let html = '';
+    keys.forEach(key => {
+        let value = data[key];
+
+        // Format arrays or special fields
+        if (Array.isArray(value)) value = value.join(', ');
+        if (key === 'website' && value) value = `<a href="${value}" target="_blank" style="color: var(--accent-color); text-decoration: none;">🔗 Link</a>`;
+        if (key === 'instagram' && value && !value.startsWith('http')) value = `<a href="https://instagram.com/${value.replace('@', '')}" target="_blank" style="color: var(--accent-color); text-decoration: none;">@${value.replace('@', '')}</a>`;
+        if (key === 'whatsapp' && value) value = `<a href="https://wa.me/${value.replace(/\D/g, '')}" target="_blank" style="color: #25D366;">📱 ${value}</a>`;
+        if (!value) value = '<span style="color: var(--text-tertiary);">-</span>';
+
+        html += `<td>${value}</td>`;
+    });
+
+    tr.innerHTML = html;
     modalResultsBody.appendChild(tr);
 }
 
@@ -686,4 +1023,63 @@ btnCancel.onclick = () => {
     }
 };
 
+// History Filter Events
+const filterStatus = document.getElementById('filter-status');
+const filterType = document.getElementById('filter-type');
 
+if (filterStatus) {
+    filterStatus.addEventListener('change', renderHistory);
+}
+
+if (filterType) {
+    filterType.addEventListener('change', renderHistory);
+}
+
+// Clear History Modal
+const clearHistoryBtn = document.getElementById('clear-history-btn');
+const clearHistoryModal = document.getElementById('clear-history-modal');
+const cancelClearHistory = document.getElementById('cancel-clear-history');
+const confirmClearHistory = document.getElementById('confirm-clear-history');
+
+if (clearHistoryBtn && clearHistoryModal) {
+    clearHistoryBtn.addEventListener('click', () => {
+        clearHistoryModal.classList.remove('hidden');
+    });
+
+    clearHistoryModal.addEventListener('click', (e) => {
+        if (e.target === clearHistoryModal) {
+            clearHistoryModal.classList.add('hidden');
+        }
+    });
+}
+
+if (cancelClearHistory) {
+    cancelClearHistory.addEventListener('click', () => {
+        clearHistoryModal.classList.add('hidden');
+    });
+}
+
+if (confirmClearHistory) {
+    confirmClearHistory.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/api/v1/clear-history', {
+                method: 'DELETE',
+                headers: {
+                    'X-API-Key': cachedApiKey || ''
+                }
+            });
+
+            if (response.ok) {
+                history = [];
+                renderHistory();
+                clearHistoryModal.classList.add('hidden');
+                alert('Histórico limpo com sucesso!');
+            } else {
+                alert('Erro ao limpar histórico');
+            }
+        } catch (error) {
+            console.error('Error clearing history:', error);
+            alert('Erro ao limpar histórico');
+        }
+    });
+}

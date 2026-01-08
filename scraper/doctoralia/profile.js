@@ -1,4 +1,4 @@
-const { randomDelay, scrollPage } = require('./utils');
+const { randomDelay, scrollPage } = require('../utils');
 const { formatProfilePhones } = require('./phoneFormatter');
 
 class ProfileExtractor {

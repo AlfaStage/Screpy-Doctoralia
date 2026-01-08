@@ -5,7 +5,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 const ScraperManager = require('./scraper/manager');
-const SpecialtyFetcher = require('./scraper/specialties');
+const SpecialtyFetcher = require('./scraper/doctoralia/specialties');
 const { getOrCreateApiKey } = require('./api/apiMiddleware');
 const createApiRoutes = require('./api/apiRoutes');
 
@@ -47,8 +47,8 @@ io.on('connection', (socket) => {
 
     socket.on('start-scrape', async (data) => {
         try {
-            const { specialties, city, quantity, onlyWithPhone } = data;
-            console.log('Starting scrape:', { specialties, city, quantity, onlyWithPhone });
+            const { specialties, city, quantity, onlyWithPhone, requiredFields, useProxy } = data;
+            console.log('Starting scrape:', { specialties, city, quantity, onlyWithPhone, requiredFields, useProxy });
 
             // Validate input (specialties can be empty array, will default to "Médico")
             if (!quantity || quantity < 1) {
@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
             }
 
             const id = await scraperManager.startScrape(data);
-            socket.emit('scrape-started', { id });
+            socket.emit('scrape-started', { id, type: 'doctoralia' });
 
         } catch (error) {
             console.error('Error starting scrape:', error);
@@ -75,6 +75,32 @@ io.on('connection', (socket) => {
 
     socket.on('cancel-scrape', async ({ id }) => {
         await scraperManager.cancelScraper(id);
+    });
+
+    // Google Maps scraper events
+    socket.on('start-maps-scrape', async (data) => {
+        try {
+            const { searchTerm, city, quantity, investigateWebsites, requiredFields, useProxy } = data;
+            console.log('Starting Maps scrape:', { searchTerm, city, quantity, investigateWebsites, requiredFields, useProxy });
+
+            // Validate input
+            if (!searchTerm || searchTerm.trim().length === 0) {
+                socket.emit('error', { message: 'Termo de busca é obrigatório' });
+                return;
+            }
+
+            if (!quantity || quantity < 1) {
+                socket.emit('error', { message: 'Quantidade inválida' });
+                return;
+            }
+
+            const id = await scraperManager.startMapsScrape(data);
+            socket.emit('scrape-started', { id, type: 'googlemaps' });
+
+        } catch (error) {
+            console.error('Error starting maps scrape:', error);
+            socket.emit('error', { message: error.message });
+        }
     });
 
     socket.on('disconnect', () => {

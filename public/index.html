@@ -36,7 +36,24 @@
             </div>
 
             <div class="sidebar-section">
-                <h2><i class="fas fa-history"></i> Histórico</h2>
+                <div class="section-header">
+                    <h2><i class="fas fa-history"></i> Histórico</h2>
+                    <button id="clear-history-btn" class="btn-icon btn-danger-icon" title="Limpar Histórico">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="history-filters">
+                    <select id="filter-status" class="filter-select">
+                        <option value="">Todos Status</option>
+                        <option value="completed">Sucesso</option>
+                        <option value="error">Falha</option>
+                    </select>
+                    <select id="filter-type" class="filter-select">
+                        <option value="">Todos Tipos</option>
+                        <option value="doctoralia">Doctoralia</option>
+                        <option value="googlemaps">Google Maps</option>
+                    </select>
+                </div>
                 <div id="history-list" class="scrapers-list">
                     <div class="empty-state">Histórico vazio</div>
                 </div>
@@ -50,7 +67,18 @@
             </div>
 
             <div class="config-card">
-                <form id="scrape-form">
+                <!-- Tabs -->
+                <div class="scraper-tabs">
+                    <button class="tab-btn active" data-tab="doctoralia">
+                        <i class="fas fa-user-md"></i> Doctoralia
+                    </button>
+                    <button class="tab-btn" data-tab="googlemaps">
+                        <i class="fas fa-map-marker-alt"></i> Google Maps
+                    </button>
+                </div>
+
+                <!-- Doctoralia Form -->
+                <form id="scrape-form" class="tab-content active" data-tab="doctoralia">
                     <div class="form-group">
                         <label>Selecione as Especialidades</label>
                         <div class="specialty-grid" id="specialty-grid">
@@ -78,15 +106,137 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="only-with-phone">
-                            <span>Somente com telefone cadastrado</span>
-                        </label>
-                        <small>Extrair apenas médicos com número de telefone disponível</small>
+                        <label>Dados Obrigatórios</label>
+                        <small>Marque os campos que o médico deve ter para ser extraído</small>
+                        <div class="required-fields-selector">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="doc-required" value="phone">
+                                <span>Telefone</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="doc-required" value="address">
+                                <span>Endereço</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Modo de Conexão</label>
+                        <div class="proxy-selector">
+                            <label class="radio-label">
+                                <input type="radio" name="proxy-mode" value="proxy" checked>
+                                <span><i class="fas fa-shield-alt"></i> Com Proxy</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="proxy-mode" value="no-proxy">
+                                <span><i class="fas fa-bolt"></i> Sem Proxy (Mais Rápido)</span>
+                            </label>
+                        </div>
+                        <small>Com proxy: mais seguro, evita bloqueios. Sem proxy: mais rápido, mas pode ser
+                            bloqueado.</small>
                     </div>
 
                     <button type="submit" class="btn-primary">
                         <i class="fas fa-rocket"></i> Iniciar Extração
+                    </button>
+                </form>
+
+                <!-- Google Maps Form -->
+                <form id="maps-form" class="tab-content" data-tab="googlemaps">
+                    <div class="form-group">
+                        <label for="search-term">Termo de Busca</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-term"
+                                placeholder="Ex: médico, padaria, estetica, marceneiro...">
+                        </div>
+                        <small>Digite o tipo de estabelecimento que deseja buscar</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="maps-city">Cidade / Região</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="maps-city" placeholder="Ex: São Paulo, SP (vazio = Brasil todo)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maps-quantity">Quantidade de Resultados</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-list-ol"></i>
+                                <input type="number" id="maps-quantity" value="10" min="1" max="500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="investigate-websites" checked>
+                            <span>Investigar websites dos estabelecimentos</span>
+                        </label>
+                        <small>Acessar sites vinculados para extrair email, Instagram, CNPJ e telefones
+                            adicionais</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dados Obrigatórios</label>
+                        <small>Marque os campos que o estabelecimento deve ter para ser extraído</small>
+                        <div class="required-fields-selector">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="maps-required" value="phone">
+                                <span>Telefone</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="maps-required" value="whatsapp">
+                                <span>WhatsApp</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="maps-required" value="website">
+                                <span>Website</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="maps-required" value="email">
+                                <span>Email</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="maps-required" value="instagram">
+                                <span>Instagram</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Dados extraídos:</strong>
+                            <ul>
+                                <li><strong>Do Maps:</strong> Nome, Endereço, Telefone, Website, Categoria, Avaliação
+                                </li>
+                                <li><strong>De Websites:</strong> Email, Instagram, CNPJ, Telefones adicionais</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Modo de Conexão</label>
+                        <div class="proxy-selector">
+                            <label class="radio-label">
+                                <input type="radio" name="maps-proxy-mode" value="proxy" checked>
+                                <span><i class="fas fa-shield-alt"></i> Com Proxy</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="maps-proxy-mode" value="no-proxy">
+                                <span><i class="fas fa-bolt"></i> Sem Proxy (Mais Rápido)</span>
+                            </label>
+                        </div>
+                        <small>Com proxy: mais seguro, evita bloqueios. Sem proxy: mais rápido, mas pode ser
+                            bloqueado.</small>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-maps">
+                        <i class="fas fa-map"></i> Iniciar Extração do Maps
                     </button>
                 </form>
             </div>
@@ -151,16 +301,14 @@
 
                 <div class="modal-section">
                     <h3>Resultados</h3>
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Especialidades</th>
-                                <th>Telefone</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modal-results-body"></tbody>
-                    </table>
+                    <div class="results-table-wrapper">
+                        <table id="modal-results-table" class="results-table">
+                            <thead>
+                                <tr></tr>
+                            </thead>
+                            <tbody id="modal-results-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -192,6 +340,26 @@
                     </button>
                 </div>
                 <small>Inclua no header: <code>X-API-Key: &lt;sua-chave&gt;</code></small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear History Modal -->
+    <div id="clear-history-modal" class="modal-overlay hidden">
+        <div class="modal-content confirm-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
+                </div>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja limpar todo o histórico?</p>
+                <p class="text-warning"><strong>Esta ação irá excluir todos os arquivos de resultados e não pode ser
+                        desfeita.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-clear-history" class="btn-secondary">Cancelar</button>
+                <button id="confirm-clear-history" class="btn-danger">Limpar Tudo</button>
             </div>
         </div>
     </div>

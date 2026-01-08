@@ -1,7 +1,7 @@
-const BrowserManager = require('./browser');
+const BrowserManager = require('../browser');
 const SearchHandler = require('./search');
 const ProfileExtractor = require('./profile');
-const ProxyManager = require('./proxyManager');
+const ProxyManager = require('../proxyManager');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -41,23 +41,31 @@ class DoctoraliaScraper {
         };
     }
 
-    async initialize() {
+    async initialize(useProxy = true) {
         // Small delay to ensure frontend is connected and listening to logs
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         this.proxyManager = new ProxyManager((msg) => this.emitProgress(msg));
 
-        // Try to get proxy, fallback to no proxy if all fail
-        // Pass true to allowNoProxy fallback
-        this.currentProxy = await this.proxyManager.getNextProxy(true);
-
-        if (this.currentProxy === null) {
-            this.emitProgress('⚠️ Modo SEM PROXY ativado. Usando rate limiting.');
+        // Check if user explicitly disabled proxy
+        if (!useProxy) {
+            this.emitProgress('🚀 Modo SEM PROXY selecionado. Usando rate limiting.');
+            this.currentProxy = null;
             this.usingProxy = false;
             this.currentDelay = 3000; // Start with 3s delay when no proxy
         } else {
-            this.usingProxy = true;
-            this.currentDelay = 0; // No delay with proxy
+            // Try to get proxy, fallback to no proxy if all fail
+            // Pass true to allowNoProxy fallback
+            this.currentProxy = await this.proxyManager.getNextProxy(true);
+
+            if (this.currentProxy === null) {
+                this.emitProgress('⚠️ Nenhum proxy disponível. Usando rate limiting.');
+                this.usingProxy = false;
+                this.currentDelay = 3000; // Start with 3s delay when no proxy
+            } else {
+                this.usingProxy = true;
+                this.currentDelay = 0; // No delay with proxy
+            }
         }
 
         // Tentar inicializar o browser com o proxy
@@ -238,11 +246,11 @@ class DoctoraliaScraper {
         console.log(fullMessage);
     }
 
-    async scrape(specialties, city, quantity, onlyWithPhone = false) {
+    async scrape(specialties, city, quantity, onlyWithPhone = false, requiredFields = []) {
         try {
             this.results = [];
             // Do NOT clear logs here to preserve initialization logs
-            this.config = { specialties, city, quantity, onlyWithPhone };
+            this.config = { specialties, city, quantity, onlyWithPhone, requiredFields };
             this.progress.total = quantity;
             this.progress.successCount = 0;
             this.progress.errorCount = 0;
@@ -328,12 +336,48 @@ class DoctoraliaScraper {
                 try {
                     const profileData = await this.profileExtractor.extractProfile(url, (msg) => this.emitProgress(msg.message));
 
-                    // Check phone filter
-                    if (onlyWithPhone && !this.profileExtractor.hasPhoneNumber(profileData)) {
+                    // Check required fields
+                    if (requiredFields && requiredFields.length > 0) {
+                        const missingFields = [];
+
+                        for (const field of requiredFields) {
+                            if (field === 'phone' && !this.profileExtractor.hasPhoneNumber(profileData)) missingFields.push('Telefone');
+                            if (field === 'address' && !profileData.endereco) missingFields.push('Endereço');
+                        }
+
+                        // Also respect legacy onlyWithPhone flag
+                        if (onlyWithPhone && !this.profileExtractor.hasPhoneNumber(profileData) && !missingFields.includes('Telefone')) {
+                            missingFields.push('Telefone');
+                        }
+
+                        if (missingFields.length > 0) {
+                            this.progress.skippedCount++;
+                            this.emitProgress(`⏭️ Médico pulado: ${profileData.nome} (Faltando: ${missingFields.join(', ')})`);
+                            console.log(`⏭️ Skipping ${profileData.nome} - missing fields: ${missingFields.join(', ')}`);
+
+                            // Emit skipped update to UI
+                            this.io.emit('scraper-progress', {
+                                id: this.id,
+                                type: 'doctoralia',
+                                ...this.progress
+                            });
+
+                            continue;
+                        }
+                    } else if (onlyWithPhone && !this.profileExtractor.hasPhoneNumber(profileData)) {
+                        // Fallback for onlyWithPhone if requiredFields is empty/undefined
                         this.progress.skippedCount++;
                         this.emitProgress(`⏭️ Médico pulado (sem telefone): ${profileData.nome}`);
                         console.log(`⏭️ Skipping ${profileData.nome} - no phone number`);
-                        continue; // Don't count as success, continue to next
+
+                        // Emit skipped update to UI
+                        this.io.emit('scraper-progress', {
+                            id: this.id,
+                            type: 'doctoralia',
+                            ...this.progress
+                        });
+
+                        continue;
                     }
 
                     if (this.profileExtractor.hasPhoneNumber(profileData)) {
@@ -639,9 +683,9 @@ class DoctoraliaScraper {
     async saveResults() {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const fileName = `doctoralia_results_${timestamp}.csv`;
-        const filePath = path.join(__dirname, '..', 'results', fileName);
+        const filePath = path.join(__dirname, '..', '..', 'results', fileName);
 
-        await fs.mkdir(path.join(__dirname, '..', 'results'), { recursive: true });
+        await fs.mkdir(path.join(__dirname, '..', '..', 'results'), { recursive: true });
 
         // Save CSV
         const csvLines = ['Nome,Especialidades,Numero Fixo,Numero Movel,Enderecos'];
