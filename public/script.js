@@ -269,10 +269,39 @@ socket.on('initial-state', (data) => {
 });
 
 socket.on('scrape-started', ({ id, type }) => {
-    // Only handle Doctoralia type here (googlemaps is handled above)
+    // Skip types handled elsewhere
     if (type === 'googlemaps') return;
 
-    // Criar scraper com dados iniciais
+    // Handle Instagram type
+    if (type === 'instagram') {
+        const config = {
+            searchType: document.getElementById('ig-search-type')?.value || 'profiles',
+            searchTerm: document.getElementById('ig-search-term')?.value || '',
+            filterTerm: document.getElementById('ig-filter-term')?.value || '',
+            quantity: parseInt(document.getElementById('ig-quantity')?.value) || 10
+        };
+        const scraper = {
+            id,
+            type: 'instagram',
+            config,
+            status: 'running',
+            current: 0,
+            total: config.quantity,
+            logs: [],
+            results: [],
+            startTime: Date.now(),
+            successCount: 0,
+            errorCount: 0,
+            skippedCount: 0
+        };
+        activeScrapers.set(id, scraper);
+        renderActiveScrapers();
+        currentModalScraperId = id;
+        openModal(id, true);
+        return;
+    }
+
+    // Doctoralia type (default)
     const config = { city: document.getElementById('city').value || '', specialties: Array.from(selectedSpecialties), quantity: parseInt(document.getElementById('quantity').value) || 10 };
     const scraper = {
         id,
@@ -578,6 +607,250 @@ mapsForm.addEventListener('submit', (e) => {
     });
 });
 
+// Instagram Form Logic
+const instagramForm = document.getElementById('instagram-form');
+const igSearchType = document.getElementById('ig-search-type');
+const igSearchLabel = document.getElementById('ig-search-label');
+const igSearchHint = document.getElementById('ig-search-hint');
+const igFilterGroup = document.getElementById('ig-filter-group');
+const igCookiesSection = document.getElementById('ig-cookies-section');
+const igCredentialsSection = document.getElementById('ig-credentials-section');
+const igAuthMethodGroup = document.getElementById('ig-auth-method-group');
+
+// Handle search type change
+if (igSearchType) {
+    igSearchType.addEventListener('change', () => {
+        const type = igSearchType.value;
+
+        switch (type) {
+            case 'profiles':
+            case 'hashtag':
+                const label = type === 'profiles' ? 'Termo de Busca' : 'Hashtag';
+                const hint = type === 'profiles' ? 'Digite um termo para buscar perfis' : 'Digite a hashtag sem o # (ex: estetica)';
+                igSearchLabel.textContent = label;
+                igSearchHint.textContent = hint;
+                igFilterGroup.classList.add('hidden');
+
+                // Hide auth fields for non-auth types
+                if (igAuthMethodGroup) igAuthMethodGroup.classList.add('hidden');
+                if (igCookiesSection) igCookiesSection.classList.add('hidden');
+                if (igCredentialsSection) igCredentialsSection.classList.add('hidden');
+                break;
+
+            case 'followers':
+                igSearchLabel.textContent = 'Perfil de Origem';
+                igSearchHint.textContent = 'Digite @usuario ou URL do perfil';
+                igFilterGroup.classList.remove('hidden');
+
+                // Show Auth Selector
+                if (igAuthMethodGroup) igAuthMethodGroup.classList.remove('hidden');
+                // Trigger auth method change logic
+                updateAuthFieldsVisibility();
+                break;
+        }
+    });
+
+    // Trigger change initially to set correct state
+    igSearchType.dispatchEvent(new Event('change'));
+}
+
+// Handle Auth Method Change (Radio Buttons)
+function updateAuthFieldsVisibility() {
+    const selectedMethod = document.querySelector('input[name="ig-auth-method"]:checked')?.value;
+
+    if (selectedMethod === 'credentials') {
+        if (igCredentialsSection) igCredentialsSection.classList.remove('hidden');
+        if (igCookiesSection) {
+            igCookiesSection.classList.add('hidden');
+            igCookiesSection.removeAttribute('open');
+        }
+    } else { // Default to cookies if not credentials
+        if (igCredentialsSection) igCredentialsSection.classList.add('hidden');
+        if (igCookiesSection) {
+            igCookiesSection.classList.remove('hidden');
+            igCookiesSection.setAttribute('open', 'true');
+        }
+    }
+}
+
+document.querySelectorAll('input[name="ig-auth-method"]').forEach(radio => {
+    radio.addEventListener('change', updateAuthFieldsVisibility);
+});
+
+
+if (instagramForm) {
+    instagramForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (!socket.connected) {
+            alert('Erro de conexão com o servidor. Tentando reconectar...');
+            socket.connect();
+            return;
+        }
+
+        const searchType = document.getElementById('ig-search-type').value;
+        const searchTerm = document.getElementById('ig-search-term').value;
+        const filterTerm = document.getElementById('ig-filter-term')?.value || '';
+        const quantity = document.getElementById('ig-quantity').value;
+        const proxyMode = document.querySelector('input[name="ig-proxy-mode"]:checked')?.value || 'proxy';
+        const useProxy = proxyMode === 'proxy';
+
+        // Collect required fields
+        const requiredFields = Array.from(document.querySelectorAll('input[name="ig-required"]:checked'))
+            .map(cb => cb.value);
+
+        // Collect credentials
+        const username = document.getElementById('ig-username')?.value || '';
+        const password = document.getElementById('ig-password')?.value || '';
+
+        // Collect cookies if provided
+        const sessionid = document.getElementById('ig-cookie-sessionid')?.value || '';
+        const csrftoken = document.getElementById('ig-cookie-csrftoken')?.value || '';
+        const ds_user_id = document.getElementById('ig-cookie-ds_user_id')?.value || '';
+
+        let cookies = null;
+        if (sessionid) {
+            cookies = { sessionid, csrftoken, ds_user_id };
+        }
+
+        if (!searchTerm || searchTerm.trim().length === 0) {
+            alert('Por favor, informe o termo de busca ou perfil');
+            return;
+        }
+
+        // Validate auth for followers
+        if (searchType === 'followers' && !cookies && (!username || !password)) {
+            alert('Para extrair seguidores, você precisa fornecer Login/Senha OU Cookies de Sessão.');
+            return;
+        }
+
+        // Visual feedback
+        const btn = instagramForm.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
+
+        const timeoutId = setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert('O servidor demorou para responder. Tente novamente.');
+        }, 5000);
+
+        const onStarted = (data) => {
+            if (data.type === 'instagram') {
+                clearTimeout(timeoutId);
+                socket.off('scrape-started', onStarted);
+                socket.off('error', onError);
+
+                // Keep form values (user might want to adjust and retry)
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        };
+
+        const onError = (err) => {
+            clearTimeout(timeoutId);
+            socket.off('scrape-started', onStarted);
+            socket.off('error', onError);
+
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert(err.message);
+        };
+
+        socket.on('scrape-started', onStarted);
+        socket.once('error', onError);
+
+        socket.emit('start-instagram-scrape', {
+            searchType,
+            searchTerm,
+            filterTerm,
+            quantity: parseInt(quantity),
+            requiredFields,
+            useProxy,
+            cookies,
+            username,
+            password
+        });
+    });
+}
+
+// Handle Instagram auth required event (Login failure / Cookie expired)
+const reloginModal = document.getElementById('relogin-modal');
+const reloginForm = document.getElementById('relogin-form');
+const reloginUsername = document.getElementById('relogin-username');
+const reloginPassword = document.getElementById('relogin-password');
+const closeReloginBtn = document.getElementById('close-relogin-modal');
+let currentReloginScraperId = null;
+
+socket.on('instagram-auth-required', ({ id, message }) => {
+    // Check if this scraper is active or we should show global modal
+    if (reloginModal) {
+        currentReloginScraperId = id;
+        reloginModal.classList.remove('hidden');
+        reloginUsername.focus();
+        // You could also update a status message inside the modal
+    } else {
+        alert(message || 'Login necessário. Por favor, reinicie com credenciais válidas.');
+    }
+});
+
+if (closeReloginBtn) {
+    closeReloginBtn.onclick = () => {
+        reloginModal.classList.add('hidden');
+        currentReloginScraperId = null;
+    };
+}
+
+if (reloginForm) {
+    reloginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const username = reloginUsername.value;
+        const password = reloginPassword.value;
+
+        if (!username || !password) return;
+
+        if (currentReloginScraperId) {
+            // Emitting new event to server to verify credentials and resume
+            socket.emit('update-instagram-credentials', {
+                id: currentReloginScraperId,
+                username,
+                password
+            });
+
+            reloginModal.classList.add('hidden');
+            // Give visual feedback or show generic loader?
+        }
+    });
+}
+
+// Handle Instagram Challenge (2FA/Email Code)
+const authCodeModal = document.getElementById('auth-code-modal');
+const authCodeInput = document.getElementById('auth-code-input');
+const btnSubmitCode = document.getElementById('btn-submit-code');
+
+socket.on('instagram-challenge-required', ({ id, type, message }) => {
+    if (authCodeModal) {
+        authCodeModal.classList.remove('hidden');
+        authCodeInput.value = '';
+        authCodeInput.focus();
+
+        // Update modal message if needed
+        const msgEl = authCodeModal.querySelector('.modal-body p');
+        if (msgEl) msgEl.textContent = message || 'O Instagram solicitou um código de verificação.';
+
+        // Handle submit
+        btnSubmitCode.onclick = () => {
+            const code = authCodeInput.value;
+            if (!code) return;
+
+            socket.emit('instagram-challenge-code', { id, code });
+            authCodeModal.classList.add('hidden');
+        };
+    }
+});
+
 // Theme Toggle
 const themeToggleBtn = document.getElementById('theme-toggle');
 const body = document.body;
@@ -712,37 +985,44 @@ function createScraperCard(item, isActive) {
     const div = document.createElement('div');
     div.className = `scraper-card ${isActive ? 'active' : ''}`;
     div.onclick = () => openModal(item.id, isActive);
-
-    // Determine type and display title
+    // Determine type and display info
     const scraperType = item.type || 'doctoralia';
-    let cardTitle = '';
-    let typeBadgeClass = scraperType;
-    let typeBadgeText = '';
+    let title = '';
+    let subtitle = item.config?.city || '';
+    let badgeClass = '';
+    let badgeText = '';
+    let iconClass = '';
 
     if (scraperType === 'googlemaps') {
-        cardTitle = item.config?.searchTerm || 'Google Maps';
-        typeBadgeText = '<i class="fas fa-map-marker-alt"></i> Maps';
+        title = item.config?.searchTerm || 'Google Maps';
+        subtitle = item.config?.city || 'Brasil';
+        badgeClass = 'badge-maps';
+        badgeText = 'Google Maps';
+        iconClass = 'fa-map-marker-alt';
+    } else if (scraperType === 'instagram') {
+        const searchTypeLabels = { profiles: 'Perfis', hashtag: 'Hashtag', followers: 'Seguidores' };
+        const searchType = item.config?.searchType || 'profiles';
+        title = item.config?.searchTerm || 'Instagram';
+        subtitle = searchTypeLabels[searchType] || 'Pesquisa';
+        badgeClass = 'badge-instagram';
+        badgeText = 'Instagram';
+        iconClass = 'fab fa-instagram';
     } else {
         const specialties = item.config?.specialties?.join(', ') || 'Médico';
-        cardTitle = specialties;
-        typeBadgeText = '<i class="fas fa-user-md"></i> Doctoralia';
+        title = specialties;
+        subtitle = item.config?.city || 'Qualquer lugar';
+        badgeClass = 'badge-doctoralia';
+        badgeText = 'Doctoralia';
+        iconClass = 'fa-user-md';
     }
-
-    const city = item.config?.city || 'Qualquer lugar';
-    const isMaps = item.type === 'googlemaps';
-    const title = isMaps ? (item.config?.searchTerm || 'Busca Maps') : (Array.isArray(item.config?.specialties) ? item.config.specialties.join(', ') : 'Especialidade');
-    const subtitle = item.config?.city || 'Local não definido';
-    const badgeClass = isMaps ? 'badge-maps' : 'badge-doctoralia';
-    const badgeText = isMaps ? 'Google Maps' : 'Doctoralia';
-    const iconClass = isMaps ? 'fa-map-marker-alt' : 'fa-user-md';
 
     div.innerHTML = `
         <div class="history-header">
-            <span class="history-title"><i class="fas ${iconClass}"></i> ${title}</span>
+            <span class="history-title"><i class="${scraperType === 'instagram' ? 'fab' : 'fas'} ${iconClass}"></i> ${title}</span>
             <span class="scraper-type-badge ${badgeClass}">${badgeText}</span>
         </div>
         <div class="history-details">
-            <span><i class="fas fa-map-marker-alt"></i> ${subtitle}</span>
+            <span><i class="fas ${scraperType === 'instagram' ? 'fa-hashtag' : 'fa-map-marker-alt'}"></i> ${subtitle}</span>
             <span><i class="fas fa-users"></i> ${item.total || item.config?.quantity || 0} leads</span>
         </div>
         <div class="history-meta">
@@ -1088,8 +1368,10 @@ if (confirmClearHistory) {
 const liveViewModal = document.getElementById('live-view-modal');
 const closeLiveViewBtn = document.getElementById('close-live-view');
 const btnLiveView = document.getElementById('btn-live-view');
-const liveScreenshot = document.getElementById('live-screenshot');
-const screenshotPlaceholder = document.getElementById('screenshot-placeholder');
+const liveScreenshotMain = document.getElementById('live-screenshot-main');
+const screenshotPlaceholderMain = document.getElementById('screenshot-placeholder-main');
+const liveScreenshotWorker = document.getElementById('live-screenshot-worker');
+const screenshotPlaceholderWorker = document.getElementById('screenshot-placeholder-worker');
 const liveActionBadge = document.getElementById('live-action-badge');
 const liveLogs = document.getElementById('live-logs');
 
@@ -1102,7 +1384,8 @@ function updateLiveViewButtonState() {
     if (!btnLiveView || !currentModalScraperId) return;
 
     const screenshotData = scraperScreenshots.get(currentModalScraperId);
-    if (screenshotData && screenshotData.image) {
+    // Enable if we have EITHER a main OR a worker screenshot
+    if (screenshotData && (screenshotData.main || screenshotData.worker)) {
         btnLiveView.disabled = false;
         btnLiveView.title = 'Visualizar ao vivo';
     } else {
@@ -1112,19 +1395,35 @@ function updateLiveViewButtonState() {
 }
 
 // Open live view modal
+// Open live view modal
 function openLiveView() {
     if (!currentModalScraperId) return;
 
     const screenshotData = scraperScreenshots.get(currentModalScraperId);
-    if (!screenshotData || !screenshotData.image) return;
+    if (!screenshotData || (!screenshotData.main && !screenshotData.worker)) return; // Need at least one
 
     liveViewModal.classList.remove('hidden');
     liveViewActive = true;
 
-    // Load existing screenshot for this scraper
-    liveScreenshot.src = screenshotData.image;
-    liveScreenshot.style.display = 'block';
-    screenshotPlaceholder.style.display = 'none';
+    // Load Main Screenshot
+    if (screenshotData.main && screenshotData.main.image) {
+        liveScreenshotMain.src = screenshotData.main.image;
+        liveScreenshotMain.style.display = 'block';
+        screenshotPlaceholderMain.style.display = 'none';
+    } else {
+        liveScreenshotMain.style.display = 'none';
+        screenshotPlaceholderMain.style.display = 'flex';
+    }
+
+    // Load Worker Screenshot
+    if (screenshotData.worker && screenshotData.worker.image) {
+        liveScreenshotWorker.src = screenshotData.worker.image;
+        liveScreenshotWorker.style.display = 'block';
+        screenshotPlaceholderWorker.style.display = 'none';
+    } else {
+        liveScreenshotWorker.style.display = 'none';
+        screenshotPlaceholderWorker.style.display = 'flex';
+    }
 
     // Copy existing logs from main modal
     const mainLogs = document.getElementById('modal-logs');
@@ -1161,34 +1460,45 @@ if (liveViewModal) {
 
 // Socket listener for screenshots - stores per scraper
 socket.on('scraper-screenshot', (data) => {
-    const { id, image, action, timestamp } = data;
+    const { id, image, action, timestamp, source } = data;
+    const currentSource = source || 'main'; // Default to main if not specified
 
     // Get or create screenshot data for this scraper
-    let screenshotData = scraperScreenshots.get(id);
-
-    // Clear any existing expiry timer for this scraper
-    if (screenshotData && screenshotData.expiryTimer) {
-        clearTimeout(screenshotData.expiryTimer);
+    let existingData = scraperScreenshots.get(id);
+    if (!existingData) {
+        existingData = { main: null, worker: null };
     }
 
-    // Store new screenshot
-    scraperScreenshots.set(id, {
+    // Update specific source data
+    existingData[currentSource] = {
         image: image,
         action: action,
-        timestamp: timestamp,
-        expiryTimer: null
-    });
+        timestamp: timestamp
+    };
+
+    // Save back to map
+    scraperScreenshots.set(id, existingData);
 
     // Update button state if viewing this scraper
     if (id === currentModalScraperId) {
         updateLiveViewButtonState();
     }
 
-    // If live view is open for this scraper, update it
-    if (liveViewActive && id === currentModalScraperId && image) {
-        liveScreenshot.src = image;
-        liveScreenshot.style.display = 'block';
-        screenshotPlaceholder.style.display = 'none';
+    // If live view is open for this scraper, update the specific screenshot
+    if (liveViewActive && id === currentModalScraperId) {
+        if (currentSource === 'main') {
+            if (image) {
+                liveScreenshotMain.src = image;
+                liveScreenshotMain.style.display = 'block';
+                screenshotPlaceholderMain.style.display = 'none';
+            }
+        } else if (currentSource === 'worker') {
+            if (image) {
+                liveScreenshotWorker.src = image;
+                liveScreenshotWorker.style.display = 'block';
+                screenshotPlaceholderWorker.style.display = 'none';
+            }
+        }
 
         // Update action badge
         if (liveActionBadge) {
@@ -1199,7 +1509,17 @@ socket.on('scraper-screenshot', (data) => {
                 'EXTRACT_PROFILE': 'Extraindo Perfil',
                 'INVESTIGATE_WEBSITE': 'Investigando',
                 'NAVIGATE_PAGE': 'Navegando...',
-                'ERROR': 'ERRO'
+                'ERROR': 'ERRO',
+                // Instagram Actions
+                'LOGIN': 'Fazendo Login',
+                'LOGIN_CHALLENGE': 'Resolvendo Desafio',
+                'PROFILE_SEARCH': 'Buscando Perfil',
+                'HASHTAG_SEARCH': 'Buscando Hashtag',
+                'PROFILE_EXTRACT': 'Extraindo Perfil',
+                'FOLLOWER_EXTRACT': 'Extraindo Seguidores',
+                'SCROLL_FOLLOWERS': 'Rolando Lista',
+                'WORKER_COMPLETE': 'Worker OK',
+                'WORKER_ERROR': 'Worker Erro'
             };
             liveActionBadge.textContent = actionLabels[action] || action;
             liveActionBadge.className = 'status-badge ' + (action === 'ERROR' ? 'status-error' : 'status-running');

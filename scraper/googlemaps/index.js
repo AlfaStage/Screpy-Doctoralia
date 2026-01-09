@@ -42,20 +42,38 @@ class GoogleMapsScraper {
         };
         this.lastScreenshotTime = null;
         this.screenshotPath = null;
+
+        // Parallel processing
+        this.page2 = null;
+        this.queue = [];
+        this.isProcessingQueue = false;
+        this.workerBusinessExtractor = null;
+        this.workerWebsiteInvestigator = null;
     }
 
     // Capture screenshot and emit via Socket.io for live view
-    async captureScreenshot(actionName = 'ACTION') {
-        if (!this.browserManager || !this.browserManager.page) return;
+    // Capture screenshot and emit via Socket.io for live view
+    async captureScreenshot(actionName = 'ACTION', source = 'main') {
+        let pageToCapture = this.browserManager?.page;
+
+        if (source === 'worker') {
+            if (this.page2 && !this.page2.isClosed()) {
+                pageToCapture = this.page2;
+            } else {
+                return;
+            }
+        }
+
+        if (!pageToCapture || pageToCapture.isClosed()) return;
 
         try {
-            const page = this.browserManager.page;
             const timestamp = Date.now();
-            const filename = `live_${this.id}.png`;
+            // New Format: googlemaps_[id]_live_[source].png
+            const filename = `googlemaps_${this.id}_live_${source}.png`;
             const filepath = path.join('./results', filename);
 
             // Take screenshot
-            await page.screenshot({ path: filepath, type: 'png' });
+            await pageToCapture.screenshot({ path: filepath, type: 'png' });
 
             // Read as base64 for Socket.io emission
             const imageBuffer = await fs.readFile(filepath);
@@ -67,15 +85,16 @@ class GoogleMapsScraper {
                 action: actionName,
                 timestamp: timestamp,
                 image: base64Image,
+                source: source,
                 url: `/results/${filename}?t=${timestamp}`
             });
 
             this.lastScreenshotTime = timestamp;
-            this.screenshotPath = filepath;
+            if (source === 'main') this.screenshotPath = filepath;
 
         } catch (e) {
             // Silently fail - screenshot is optional
-            console.log(`Screenshot capture failed: ${e.message}`);
+            // console.log(`Screenshot capture failed: ${e.message}`);
         }
     }
 
@@ -118,6 +137,22 @@ class GoogleMapsScraper {
                 this.searchHandler = new MapsSearchHandler(page);
                 this.businessExtractor = new BusinessExtractor(page);
                 this.websiteInvestigator = new WebsiteInvestigator(page, (msg) => this.emitProgress(msg), (action) => this.captureScreenshot(action));
+
+                // Initialize Worker Page (Page 2)
+                try {
+                    this.page2 = await this.browserManager.browser.newPage();
+                    await this.page2.setViewport({ width: 1366, height: 768 });
+                    // Share cookies/context with main page automatically since it's same browserContext
+                    this.workerBusinessExtractor = new BusinessExtractor(this.page2);
+                    this.workerWebsiteInvestigator = new WebsiteInvestigator(this.page2,
+                        (msg) => { if (msg.includes('Worker')) this.emitProgress(msg); },
+                        (action) => this.captureScreenshot(action, 'worker')
+                    );
+                    this.emitProgress('✅ Worker Page inicializada para processamento paralelo');
+                } catch (e) {
+                    this.emitProgress('⚠️ Falha ao iniciar Worker Page, continuando em modo single-thread: ' + e.message);
+                }
+
                 initSuccess = true;
 
             } catch (error) {
@@ -366,6 +401,98 @@ class GoogleMapsScraper {
         console.log(fullMessage);
     }
 
+    async processQueue(investigateWebsites, requiredFields) {
+        this.isProcessingQueue = true;
+        this.emitProgress(`👷 Worker iniciado: Aguardando estabelecimentos na fila...`);
+
+        while (this.isProcessingQueue && !this.isCancelled) {
+            if (this.queue.length > 0) {
+                const business = this.queue.shift();
+
+                // Dedup check (if not already done)
+                const uid = (business.url || '') + (business.nome || '');
+                if (this.results.some(r => (r.url === business.url) || (uid && r.uid === uid))) continue;
+
+                try {
+                    // Extract business data using WORKER extractors
+                    await this.captureScreenshot('WORKER_EXTRACT_START', 'worker');
+
+                    // Use workerBusinessExtractor if available, else fallback to main (but main is busy scrolling...)
+                    // Ideally we only run this if page2 exists. If not, we should have a fallback.
+                    const extractor = this.workerBusinessExtractor || this.businessExtractor;
+                    const investigator = this.workerWebsiteInvestigator || this.websiteInvestigator;
+
+                    const businessData = await extractor.extractBusiness(
+                        business,
+                        (msg) => { if (msg.message && msg.message.includes('Acessando')) this.emitProgress(`Worker: ${msg.message}`) }
+                    );
+
+                    // Website Investigation
+                    if (investigateWebsites && businessData.website) {
+                        this.emitProgress(`🔎 Worker investigating: ${businessData.website}`);
+                        try {
+                            const websiteData = await investigator.investigate(businessData.website);
+                            await this.captureScreenshot('WORKER_INVESTIGATE', 'worker');
+
+                            investigator.finalizeResult(websiteData);
+
+                            // Merge data
+                            if (websiteData.email && !businessData.email) businessData.email = websiteData.email;
+                            if (websiteData.instagram && !businessData.instagram) businessData.instagram = websiteData.instagram;
+                            if (websiteData.cnpj && !businessData.cnpj) businessData.cnpj = websiteData.cnpj;
+                            if (websiteData.telefone && !businessData.telefone) businessData.telefone = websiteData.telefone;
+                            if (websiteData.whatsapp) businessData.whatsapp = websiteData.whatsapp;
+
+                        } catch (invErr) {
+                            // console.log('Worker invest error', invErr);
+                        }
+                    }
+
+                    // Check required fields
+                    let isValid = true;
+                    if (requiredFields && requiredFields.length > 0) {
+                        for (const field of requiredFields) {
+                            if (field === 'phone' && !businessData.telefone) isValid = false;
+                            if (field === 'email' && !businessData.email) isValid = false;
+                            if (field === 'website' && !businessData.website) isValid = false;
+                            if (field === 'whatsapp' && !businessData.whatsapp) isValid = false;
+                        }
+                    }
+
+                    if (isValid) {
+                        this.results.push(businessData);
+                        this.progress.successCount++;
+
+                        this.io.emit('scraper-result', {
+                            id: this.id,
+                            type: 'googlemaps',
+                            data: businessData
+                        });
+
+                        const percent = this.queue.length > 0 ? `(Fila: ${this.queue.length})` : '';
+                        this.emitProgress(`✅ [Worker] Sucesso: ${businessData.nome} ${percent}`);
+                    } else {
+                        this.progress.skippedCount++;
+                    }
+
+                    await this.captureScreenshot('WORKER_COMPLETE', 'worker');
+
+                } catch (e) {
+                    this.progress.errorCount++;
+                    await this.captureScreenshot('WORKER_ERROR', 'worker');
+                }
+
+                // Small delay
+                await new Promise(r => setTimeout(r, 1000));
+
+            } else {
+                // Wait for more items
+                await new Promise(r => setTimeout(r, 1000));
+            }
+        }
+        this.emitProgress(`👷 Worker finalizado.`);
+    }
+
     async scrape(searchTerm, city, quantity, investigateWebsites = true, requiredFields = []) {
         try {
             this.results = [];
@@ -393,6 +520,11 @@ class GoogleMapsScraper {
                 searchLocations = [city];
             }
 
+            // Start Worker Process (Consumer)
+            if (!this.processQueuePromise) {
+                this.processQueuePromise = this.processQueue(investigateWebsites, requiredFields);
+            }
+
             for (const currentCity of searchLocations) {
                 if (this.progress.successCount >= quantity) {
                     break;
@@ -409,7 +541,7 @@ class GoogleMapsScraper {
                 // SEARCH PHASE WITH RETRY LOGIC
                 let searchSuccess = false;
                 let searchAttempts = 0;
-                const maxSearchAttempts = 10; // Will try up to 10 different proxies
+                const maxSearchAttempts = 10;
 
                 while (!searchSuccess && searchAttempts < maxSearchAttempts) {
                     try {
@@ -423,15 +555,9 @@ class GoogleMapsScraper {
                     } catch (searchError) {
                         if (this.isProxyError(searchError)) {
                             this.emitProgress(`❌ Erro de conexão na busca: ${searchError.message.split(' at ')[0]}`);
-
-                            if (searchAttempts < maxSearchAttempts) {
-                                // Rotate to next proxy and retry
-                                await this.rotateProxy();
-                            } else {
-                                throw new Error(`Falha após ${maxSearchAttempts} tentativas de proxy. Verifique sua conexão.`);
-                            }
+                            if (searchAttempts < maxSearchAttempts) await this.rotateProxy();
+                            else throw new Error(`Falha após ${maxSearchAttempts} tentativas de proxy.`);
                         } else {
-                            // Non-proxy error, rethrow
                             throw searchError;
                         }
                     }
@@ -439,259 +565,61 @@ class GoogleMapsScraper {
 
                 await this.checkState();
 
-                // COLLECT BUSINESSES WITH RETRY LOGIC
+                // COLLECT BUSINESSES (Producer)
+                const adjustedTarget = quantity * 2;
                 let collectSuccess = false;
                 let collectAttempts = 0;
-                const maxCollectAttempts = 5;
-                const adjustedTarget = Math.min(quantity * 2, 5000); // Cap at 5000
-                let businesses = [];
 
-                while (!collectSuccess && collectAttempts < maxCollectAttempts) {
+                while (!collectSuccess && collectAttempts < 5) {
                     try {
                         collectAttempts++;
-                        businesses = await this.searchHandler.collectBusinesses(adjustedTarget, (msg) => {
-                            this.emitProgress(msg.message);
-                        });
+                        await this.searchHandler.collectBusinesses(
+                            adjustedTarget,
+                            (msg) => this.emitProgress(msg.message),
+                            false,
+                            (newBusinesses) => {
+                                for (const b of newBusinesses) {
+                                    this.queue.push(b);
+                                }
+                                if (newBusinesses.length > 0) {
+                                    this.emitProgress(`📥 ${newBusinesses.length} novos itens na fila (Total: ${this.queue.length})`);
+                                }
+                            }
+                        );
                         collectSuccess = true;
                         await this.captureScreenshot('COLLECT_COMPLETE');
 
                     } catch (collectError) {
                         if (this.isProxyError(collectError)) {
-                            this.emitProgress(`❌ Erro de conexão ao coletar: ${collectError.message.split(' at ')[0]}`);
-
-                            if (collectAttempts < maxCollectAttempts) {
+                            this.emitProgress(`❌ Erro coleta: ${collectError.message}`);
+                            if (collectAttempts < 5) {
                                 await this.rotateProxy();
-                                // Re-do search after proxy rotation
-                                this.emitProgress(`🔄 Refazendo busca com novo proxy...`);
-                                await this.searchHandler.performSearch(searchQuery, (msg) => this.emitProgress(msg.message));
-                            } else {
-                                throw new Error(`Falha ao coletar estabelecimentos após ${maxCollectAttempts} tentativas.`);
+                                await this.searchHandler.performSearch(searchQuery, () => { });
                             }
-                        } else {
-                            throw collectError;
                         }
                     }
                 }
 
-                if (businesses.length === 0) {
-                    throw new Error('Nenhum estabelecimento encontrado com os filtros especificados');
+                // Polling for completion check
+                while (this.queue.length > 0 && this.progress.successCount < quantity && !this.isCancelled) {
+                    await new Promise(r => setTimeout(r, 2000));
                 }
 
-                this.emitProgress(`📋 Iniciando extração de ${businesses.length} estabelecimentos...`);
+            } // End city loop
 
-                // Process list loop
-                let businessIndex = 0;
-                let currentBatchStartIndex = 0;
+            // Final wait
+            this.emitProgress(`🏁 Busca finalizada. Aguardando processamento da fila restante (${this.queue.length} itens)...`);
+            while (this.queue.length > 0 && !this.isCancelled) {
+                await new Promise(r => setTimeout(r, 1000));
+            }
 
-                // STRICT MODE: Loop until we have enough successes
-                while (this.progress.successCount < quantity) {
-                    await this.checkState();
+            // Stop worker
+            this.isProcessingQueue = false;
+            if (this.processQueuePromise) {
+                await this.processQueuePromise;
+            }
 
-                    // If we ran out of businesses in the current list
-                    if (businessIndex >= businesses.length) {
-                        this.emitProgress(`🔄 Lista atual esgotada (${businessIndex} processados). Buscando mais estabelecimentos...`);
-
-                        // Fetch more with continueCollection=true
-                        const newTarget = businesses.length + 10; // Try to get 10 more
-                        const oldLength = businesses.length;
-
-                        businesses = await this.searchHandler.collectBusinesses(newTarget, (msg) => {
-                            this.emitProgress(msg.message);
-                        }, true);
-
-                        if (businesses.length <= oldLength) {
-                            this.emitProgress(`⚠️ Não foi possível encontrar mais estabelecimentos. Encerrando com ${this.progress.successCount} sucessos.`);
-                            break;
-                        }
-
-                        this.emitProgress(`✅ Lista expandida para ${businesses.length} estabelecimentos.`);
-                    }
-
-                    const business = businesses[businessIndex];
-                    businessIndex++;
-
-                    // Dedup check (Name + Phone is usually unique enough)
-                    const uid = (business.nome || '') + (business.telefone || '');
-                    if (uid && collectedIds.has(uid)) {
-                        continue;
-                    }
-                    if (uid) collectedIds.add(uid);
-
-                    const totalProcessed = this.progress.successCount + this.progress.errorCount + this.progress.skippedCount;
-                    this.progress.current = totalProcessed + 1;
-
-                    this.emitProgress(`Processando ${businessIndex}/${businesses.length} (Sucesso: ${this.progress.successCount}/${quantity})`);
-
-                    try {
-                        // Add delay between requests
-                        if (businessIndex > 1) {
-                            await this.adaptiveDelay();
-                        }
-
-                        // Extract business data from Maps
-                        const businessData = await this.businessExtractor.extractBusiness(
-                            business,
-                            (msg) => this.emitProgress(msg.message)
-                        );
-                        await this.captureScreenshot('EXTRACT_BUSINESS');
-
-                        // If website exists and investigation is enabled
-                        if (investigateWebsites && businessData.website) {
-                            this.emitProgress(`🔎 Investigando website: ${businessData.website}`);
-
-                            try {
-                                // Investigate website with max depth 5 (always, regardless of required fields)
-                                const websiteData = await this.websiteInvestigator.investigate(businessData.website);
-
-                                // Screenshot after visiting website
-                                await this.captureScreenshot('INVESTIGATE_WEBSITE');
-
-                                // Finalize results (format phones, determine whatsapp)
-                                this.websiteInvestigator.finalizeResult(websiteData);
-
-                                this.progress.websitesInvestigated++;
-
-                                // Merge data from website investigation
-                                if (websiteData.email && !businessData.email) businessData.email = websiteData.email;
-                                if (websiteData.instagram && !businessData.instagram) businessData.instagram = websiteData.instagram;
-                                if (websiteData.cnpj && !businessData.cnpj) businessData.cnpj = websiteData.cnpj;
-
-                                // Use formatted phone from website if Maps didn't have one
-                                if (websiteData.telefone && !businessData.telefone) {
-                                    businessData.telefone = websiteData.telefone;
-                                }
-
-                                // Set WhatsApp (from explicit links or mobile number)
-                                if (websiteData.whatsapp) {
-                                    businessData.whatsapp = websiteData.whatsapp;
-                                }
-
-                                // Store additional phones found
-                                if (websiteData.telefones && websiteData.telefones.length > 0) {
-                                    businessData.telefonesAdicionais = websiteData.telefones;
-                                }
-
-                                const foundData = [];
-                                if (websiteData.email) foundData.push('Email');
-                                if (websiteData.instagram) foundData.push('Instagram');
-                                if (websiteData.telefone) foundData.push('Telefone');
-                                if (websiteData.whatsapp) foundData.push('WhatsApp');
-
-                                if (foundData.length > 0) {
-                                    this.emitProgress(`✅ Website investigado: ${foundData.join(', ')}`);
-                                } else {
-                                    this.emitProgress(`✅ Website investigado (sem dados adicionais)`);
-                                }
-                            } catch (webError) {
-                                this.emitProgress(`⚠️ Erro ao investigar website: ${webError.message}`);
-                            }
-                        }
-
-                        // Format Maps phone if present but not already formatted
-                        if (businessData.telefone && !businessData.telefone.startsWith('+55')) {
-                            const formatted = this.websiteInvestigator.formatPhone(businessData.telefone);
-                            if (formatted) businessData.telefone = formatted;
-                        }
-
-                        // If no whatsapp yet, check if the main phone is mobile
-                        if (!businessData.whatsapp && businessData.telefone) {
-                            if (this.websiteInvestigator.isMobileNumber(businessData.telefone)) {
-                                businessData.whatsapp = businessData.telefone;
-                            }
-                        }
-
-                        // Detailed logging of found data
-                        const foundData = [];
-                        if (businessData.telefone) foundData.push('Telefone');
-                        if (businessData.website) foundData.push('Website');
-                        if (businessData.email) foundData.push('Email');
-                        if (businessData.instagram) foundData.push('Instagram');
-
-                        if (foundData.length > 0) {
-                            this.emitProgress(`📊 Dados encontrados: ${foundData.join(', ')}`);
-                        }
-
-                        // Check required fields
-                        if (requiredFields && requiredFields.length > 0) {
-                            const missingFields = [];
-
-                            for (const field of requiredFields) {
-                                if (field === 'phone' && !businessData.telefone) missingFields.push('Telefone');
-                                if (field === 'whatsapp' && !businessData.whatsapp) missingFields.push('WhatsApp');
-                                if (field === 'website' && !businessData.website) missingFields.push('Website');
-                                if (field === 'email' && !businessData.email) missingFields.push('Email');
-                                if (field === 'instagram' && !businessData.instagram) missingFields.push('Instagram');
-                            }
-
-                            if (missingFields.length > 0) {
-                                this.progress.skippedCount++;
-                                this.emitProgress(`⏭️ Ignorado: ${businessData.nome} (Faltando: ${missingFields.join(', ')})`);
-
-                                // Emit skipped update to UI
-                                this.io.emit('scraper-progress', {
-                                    id: this.id,
-                                    type: 'googlemaps',
-                                    ...this.progress
-                                });
-
-                                continue;
-                            }
-                        }
-
-                        // Success!
-                        this.results.push(businessData);
-                        this.progress.successCount++;
-                        this.consecutiveErrors = 0;
-                        this.consecutiveSuccesses++;
-
-                        // Adaptive delay: decrease on success
-                        if (this.consecutiveSuccesses >= 3 && !this.usingProxy) {
-                            this.consecutiveSuccesses = 0;
-                            this.currentDelay = Math.max(this.currentDelay - 500, this.minDelay);
-                        }
-
-                        this.io.emit('scraper-result', {
-                            id: this.id,
-                            type: 'googlemaps',
-                            data: businessData
-                        });
-
-                        this.emitProgress(`✅ Extraído: ${businessData.nome} (${this.progress.successCount}/${quantity})`);
-
-                    } catch (error) {
-                        this.progress.errorCount++;
-                        this.consecutiveErrors++;
-
-                        const errorType = error.type || 'UNKNOWN';
-                        this.emitProgress(`❌ Erro [${errorType}]: ${error.message}`);
-
-                        // Check for connection errors
-                        const isConnectionError = error.message && (
-                            error.message.includes('ERR_CONNECTION_CLOSED') ||
-                            error.message.includes('ERR_CONNECTION_REFUSED') ||
-                            error.message.includes('ERR_PROXY_CONNECTION_FAILED') ||
-                            error.message.includes('net::ERR_')
-                        );
-
-                        // Proxy rotation on connection errors or after 2 consecutive errors
-                        if (isConnectionError || this.consecutiveErrors >= 2) {
-                            await this.rotateProxy();
-                        }
-
-                        // Increase delay on errors
-                        this.currentDelay = Math.min(this.currentDelay + 2000, this.maxDelay);
-                        this.emitProgress(`⬆️ Delay aumentado para ${(this.currentDelay / 1000).toFixed(1)}s`);
-
-                        continue;
-                    }
-                }
-
-                // Short delay between cities
-                if (!this.usingProxy) await new Promise(r => setTimeout(r, 2000));
-
-            } // End of expansion loop
-
-            // Final summary
+            // Verify count
             if (this.progress.successCount < quantity) {
                 this.emitProgress(`Meta atingida parcialmente: ${this.progress.successCount}/${quantity} estabelecimentos extraídos.`);
             } else {
@@ -728,102 +656,72 @@ class GoogleMapsScraper {
 
             console.error('Scraping error:', error);
             this.emitProgress(`❌ Erro: ${error.message}`);
-            throw error;
+            return { success: false, message: error.message, data: this.results, logs: this.logs };
         }
     }
 
     async adaptiveDelay() {
-        const delay = this.currentDelay + Math.random() * 2000; // Add randomness
-        this.emitProgress(`⏳ Aguardando ${(delay / 1000).toFixed(1)}s...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        const jitter = Math.random() * 1000;
+        await new Promise(resolve => setTimeout(resolve, this.currentDelay + jitter));
     }
 
     async saveResults() {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const fileName = `googlemaps_results_${timestamp}.csv`;
-        const filePath = path.join(__dirname, '..', '..', 'results', fileName);
+        const baseFilename = `googlemaps_${this.id}_results_${timestamp}`;
+        const jsonPath = path.join('./results', `${baseFilename}.json`);
+        const csvPath = path.join('./results', `${baseFilename}.csv`);
 
-        await fs.mkdir(path.join(__dirname, '..', '..', 'results'), { recursive: true });
+        // Ensure results dir
+        try {
+            await fs.mkdir('./results', { recursive: true });
 
-        // Save CSV
-        const csvHeaders = [
-            'Nome',
-            'Categoria',
-            'Endereco',
-            'Telefone',
-            'WhatsApp',
-            'Website',
-            'Email',
-            'Instagram',
-            'CNPJ',
-            'TelefonesAdicionais'
-        ];
+            // 1. Save JSON (Source of Truth for History)
+            await fs.writeFile(jsonPath, JSON.stringify(this.results, null, 2));
 
-        const csvLines = [csvHeaders.join(',')];
+            // 2. Generate and Save CSV (For User Download)
+            if (this.results.length > 0) {
+                // Determine headers from all keys in the first result, or a fixed set
+                const headers = [
+                    'nome', 'categoria', 'telefone', 'whatsapp', 'website',
+                    'link', 'endereco', 'email', 'instagram', 'facebook', 'linkedin'
+                ];
 
-        this.results.forEach(result => {
-            const line = [
-                this.escapeCsv(result.nome),
-                this.escapeCsv(result.categoria),
-                this.escapeCsv(result.endereco),
-                this.escapeCsv(result.telefone),
-                this.escapeCsv(result.whatsapp),
-                this.escapeCsv(result.website),
-                this.escapeCsv(result.email),
-                this.escapeCsv(result.instagram),
-                this.escapeCsv(result.cnpj),
-                this.escapeCsv(result.telefonesAdicionais ? result.telefonesAdicionais.join('; ') : '')
-            ].join(',');
+                // BOM for Excel
+                let csvContent = '\uFEFF';
 
-            csvLines.push(line);
-        });
+                // Add Headers
+                csvContent += headers.join(';') + '\n';
 
-        await fs.writeFile(filePath, csvLines.join('\n'), 'utf8');
-        console.log(`Results saved to: ${filePath}`);
+                // Add Rows
+                for (const row of this.results) {
+                    const line = headers.map(header => {
+                        let val = row[header] || '';
+                        // Clean for CSV
+                        if (typeof val === 'string') {
+                            val = val.replace(/"/g, '""').replace(/;/g, ',');
+                            val = `"${val}"`;
+                        }
+                        return val;
+                    }).join(';');
+                    csvContent += line + '\n';
+                }
 
-        // Save JSON
-        const jsonPath = filePath.replace('.csv', '.json');
+                await fs.writeFile(csvPath, csvContent, 'utf8');
+                return csvPath; // Return CSV path for the frontend download button
+            }
 
-        const jsonData = {
-            config: {
-                searchTerm: this.config.searchTerm || '',
-                city: this.config.city || '',
-                quantity: this.config.quantity || 0,
-                investigateWebsites: this.config.investigateWebsites
-            },
-            metadata: {
-                startTime: this.startTime,
-                endTime: new Date().toISOString(),
-                totalResults: this.results.length,
-                websitesInvestigated: this.progress.websitesInvestigated
-            },
-            logs: this.logs,
-            results: this.results
-        };
-
-        await fs.writeFile(jsonPath, JSON.stringify(jsonData, null, 2), 'utf8');
-        console.log(`JSON saved to: ${jsonPath}`);
-
-        return filePath;
-    }
-
-    escapeCsv(value) {
-        if (!value) return '';
-        const stringValue = String(value);
-        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
-            return `"${stringValue.replace(/"/g, '""')}"`;
+            return jsonPath; // Fallback if no results to make CSV
+        } catch (e) {
+            console.error('Save error:', e);
+            return null;
         }
-        return stringValue;
     }
 
     async close() {
         if (this.browserManager) {
             await this.browserManager.close();
         }
-    }
-
-    getResults() {
-        return this.results;
+        this.status = 'closed';
     }
 }
 

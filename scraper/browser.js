@@ -88,6 +88,7 @@ class BrowserManager {
 
     const launchOptions = {
       headless: 'new',
+      protocolTimeout: 120000, // Increase protocol timeout to 2 minutes
       args: launchArgs
     };
 
@@ -133,6 +134,31 @@ class BrowserManager {
 
   getPage() {
     return this.page;
+  }
+
+  // Create or setup a new page with standard configuration
+  async setupPage(page = null) {
+    const targetPage = page || (await this.browser.newPage());
+
+    // Set viewport
+    await targetPage.setViewport({ width: 1920, height: 1080 });
+
+    // Set default timeouts to prevent infinite protocol hangs
+    await targetPage.setDefaultTimeout(60000);
+    await targetPage.setDefaultNavigationTimeout(60000);
+
+    // Set extra headers
+    await targetPage.setExtraHTTPHeaders({
+      'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+    });
+
+    // Authenticate if we have proxy credentials
+    // (Note: Proxy logic from initialize() might need to be stored to re-apply here if needed, 
+    // but usually page.authenticate persists or is set at browser level for new pages if using args. 
+    // For now, basic setup is enough to fix the crash.)
+
+    return targetPage;
   }
 
   // Testar se o túnel do proxy está funcionando

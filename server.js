@@ -27,7 +27,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
-app.use('/results', express.static('results'));
+app.use('/results', express.static(path.join(__dirname, 'results')));
 
 // Initialize Scraper Manager
 const scraperManager = new ScraperManager(io);
@@ -101,6 +101,58 @@ io.on('connection', (socket) => {
             console.error('Error starting maps scrape:', error);
             socket.emit('error', { message: error.message });
         }
+    });
+
+    // Instagram scraper events
+    socket.on('start-instagram-scrape', async (data) => {
+        try {
+            const { searchType, searchTerm, quantity, filterTerm, requiredFields, useProxy, cookies, username, password } = data;
+            console.log('Starting Instagram scrape:', { searchType, searchTerm, quantity, filterTerm, useProxy });
+
+            // Validate input
+            if (!searchTerm || searchTerm.trim().length === 0) {
+                socket.emit('error', { message: 'Termo de busca ou perfil é obrigatório' });
+                return;
+            }
+
+            if (!searchType || !['profiles', 'hashtag', 'followers'].includes(searchType)) {
+                socket.emit('error', { message: 'Tipo de pesquisa inválido' });
+                return;
+            }
+
+            if (!quantity || quantity < 1) {
+                socket.emit('error', { message: 'Quantidade inválida' });
+                return;
+            }
+
+            const id = await scraperManager.startInstagramScrape(data);
+            socket.emit('scrape-started', { id, type: 'instagram' });
+
+        } catch (error) {
+            console.error('Error starting instagram scrape:', error);
+            socket.emit('error', { message: error.message });
+        }
+    });
+
+    // Handle Instagram cookie submission
+    socket.on('instagram-cookies', async (data) => {
+        const { scraperId, cookies } = data;
+        const scraper = scraperManager.getScraper(scraperId);
+
+        if (scraper && scraper.authHandler) {
+            const success = await scraper.authHandler.applyCookies(cookies);
+            socket.emit('instagram-auth-result', { scraperId, success });
+        }
+    });
+
+    // Forward 2FA code
+    socket.on('instagram-challenge-code', (data) => {
+        io.emit('instagram-challenge-code', data);
+    });
+
+    // Forward new credentials (Re-Login Loop)
+    socket.on('update-instagram-credentials', (data) => {
+        io.emit('update-instagram-credentials', data);
     });
 
     socket.on('disconnect', () => {

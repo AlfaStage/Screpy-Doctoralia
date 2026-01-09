@@ -290,6 +290,13 @@ body {
     border: 1px solid rgba(66, 133, 244, 0.3);
 }
 
+.scraper-type-badge.badge-instagram,
+.scraper-type-badge.instagram {
+    background: linear-gradient(135deg, rgba(225, 48, 108, 0.2) 0%, rgba(225, 48, 108, 0.1) 100%);
+    color: #ff85b3;
+    border: 1px solid rgba(225, 48, 108, 0.3);
+}
+
 /* Status Badge in Cards */
 .scraper-card .status-badge {
     font-size: 9px;
@@ -1394,4 +1401,166 @@ small {
     margin-left: 12px;
     font-size: 11px;
     padding: 4px 10px;
+}
+
+/* Instagram Specific Styles */
+.btn-instagram {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: #fff;
+    border: none;
+    margin-top: 32px;
+}
+
+.btn-instagram:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 39, 67, 0.3);
+    color: #fff;
+}
+
+/* Cookies Section */
+.cookies-section {
+    margin-bottom: 24px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.cookies-section summary {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.cookies-section summary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.cookies-section summary::-webkit-details-marker {
+    display: none;
+}
+
+.cookies-section summary::after {
+    content: '+';
+    margin-left: auto;
+    font-size: 14px;
+}
+
+.cookies-section[open] summary::after {
+    content: '-';
+}
+
+.cookies-content {
+    padding: 16px;
+    border-top: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Live View Layout */
+.live-view-body {
+    padding: 20px;
+    height: calc(90vh - 120px);
+    overflow: hidden;
+}
+
+.live-view-split {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+}
+
+.live-logs-panel {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.live-screens-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+}
+
+.live-screen-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 300px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.live-screen-box h4 {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.screenshot-wrapper {
+    flex: 1;
+    background: #000;
+    border: 1px solid var(--border-color);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.screenshot-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: none;
+}
+
+.screenshot-placeholder {
+    color: var(--text-tertiary);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.screenshot-placeholder i {
+    font-size: 32px;
+    opacity: 0.5;
+}
+
+/* Modal sizing update */
+.live-view-modal-content {
+    width: 95vw;
+    height: 90vh;
+    max-width: 1400px;
+}
+
+/* Logs container inside live view */
+.live-logs-panel .logs-container {
+    flex: 1;
+    background: #000;
+    border: 1px solid var(--border-color);
+    overflow-y: auto;
+    padding: 10px;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
 }

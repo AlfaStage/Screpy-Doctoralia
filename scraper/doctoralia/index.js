@@ -41,20 +41,37 @@ class DoctoraliaScraper {
         };
         this.lastScreenshotTime = null;
         this.screenshotPath = null;
+
+        // Parallel processing
+        this.page2 = null;
+        this.queue = [];
+        this.isProcessingQueue = false;
+        this.workerProfileExtractor = null;
     }
 
     // Capture screenshot and emit via Socket.io for live view
-    async captureScreenshot(actionName = 'ACTION') {
-        if (!this.browserManager || !this.browserManager.page) return;
+    // Capture screenshot and emit via Socket.io for live view
+    async captureScreenshot(actionName = 'ACTION', source = 'main') {
+        let pageToCapture = this.browserManager?.page;
+
+        if (source === 'worker') {
+            if (this.page2 && !this.page2.isClosed()) {
+                pageToCapture = this.page2;
+            } else {
+                return;
+            }
+        }
+
+        if (!pageToCapture || pageToCapture.isClosed()) return;
 
         try {
-            const page = this.browserManager.page;
             const timestamp = Date.now();
-            const filename = `live_${this.id}.png`;
+            // New Format: doctoralia_[id]_live_[source].png
+            const filename = `doctoralia_${this.id}_live_${source}.png`;
             const filepath = path.join('./results', filename);
 
             // Take screenshot
-            await page.screenshot({ path: filepath, type: 'png' });
+            await pageToCapture.screenshot({ path: filepath, type: 'png' });
 
             // Read as base64 for Socket.io emission
             const imageBuffer = await fs.readFile(filepath);
@@ -66,15 +83,16 @@ class DoctoraliaScraper {
                 action: actionName,
                 timestamp: timestamp,
                 image: base64Image,
+                source: source,
                 url: `/results/${filename}?t=${timestamp}`
             });
 
             this.lastScreenshotTime = timestamp;
-            this.screenshotPath = filepath;
+            if (source === 'main') this.screenshotPath = filepath;
 
         } catch (e) {
             // Silently fail - screenshot is optional
-            console.log(`Screenshot capture failed: ${e.message}`);
+            // console.log(`Screenshot capture failed: ${e.message}`);
         }
     }
 
@@ -92,7 +110,6 @@ class DoctoraliaScraper {
             this.currentDelay = 3000; // Start with 3s delay when no proxy
         } else {
             // Try to get proxy, fallback to no proxy if all fail
-            // Pass true to allowNoProxy fallback
             this.currentProxy = await this.proxyManager.getNextProxy(true);
 
             if (this.currentProxy === null) {
@@ -118,6 +135,17 @@ class DoctoraliaScraper {
 
                 this.searchHandler = new SearchHandler(page);
                 this.profileExtractor = new ProfileExtractor(page);
+
+                // Initialize Worker Page (Page 2)
+                try {
+                    this.page2 = await this.browserManager.browser.newPage();
+                    await this.page2.setViewport({ width: 1366, height: 768 });
+                    this.workerProfileExtractor = new ProfileExtractor(this.page2);
+                    this.emitProgress('✅ Worker Page inicializada para processamento paralelo');
+                } catch (e) {
+                    this.emitProgress('⚠️ Falha ao iniciar Worker Page, continuando em modo single-thread: ' + e.message);
+                }
+
                 initSuccess = true; // Sucesso, sair do loop
 
             } catch (error) {
@@ -239,20 +267,14 @@ class DoctoraliaScraper {
         });
 
         // Calculate estimation
-        // Initial estimate: 6 seconds per item
         if (this.progress.current === 0) {
             this.progress.estimatedTimeRemaining = this.progress.total * 6;
         } else if (this.progress.total > 0) {
-            // Adaptive estimation
             const elapsed = Date.now() - this.progress.startTime;
             const avgTimePerItem = elapsed / this.progress.current;
             const remainingItems = this.progress.total - this.progress.current;
-
-            // Weight the initial estimate vs actual average based on progress
-            // Early on, trust the 6s estimate more. Later, trust the average.
             const progressRatio = this.progress.current / this.progress.total;
             const weightedAvg = (avgTimePerItem * progressRatio) + (6000 * (1 - progressRatio));
-
             this.progress.estimatedTimeRemaining = Math.ceil((weightedAvg * remainingItems) / 1000);
         }
 
@@ -266,7 +288,6 @@ class DoctoraliaScraper {
             message: fullMessage
         });
 
-        // Also log to terminal with timestamp
         console.log(fullMessage);
     }
 
@@ -281,6 +302,75 @@ class DoctoraliaScraper {
         });
 
         console.log(fullMessage);
+    }
+
+    async processQueue(requiredFields, onlyWithPhone) {
+        this.isProcessingQueue = true;
+        this.emitProgress(`👷 Worker iniciado: Aguardando perfis na fila...`);
+
+        while (this.isProcessingQueue && !this.isCancelled) {
+            if (this.queue.length > 0) {
+                const url = this.queue.shift();
+
+                // Dedup check
+                if (this.results.some(r => r.url === url)) continue;
+
+                try {
+                    // Use workerProfileExtractor if available, else fallback
+                    const extractor = this.workerProfileExtractor || this.profileExtractor;
+                    await this.captureScreenshot('WORKER_START', 'worker');
+
+                    const profileData = await extractor.extractProfile(url,
+                        (msg) => { if (msg.message && msg.message.includes('Acessando')) this.emitProgress(`Worker: ${msg.message}`) }
+                    );
+                    await this.captureScreenshot('WORKER_EXTRACT', 'worker');
+
+                    // Check required fields logic
+                    const missingFields = [];
+                    if (requiredFields && requiredFields.length > 0) {
+                        for (const field of requiredFields) {
+                            if (field === 'phone' && !extractor.hasPhoneNumber(profileData)) missingFields.push('Telefone');
+                            if (field === 'address' && !profileData.endereco) missingFields.push('Endereço');
+                        }
+                        if (onlyWithPhone && !extractor.hasPhoneNumber(profileData) && !missingFields.includes('Telefone')) {
+                            missingFields.push('Telefone');
+                        }
+                    } else if (onlyWithPhone && !extractor.hasPhoneNumber(profileData)) {
+                        missingFields.push('Telefone');
+                    }
+
+                    if (missingFields.length > 0) {
+                        this.progress.skippedCount++;
+                        // this.emitProgress(`⏭️ [Worker] Pulado: ${profileData.nome} (Faltando: ${missingFields.join(', ')})`);
+                        this.io.emit('scraper-progress', { id: this.id, type: 'doctoralia', ...this.progress });
+                    } else {
+                        if (extractor.hasPhoneNumber(profileData)) {
+                            this.progress.phonesFound++;
+                        }
+                        this.results.push(profileData);
+                        this.progress.successCount++;
+                        this.consecutiveErrors = 0;
+
+                        this.io.emit('scraper-result-update', { id: this.id, data: profileData });
+
+                        const percent = this.queue.length > 0 ? `(Fila: ${this.queue.length})` : '';
+                        this.emitProgress(`✅ [Worker] Sucesso: ${profileData.nome} ${percent}`);
+                    }
+
+                    await this.captureScreenshot('WORKER_COMPLETE', 'worker');
+
+                } catch (error) {
+                    this.progress.errorCount++;
+                    // Silent consumer error logging to avoid spam
+                }
+
+                // Small delay
+                await new Promise(r => setTimeout(r, 1000));
+            } else {
+                await new Promise(r => setTimeout(r, 1000));
+            }
+        }
+        this.emitProgress('👷 Worker finalizado.');
     }
 
     async scrape(specialties, city, quantity, onlyWithPhone = false, requiredFields = []) {
@@ -300,7 +390,14 @@ class DoctoraliaScraper {
             const quantityPerSpecialty = Math.ceil(quantity / specialties.length);
             const allProfileUrls = new Set();
 
+            // Start Worker
+            if (!this.processQueuePromise) {
+                this.processQueuePromise = this.processQueue(requiredFields, onlyWithPhone);
+            }
+
             for (let i = 0; i < specialties.length; i++) {
+                if (this.progress.successCount >= quantity) break;
+
                 await this.checkState();
 
                 const specialty = specialties[i];
@@ -312,208 +409,43 @@ class DoctoraliaScraper {
 
                 await this.checkState();
 
-                const urls = await this.searchHandler.collectProfileUrls(quantityPerSpecialty, (msg) => {
-                    this.emitProgress(msg.message);
-                });
+                // Streaming Collection
+                const urls = await this.searchHandler.collectProfileUrls(
+                    quantityPerSpecialty,
+                    (msg) => this.emitProgress(msg.message),
+                    (newUrls) => {
+                        // Push to queue
+                        for (const u of newUrls) {
+                            if (!allProfileUrls.has(u)) {
+                                allProfileUrls.add(u);
+                                this.queue.push(u);
+                            }
+                        }
+                        if (newUrls.length > 0) this.emitProgress(`📥 ${newUrls.length} perfis na fila (Total: ${this.queue.length})`);
+                    }
+                );
 
-                urls.forEach(url => allProfileUrls.add(url));
-
-                if (allProfileUrls.size >= quantity) {
-                    break;
+                // Polling wait loop 
+                while (this.queue.length > 0 && this.progress.successCount < quantity && !this.isCancelled) {
+                    await new Promise(r => setTimeout(r, 2000));
                 }
             }
 
             const profileUrls = Array.from(allProfileUrls);
 
-            if (profileUrls.length === 0) {
+            if (profileUrls.length === 0 && this.results.length === 0) {
                 throw new Error('Nenhum perfil encontrado com os filtros especificados');
             }
 
-            this.emitProgress(`Iniciando extração de ${profileUrls.length} perfis...`);
+            // Clean up queue processing
+            while (this.queue.length > 0 && !this.isCancelled) await new Promise(r => setTimeout(r, 1000));
+            this.isProcessingQueue = false;
 
-            // Extract profiles with phone filter and error handling
-            // Keep fetching more URLs until we have enough successes
-            let urlIndex = 0;
-            let processedUrls = new Set(); // Track which URLs we already tried
-
-            while (this.progress.successCount < quantity) {
-                await this.checkState();
-
-                // If we ran out of URLs, fetch more from search
-                if (urlIndex >= profileUrls.length) {
-                    this.emitProgress(`🔍 Buscando mais perfis para completar a meta...`);
-
-                    // Try to collect more URLs from next pages
-                    const additionalUrls = await this.searchHandler.collectProfileUrls(
-                        quantity - this.progress.successCount + 10, // Get a bit extra
-                        processedUrls, // Pass the Set of already processed URLs to exclude
-                        (msg) => this.emitProgress(msg.message)
-                    );
-
-                    // Add new URLs (skip duplicates)
-                    const newUrls = additionalUrls.filter(url => !processedUrls.has(url));
-                    profileUrls.push(...newUrls);
-
-                    if (newUrls.length === 0) {
-                        this.emitProgress(`⚠️ Não há mais perfis disponíveis. Encerrando com ${this.progress.successCount} sucessos.`);
-                        break;
-                    }
-
-                    this.emitProgress(`✅ Encontrados ${newUrls.length} perfis adicionais`);
-                }
-
-                const url = profileUrls[urlIndex];
-                urlIndex++;
-                processedUrls.add(url);
-
-                const totalProcessed = this.progress.successCount + this.progress.errorCount + this.progress.skippedCount;
-                this.progress.current = totalProcessed + 1;
-
-                this.emitProgress(`Processando médico ${urlIndex}/${profileUrls.length} (Sucesso: ${this.progress.successCount}/${quantity}, Erros: ${this.progress.errorCount}, Pulados: ${this.progress.skippedCount})`);
-
-                try {
-                    const profileData = await this.profileExtractor.extractProfile(url, (msg) => this.emitProgress(msg.message));
-                    await this.captureScreenshot('EXTRACT_PROFILE');
-
-                    // Check required fields
-                    if (requiredFields && requiredFields.length > 0) {
-                        const missingFields = [];
-
-                        for (const field of requiredFields) {
-                            if (field === 'phone' && !this.profileExtractor.hasPhoneNumber(profileData)) missingFields.push('Telefone');
-                            if (field === 'address' && !profileData.endereco) missingFields.push('Endereço');
-                        }
-
-                        // Also respect legacy onlyWithPhone flag
-                        if (onlyWithPhone && !this.profileExtractor.hasPhoneNumber(profileData) && !missingFields.includes('Telefone')) {
-                            missingFields.push('Telefone');
-                        }
-
-                        if (missingFields.length > 0) {
-                            this.progress.skippedCount++;
-                            this.emitProgress(`⏭️ Médico pulado: ${profileData.nome} (Faltando: ${missingFields.join(', ')})`);
-                            console.log(`⏭️ Skipping ${profileData.nome} - missing fields: ${missingFields.join(', ')}`);
-
-                            // Emit skipped update to UI
-                            this.io.emit('scraper-progress', {
-                                id: this.id,
-                                type: 'doctoralia',
-                                ...this.progress
-                            });
-
-                            continue;
-                        }
-                    } else if (onlyWithPhone && !this.profileExtractor.hasPhoneNumber(profileData)) {
-                        // Fallback for onlyWithPhone if requiredFields is empty/undefined
-                        this.progress.skippedCount++;
-                        this.emitProgress(`⏭️ Médico pulado (sem telefone): ${profileData.nome}`);
-                        console.log(`⏭️ Skipping ${profileData.nome} - no phone number`);
-
-                        // Emit skipped update to UI
-                        this.io.emit('scraper-progress', {
-                            id: this.id,
-                            type: 'doctoralia',
-                            ...this.progress
-                        });
-
-                        continue;
-                    }
-
-                    if (this.profileExtractor.hasPhoneNumber(profileData)) {
-                        this.progress.phonesFound++;
-                    }
-
-                    // Success!
-                    this.results.push(profileData);
-                    this.progress.successCount++;
-                    this.consecutiveErrors = 0; // Reset error counter on success
-                    this.consecutiveSuccesses++;
-
-                    // Adaptive delay: decrease on success
-                    if (this.consecutiveSuccesses >= 2 && !this.usingProxy) {
-                        this.consecutiveSuccesses = 0;
-                        this.currentDelay = Math.max(this.currentDelay - 1500, this.minDelay);
-                        if (this.currentDelay > 0) {
-                            this.emitProgress(`⬇️ Delay reduzido para ${(this.currentDelay / 1000).toFixed(1)}s`);
-                        }
-                    }
-
-                    this.io.emit('scraper-result-update', {
-                        id: this.id,
-                        data: profileData
-                    });
-
-                    this.emitProgress(`✅ Extraído: ${profileData.nome} (${this.progress.successCount}/${quantity})`);
-
-                } catch (error) {
-                    // Error handling
-                    this.progress.errorCount++;
-                    this.consecutiveErrors++;
-
-                    const errorType = error.type || 'UNKNOWN';
-                    const errorMsg = `❌ Erro [${errorType}]: ${error.message}`;
-
-                    this.emitProgress(errorMsg);
-                    console.error(errorMsg);
-
-                    // Check for connection errors that require immediate proxy change
-                    const isConnectionError = error.message && (
-                        error.message.includes('ERR_CONNECTION_CLOSED') ||
-                        error.message.includes('ERR_CONNECTION_REFUSED') ||
-                        error.message.includes('ERR_PROXY_CONNECTION_FAILED') ||
-                        error.message.includes('net::ERR_')
-                    );
-
-                    // Force proxy rotation on connection errors or after 2 consecutive errors
-                    if (isConnectionError || this.consecutiveErrors >= 2) {
-                        if (isConnectionError) {
-                            this.emitProgress(`⚠️ Erro de conexão detectado, trocando proxy...`);
-                        } else {
-                            this.emitProgress(`⚠️ ${this.consecutiveErrors} erros consecutivos, trocando proxy...`);
-                        }
-
-                        console.log(`🔄 Rotating proxy after connection error or ${this.consecutiveErrors} consecutive errors`);
-
-                        // Mark current proxy as failed
-                        if (this.currentProxy) {
-                            this.proxyManager.markProxyAsFailed(this.currentProxy);
-                        }
-
-                        // Get new proxy
-                        try {
-                            const newProxy = await this.proxyManager.getNextProxy();
-
-                            if (newProxy !== this.currentProxy) {
-                                // Restart browser with new proxy
-                                this.emitProgress('🔄 Reiniciando browser com novo proxy...');
-                                await this.browserManager.close();
-
-                                this.currentProxy = newProxy;
-                                this.browserManager = new BrowserManager();
-                                const page = await this.browserManager.initialize(this.currentProxy);
-
-                                this.searchHandler = new SearchHandler(page);
-                                this.profileExtractor = new ProfileExtractor(page);
-
-                                this.consecutiveErrors = 0; // Reset after proxy change
-                                this.emitProgress('✅ Proxy trocado com sucesso');
-                            }
-                        } catch (proxyError) {
-                            this.emitProgress(`⚠️ Erro ao trocar proxy: ${proxyError.message}`);
-                            console.error('Proxy rotation error:', proxyError);
-                            // Continue anyway - will try next profile
-                        }
-                    }
-
-                    // Continue to next profile
-                    continue;
-                }
-            }
+            if (this.processQueuePromise) await this.processQueuePromise;
 
             // Final summary
             if (this.progress.successCount < quantity) {
                 const reason = `Meta atingida parcialmente: Solicitado ${quantity}, extraído ${this.progress.successCount}. Erros: ${this.progress.errorCount}, Pulados: ${this.progress.skippedCount}`;
-                console.log(reason);
                 this.emitProgress(reason);
             } else {
                 this.emitProgress(`🎯 Meta completa: ${this.progress.successCount}/${quantity} médicos extraídos!`);
@@ -547,181 +479,14 @@ class DoctoraliaScraper {
 
             console.error('Scraping error:', error);
             this.emitProgress(`❌ Erro: ${error.message}`);
-
-            // Check if it's a proxy/connection error that requires immediate proxy change
-            const isProxyError = error.message && (
-                error.message.includes('TUNNEL_FAILED') ||
-                error.message.includes('ERR_TUNNEL_CONNECTION_FAILED') ||
-                error.message.includes('ERR_PROXY_CONNECTION_FAILED') ||
-                error.message.includes('ERR_CONNECTION_CLOSED') ||
-                error.message.includes('ERR_CONNECTION_REFUSED') ||
-                error.message.includes('ERR_TIMED_OUT') ||
-                error.message.includes('ERR_NAME_NOT_RESOLVED')
-            );
-
-            // Limitar tentativas de retry (máximo 3 retries)
-            if (!this.retryCount) this.retryCount = 0;
-            const maxRetries = 3;
-
-            if (isProxyError && this.retryCount < maxRetries) {
-                this.retryCount++;
-                this.emitProgress(`⚠️ Erro de proxy detectado. Tentativa ${this.retryCount}/${maxRetries}...`);
-
-                // Mark current proxy as failed
-                if (this.currentProxy) {
-                    this.proxyManager.markProxyAsFailed(this.currentProxy);
-                }
-
-                // Close current browser
-                await this.browserManager.close();
-
-                // Try to get a new proxy (pode retornar null para modo sem proxy)
-                this.currentProxy = await this.proxyManager.getNextProxy();
-
-                if (this.currentProxy === null) {
-                    this.emitProgress('🔄 Reiniciando em modo SEM PROXY...');
-                    this.usingProxy = false;
-                    this.currentDelay = 3000; // Delay para modo sem proxy
-                } else {
-                    this.emitProgress(`🔄 Reiniciando com proxy: ${this.currentProxy}`);
-                    this.usingProxy = true;
-                }
-
-                this.browserManager = new BrowserManager();
-
-                // Wrap initialization in try-catch to handle TUNNEL_FAILED and fallback
-                try {
-                    const page = await this.browserManager.initialize(this.currentProxy);
-                    this.searchHandler = new SearchHandler(page);
-                    this.profileExtractor = new ProfileExtractor(page);
-                } catch (initError) {
-                    // If tunnel failed, try without proxy
-                    if (initError.message && initError.message.includes('TUNNEL_FAILED')) {
-                        this.emitProgress('⚠️ Túnel falhou novamente. Tentando SEM PROXY...');
-                        if (this.currentProxy) {
-                            this.proxyManager.markProxyAsFailed(this.currentProxy);
-                        }
-                        this.currentProxy = null;
-                        this.usingProxy = false;
-                        this.currentDelay = 3000;
-
-                        await this.browserManager.close().catch(() => { });
-                        this.browserManager = new BrowserManager();
-                        const page = await this.browserManager.initialize(null);
-                        this.searchHandler = new SearchHandler(page);
-                        this.profileExtractor = new ProfileExtractor(page);
-                    } else {
-                        throw initError;
-                    }
-                }
-
-                // Retry the scrape
-                this.emitProgress('🔄 Tentando novamente...');
-                return await this.scrape(
-                    this.config.specialties,
-                    this.config.city,
-                    this.config.quantity,
-                    this.config.onlyWithPhone
-                );
-            }
-
-            // Se esgotou os retries COM PROXY, ir para modo sem proxy
-            if (isProxyError && this.retryCount >= maxRetries && this.usingProxy) {
-                this.emitProgress('⚠️ Esgotadas tentativas com proxy. Iniciando modo SEM PROXY...');
-
-                await this.browserManager.close();
-
-                this.currentProxy = null;
-                this.usingProxy = false;
-                this.currentDelay = 3000;
-                this.retryCount = 0; // Reset contador
-                this.noProxyErrors = 0; // Contador de erros no modo sem proxy
-
-                this.browserManager = new BrowserManager();
-                const page = await this.browserManager.initialize(null);
-
-                this.searchHandler = new SearchHandler(page);
-                this.profileExtractor = new ProfileExtractor(page);
-
-                this.emitProgress('🔄 Tentando em modo SEM PROXY...');
-                return await this.scrape(
-                    this.config.specialties,
-                    this.config.city,
-                    this.config.quantity,
-                    this.config.onlyWithPhone
-                );
-            }
-
-            // Se está no modo sem proxy e deu erro, contar erros
-            if (isProxyError && !this.usingProxy) {
-                if (!this.noProxyErrors) this.noProxyErrors = 0;
-                this.noProxyErrors++;
-
-                this.emitProgress(`⚠️ Erro sem proxy ${this.noProxyErrors}/2...`);
-
-                // Após 2 erros no modo sem proxy, voltar a tentar proxies
-                if (this.noProxyErrors >= 2) {
-                    this.emitProgress('🔄 2 erros sem proxy. Resetando proxies para nova tentativa...');
-
-                    await this.browserManager.close();
-
-                    // Resetar proxies falhos para tentar novamente
-                    this.proxyManager.resetFailedProxies();
-                    this.noProxyErrors = 0;
-                    this.retryCount = 0;
-
-                    // Tentar obter um novo proxy
-                    this.currentProxy = await this.proxyManager.getNextProxy();
-
-                    if (this.currentProxy) {
-                        this.usingProxy = true;
-                        this.currentDelay = 0;
-                        this.emitProgress(`🔄 Novo proxy obtido: ${this.currentProxy}`);
-                    } else {
-                        this.usingProxy = false;
-                        this.currentDelay = 3000;
-                        this.emitProgress('⚠️ Nenhum proxy disponível, continuando sem proxy...');
-                    }
-
-                    this.browserManager = new BrowserManager();
-                    const page = await this.browserManager.initialize(this.currentProxy);
-
-                    this.searchHandler = new SearchHandler(page);
-                    this.profileExtractor = new ProfileExtractor(page);
-
-                    return await this.scrape(
-                        this.config.specialties,
-                        this.config.city,
-                        this.config.quantity,
-                        this.config.onlyWithPhone
-                    );
-                }
-
-                // Se ainda não chegou a 2 erros, tenta novamente sem proxy
-                await this.browserManager.close();
-
-                this.browserManager = new BrowserManager();
-                const page = await this.browserManager.initialize(null);
-
-                this.searchHandler = new SearchHandler(page);
-                this.profileExtractor = new ProfileExtractor(page);
-
-                this.emitProgress('🔄 Tentando novamente sem proxy...');
-                return await this.scrape(
-                    this.config.specialties,
-                    this.config.city,
-                    this.config.quantity,
-                    this.config.onlyWithPhone
-                );
-            }
-
-            throw error;
+            return { success: false, message: error.message, data: this.results, logs: this.logs };
         } finally { }
     }
 
     async saveResults() {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const fileName = `doctoralia_results_${timestamp}.csv`;
+        // New Format: doctoralia_[id]_results_[timestamp].csv
+        const fileName = `doctoralia_${this.id}_results_${timestamp}.csv`;
         const filePath = path.join(__dirname, '..', '..', 'results', fileName);
 
         await fs.mkdir(path.join(__dirname, '..', '..', 'results'), { recursive: true });

@@ -52,6 +52,7 @@
                         <option value="">Todos Tipos</option>
                         <option value="doctoralia">Doctoralia</option>
                         <option value="googlemaps">Google Maps</option>
+                        <option value="instagram">Instagram</option>
                     </select>
                 </div>
                 <div id="history-list" class="scrapers-list">
@@ -74,6 +75,9 @@
                     </button>
                     <button class="tab-btn" data-tab="googlemaps">
                         <i class="fas fa-map-marker-alt"></i> Google Maps
+                    </button>
+                    <button class="tab-btn" data-tab="instagram">
+                        <i class="fab fa-instagram"></i> Instagram
                     </button>
                 </div>
 
@@ -239,6 +243,162 @@
                         <i class="fas fa-map"></i> Iniciar Extração do Maps
                     </button>
                 </form>
+
+                <!-- Instagram Form -->
+                <form id="instagram-form" class="tab-content" data-tab="instagram">
+                    <div class="form-group">
+                        <label for="ig-search-type">Tipo de Pesquisa</label>
+                        <select id="ig-search-type" class="filter-select" style="width: 100%;">
+                            <option value="profiles">🔍 Pesquisar Perfis</option>
+                            <option value="hashtag">#️⃣ Pesquisar por Hashtag</option>
+                            <option value="followers">👥 Extrair Seguidores</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="ig-search-term-group">
+                        <label for="ig-search-term" id="ig-search-label">Termo de Busca</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="ig-search-term"
+                                placeholder="Ex: dentista são paulo, @usuario, estetica...">
+                        </div>
+                        <small id="ig-search-hint">Digite um termo para buscar perfis</small>
+                    </div>
+
+                    <div class="form-group hidden" id="ig-filter-group">
+                        <label for="ig-filter-term">Filtrar por Termo (opcional)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-filter"></i>
+                            <input type="text" id="ig-filter-term"
+                                placeholder="Ex: estetica (filtra seguidores pela bio)">
+                        </div>
+                        <small>Deixe vazio para extrair todos os seguidores</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ig-quantity">Quantidade de Perfis</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-users"></i>
+                            <input type="number" id="ig-quantity" value="10" min="1" max="1000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dados Obrigatórios</label>
+                        <small>Marque os campos que o perfil deve ter para ser extraído</small>
+                        <div class="required-fields-selector">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="ig-required" value="phone">
+                                <span>Telefone</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="ig-required" value="whatsapp">
+                                <span>WhatsApp</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="ig-required" value="email">
+                                <span>Email</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="ig-required" value="website">
+                                <span>Website</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Dados extraídos:</strong>
+                            <ul>
+                                <li><strong>Perfil:</strong> Nome, Username, Bio, Seguidores</li>
+                                <li><strong>Contato:</strong> Email, Telefone, WhatsApp (detectados na bio)</li>
+                                <li><strong>Links:</strong> Website oficial</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Modo de Conexão</label>
+                        <div class="proxy-selector">
+                            <label class="radio-label">
+                                <input type="radio" name="ig-proxy-mode" value="proxy" checked>
+                                <span><i class="fas fa-shield-alt"></i> Com Proxy</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="ig-proxy-mode" value="no-proxy">
+                                <span><i class="fas fa-bolt"></i> Sem Proxy</span>
+                            </label>
+                        </div>
+                        <small>Proxy é altamente recomendado para Instagram.</small>
+                    </div>
+
+                    <!-- Credentials Login Section -->
+                    <div class="credentials-section" id="ig-credentials-section">
+                        <h4><i class="fas fa-key"></i> Login Automático</h4>
+                        <small>Alternativa aos cookies. O sistema fará login automaticamente.</small>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ig-username">Usuário / Email</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" id="ig-username" placeholder="seunome">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ig-password">Senha</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" id="ig-password" placeholder="********">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instagram Cookies Section (collapsed by default) -->
+                    <details class="cookies-section" id="ig-cookies-section">
+                        <summary><i class="fas fa-cookie"></i> Cookies de Sessão (Avançado)</summary>
+                        <div class="cookies-content">
+                            <small>Use estes campos se o login automático falhar ou se já tiver cookies válidos.</small>
+                            <div class="form-group">
+                                <label for="ig-cookie-sessionid">sessionid</label>
+                                <input type="text" id="ig-cookie-sessionid"
+                                    placeholder="Cole aqui o valor do cookie sessionid">
+                            </div>
+                            <div class="form-group">
+                                <label for="ig-cookie-csrftoken">csrftoken</label>
+                                <input type="text" id="ig-cookie-csrftoken"
+                                    placeholder="Cole aqui o valor do cookie csrftoken">
+                            </div>
+                            <div class="form-group">
+                                <label for="ig-cookie-ds_user_id">ds_user_id</label>
+                                <input type="text" id="ig-cookie-ds_user_id"
+                                    placeholder="Cole aqui o valor do cookie ds_user_id">
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Auth Method Selector -->
+                    <div id="ig-auth-method-group" class="form-group hidden">
+                        <label>Método de Autenticação</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="ig-auth-method" value="credentials" checked>
+                                <span class="radio-custom"></span>
+                                Login (Usuário/Senha)
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="ig-auth-method" value="cookies">
+                                <span class="radio-custom"></span>
+                                Cookies de Sessão
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-instagram">
+                        <i class="fab fa-instagram"></i> Iniciar Extração do Instagram
+                    </button>
+                </form>
             </div>
         </main>
     </div>
@@ -388,13 +548,27 @@
                         <h4><i class="fas fa-terminal"></i> Logs</h4>
                         <div id="live-logs" class="logs-container"></div>
                     </div>
-                    <div class="live-screenshot-panel">
-                        <h4><i class="fas fa-camera"></i> Screenshot</h4>
-                        <div class="screenshot-wrapper">
-                            <img id="live-screenshot" src="" alt="Live Screenshot" />
-                            <div id="screenshot-placeholder" class="screenshot-placeholder">
-                                <i class="fas fa-image"></i>
-                                <p>Aguardando screenshot...</p>
+
+                    <div class="live-screens-container">
+                        <div class="live-screen-box">
+                            <h4><i class="fas fa-desktop"></i> Navegador Principal (Lista)</h4>
+                            <div class="screenshot-wrapper">
+                                <img id="live-screenshot-main" src="" alt="Main Page" />
+                                <div id="screenshot-placeholder-main" class="screenshot-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <p>Aguardando...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="live-screen-box">
+                            <h4><i class="fas fa-robot"></i> Worker (Detalhes)</h4>
+                            <div class="screenshot-wrapper">
+                                <img id="live-screenshot-worker" src="" alt="Worker Page" />
+                                <div id="screenshot-placeholder-worker" class="screenshot-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <p>Aguardando...</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -405,6 +579,65 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
+    <div id="auth-code-modal" class="modal-overlay hidden">
+        <div class="modal-content confirm-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h2><i class="fas fa-shield-alt"></i> Verificação Necessária</h2>
+                </div>
+            </div>
+            <div class="modal-body">
+                <p>O Instagram solicitou um código de verificação para concluir o login.</p>
+                <div class="form-group">
+                    <label for="auth-code-input">Código de Segurança (SMS/Email/App)</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key"></i>
+                        <input type="text" id="auth-code-input" placeholder="123456" autofocus>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-primary" id="btn-submit-code">
+                        <i class="fas fa-check"></i> Enviar Código
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Re-Login Modal -->
+    <div id="relogin-modal" class="modal-overlay hidden">
+        <div class="modal-content confirm-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h2><i class="fas fa-sign-in-alt"></i> Login Necessário</h2>
+                </div>
+                <button id="close-relogin-modal" class="btn-icon"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>A sessão expirou ou os cookies são inválidos. Faça login para continuar o scraping.</p>
+                <form id="relogin-form">
+                    <div class="form-group">
+                        <label for="relogin-username">Usuário</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="relogin-username" placeholder="Usuário do Instagram" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="relogin-password">Senha</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="relogin-password" placeholder="Senha" required>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-primary btn-instagram">
+                            <i class="fas fa-sign-in-alt"></i> Entrar e Continuar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

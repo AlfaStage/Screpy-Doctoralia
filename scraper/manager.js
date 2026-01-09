@@ -1,5 +1,6 @@
 const DoctoraliaScraper = require('./doctoralia');
 const GoogleMapsScraper = require('./googlemaps');
+const InstagramScraper = require('./instagram');
 const fs = require('fs').promises;
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
@@ -47,6 +48,9 @@ class ScraperManager {
                     } else if (file.startsWith('doctoralia_')) {
                         type = 'doctoralia';
                         id = file.replace('.json', '').replace('doctoralia_results_', '').replace('doctoralia_error_', '');
+                    } else if (file.startsWith('instagram_')) {
+                        type = 'instagram';
+                        id = file.replace('.json', '').replace('instagram_results_', '').replace('instagram_error_', '');
                     }
 
                     // Check if it's an error file
@@ -101,8 +105,8 @@ class ScraperManager {
     async saveErrorResults(id, config, type, errorMessage, partialResults = [], logs = []) {
         try {
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const prefix = type === 'googlemaps' ? 'googlemaps_error_' : 'doctoralia_error_';
-            const filename = `${prefix}${timestamp}.json`;
+            // Standardize format: [type]_[id]_erro_[timestamp].json
+            const filename = `${type}_${id}_erro_${timestamp}.json`;
             const filePath = path.join(this.resultsDir, filename);
 
             const errorData = {
@@ -174,6 +178,150 @@ class ScraperManager {
         this.runMapsScraper(id, config);
 
         return id;
+    }
+
+    async startInstagramScrape(config) {
+        if (this.scrapers.size >= this.MAX_CONCURRENT_SCRAPES) {
+            throw new Error(`Máximo de ${this.MAX_CONCURRENT_SCRAPES} scrapers simultâneos atingido.`);
+        }
+
+        const id = uuidv4();
+        const scraper = new InstagramScraper(id, this.io);
+
+        this.scrapers.set(id, scraper);
+
+        // Notify client of new scraper
+        this.io.emit('scraper-created', {
+            id,
+            config,
+            type: 'instagram',
+            status: 'initializing',
+            startTime: Date.now()
+        });
+
+        // Start scraping asynchronously
+        this.runInstagramScraper(id, config);
+
+        return id;
+    }
+
+    async runInstagramScraper(id, config) {
+        const scraper = this.scrapers.get(id);
+        if (!scraper) {
+            throw new Error('Scraper not found');
+        }
+
+        try {
+            console.log(`[Manager] Running Instagram scraper ${id} with config:`, config);
+
+            this.io.emit('scraper-progress', {
+                id: id,
+                type: 'instagram',
+                message: `[Manager] Iniciando Instagram scraper (${config.searchType})...`,
+                status: 'initializing'
+            });
+
+            await scraper.initialize(config.useProxy !== false, config.cookies);
+            console.log(`[Manager] Instagram Scraper ${id} initialized`);
+
+            scraper.status = 'running';
+            const result = await scraper.scrape(config);
+            console.log(`[Manager] Instagram Scraper ${id} completed. Result:`, result);
+
+            this.io.emit('scraper-progress', {
+                id: id,
+                type: 'instagram',
+                message: `[Manager] Instagram scraper concluído com sucesso`,
+                status: 'completed'
+            });
+
+            // Add to history
+            const historyItem = {
+                id,
+                config,
+                type: 'instagram',
+                result,
+                status: 'completed',
+                timestamp: Date.now()
+            };
+
+            this.history.unshift(historyItem);
+            await this.saveHistory();
+
+            this.io.emit('scraper-completed', { id, type: 'instagram', result });
+
+            // Send webhook if configured
+            if (config.webhook) {
+                const csvFilename = result.filePath ? result.filePath.split(/[\\/]/).pop() : null;
+                await webhookService.send(config.webhook, {
+                    id,
+                    type: 'instagram',
+                    status: 'completed',
+                    config: {
+                        searchType: config.searchType,
+                        searchTerm: config.searchTerm,
+                        quantity: config.quantity,
+                        filterTerm: config.filterTerm
+                    },
+                    metadata: {
+                        startTime: scraper.startTime,
+                        endTime: new Date().toISOString(),
+                        totalResults: result.count || 0
+                    },
+                    csvUrl: csvFilename ? `/results/${csvFilename}` : null,
+                    results: result.data || [],
+                    logs: result.logs || []
+                }, config.jsonLogs || false);
+            }
+
+        } catch (error) {
+            console.error(`[Manager] Instagram Scraper ${id} failed:`, error);
+
+            // Collect partial results and logs
+            const partialResults = scraper.results || [];
+            const logs = scraper.logs || [];
+
+            // Save error data to JSON
+            const errorFilePath = await this.saveErrorResults(id, config, 'instagram', error.message, partialResults, logs);
+
+            const historyItem = {
+                id,
+                config,
+                type: 'instagram',
+                error: error.message,
+                status: 'failed',
+                result: {
+                    success: false,
+                    count: partialResults.length,
+                    data: partialResults,
+                    logs: logs,
+                    filePath: errorFilePath
+                },
+                timestamp: Date.now()
+            };
+
+            this.history.unshift(historyItem);
+            await this.saveHistory();
+
+            this.io.emit('scraper-error', { id, type: 'instagram', error: error.message, partialResults: partialResults.length, logs: logs.length });
+
+            if (config.webhook) {
+                await webhookService.send(config.webhook, {
+                    id,
+                    type: 'instagram',
+                    status: 'error',
+                    error: error.message,
+                    partialResults: partialResults,
+                    logs: logs,
+                    config
+                }, false);
+            }
+        } finally {
+            await scraper.close();
+            this.scrapers.delete(id);
+            this.io.emit('scraper-removed', { id });
+            console.log(`[Manager] Instagram Scraper ${id} cleanup done`);
+        }
     }
 
     async runMapsScraper(id, config) {

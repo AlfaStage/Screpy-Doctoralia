@@ -89,7 +89,7 @@ class SearchHandler {
         return true;
     }
 
-    async collectProfileUrls(targetQuantity, progressCallback) {
+    async collectProfileUrls(targetQuantity, progressCallback, onProfilesFound) {
         // Buscar 20% a mais para ter margem de erros e pulados
         const adjustedTarget = Math.ceil(targetQuantity * 1.20);
 
@@ -201,12 +201,21 @@ class SearchHandler {
 
                 // Contar quantos são novos (não duplicados)
                 const sizeBefore = profileUrls.size;
+                const newlyAdded = [];
+
                 newUrls.forEach(url => {
                     if (profileUrls.size < adjustedTarget) {
-                        profileUrls.add(url);
+                        if (!profileUrls.has(url)) {
+                            profileUrls.add(url);
+                            newlyAdded.push(url);
+                        }
                     }
                 });
                 const addedCount = profileUrls.size - sizeBefore;
+
+                if (newlyAdded.length > 0 && onProfilesFound) {
+                    onProfilesFound(newlyAdded);
+                }
 
                 if (progressCallback) progressCallback({
                     status: 'collecting',
