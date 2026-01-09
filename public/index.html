@@ -53,6 +53,7 @@
                         <option value="doctoralia">Doctoralia</option>
                         <option value="googlemaps">Google Maps</option>
                         <option value="instagram">Instagram</option>
+                        <option value="cnpj">CNPJ (Casa dos Dados)</option>
                     </select>
                 </div>
                 <div id="history-list" class="scrapers-list">
@@ -78,6 +79,9 @@
                     </button>
                     <button class="tab-btn" data-tab="instagram">
                         <i class="fab fa-instagram"></i> Instagram
+                    </button>
+                    <button class="tab-btn" data-tab="cnpj">
+                        <i class="fas fa-building"></i> CNPJ
                     </button>
                 </div>
 
@@ -397,6 +401,96 @@
 
                     <button type="submit" class="btn-primary btn-instagram">
                         <i class="fab fa-instagram"></i> Iniciar Extração do Instagram
+                    </button>
+                </form>
+
+                <!-- CNPJ (Casa dos Dados) Form -->
+                <form id="cnpj-form" class="tab-content" data-tab="cnpj">
+                    <div class="form-group">
+                        <label for="cnpj-razao-social">Razão Social ou Nome Fantasia</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-building"></i>
+                            <input type="text" id="cnpj-razao-social" placeholder="Razão Social ou Fantasia">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cnpj-cnae">Atividade Principal (CNAE)</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-briefcase"></i>
+                                <input type="text" id="cnpj-cnae" placeholder="Código ou nome da atividade">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cnpj-natureza">Natureza Jurídica</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-gavel"></i>
+                                <input type="text" id="cnpj-natureza" placeholder="Código ou nome da natureza">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cnpj-uf">Estado (UF)</label>
+                            <input type="text" id="cnpj-uf" placeholder="Ex: SP">
+                        </div>
+                        <div class="form-group">
+                            <label for="cnpj-municipio">Município</label>
+                            <input type="text" id="cnpj-municipio" placeholder="Nome da cidade">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cnpj-bairro">Bairro</label>
+                            <input type="text" id="cnpj-bairro" placeholder="Nome do bairro">
+                        </div>
+                        <div class="form-group">
+                            <label for="cnpj-cep">CEP</label>
+                            <input type="text" id="cnpj-cep" placeholder="12345678">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cnpj-capital-social">Capital Social (A partir de)</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-coins"></i>
+                                <input type="number" id="cnpj-capital-social" placeholder="Min: 1000">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cnpj-ddd">DDD</label>
+                            <input type="text" id="cnpj-ddd" placeholder="11">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Filtros de Perfil</label>
+                        <div class="required-fields-selector">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="cnpj-somente-mei">
+                                <span>Somente MEI</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="cnpj-excluir-mei">
+                                <span>Excluir MEI</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="cnpj-com-telefone" checked>
+                                <span>Com Telefone</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="cnpj-com-email">
+                                <span>Com E-mail</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-search"></i> Iniciar Pesquisa CNPJ
                     </button>
                 </form>
             </div>

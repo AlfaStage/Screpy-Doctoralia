@@ -134,6 +134,20 @@ io.on('connection', (socket) => {
         }
     });
 
+    // CNPJ scraper events
+    socket.on('start-cnpj-scrape', async (data) => {
+        try {
+            console.log('Starting CNPJ scrape:', data);
+
+            const id = await scraperManager.startCnpjScrape(data);
+            socket.emit('scrape-started', { id, type: 'cnpj' });
+
+        } catch (error) {
+            console.error('Error starting CNPJ scrape:', error);
+            socket.emit('error', { message: error.message });
+        }
+    });
+
     // Handle Instagram cookie submission
     socket.on('instagram-cookies', async (data) => {
         const { scraperId, cookies } = data;

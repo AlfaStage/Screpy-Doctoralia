@@ -1,6 +1,7 @@
 const DoctoraliaScraper = require('./doctoralia');
 const GoogleMapsScraper = require('./googlemaps');
 const InstagramScraper = require('./instagram');
+const CnpjScraper = require('./cnpj');
 const fs = require('fs').promises;
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
@@ -51,6 +52,9 @@ class ScraperManager {
                     } else if (file.startsWith('instagram_')) {
                         type = 'instagram';
                         id = file.replace('.json', '').replace('instagram_results_', '').replace('instagram_error_', '');
+                    } else if (file.startsWith('cnpj_')) {
+                        type = 'cnpj';
+                        id = file.replace('.json', '').replace('cnpj_results_', '').replace('cnpj_error_', '');
                     }
 
                     // Check if it's an error file
@@ -203,6 +207,107 @@ class ScraperManager {
         this.runInstagramScraper(id, config);
 
         return id;
+    }
+
+    async startCnpjScrape(config) {
+        if (this.scrapers.size >= this.MAX_CONCURRENT_SCRAPES) {
+            throw new Error(`Máximo de ${this.MAX_CONCURRENT_SCRAPES} scrapers simultâneos atingido.`);
+        }
+
+        const id = uuidv4();
+
+        // Define a simple emitUpdate for the scraper
+        const emitUpdate = (event, data) => {
+            this.io.emit(`scraper-update-${id}`, { event, data });
+        };
+
+        const scraper = new CnpjScraper(id, config, {
+            setupPage: async () => {
+                const browser = await require('./browser').getInstance();
+                return await browser.setupPage();
+            }
+        }, (log) => {
+            this.io.emit('scraper-progress', { id, ...log, type: 'cnpj' });
+        }, emitUpdate);
+
+        this.scrapers.set(id, scraper);
+
+        // Notify client of new scraper
+        this.io.emit('scraper-created', {
+            id,
+            config,
+            type: 'cnpj',
+            status: 'initializing',
+            startTime: Date.now()
+        });
+
+        // Start scraping asynchronously
+        this.runCnpjScraper(id, config);
+
+        return id;
+    }
+
+    async runCnpjScraper(id, config) {
+        const scraper = this.scrapers.get(id);
+        if (!scraper) return;
+
+        try {
+            this.io.emit('scraper-progress', {
+                id: id,
+                type: 'cnpj',
+                message: `[Manager] Iniciando CNPJ scraper...`,
+                status: 'initializing'
+            });
+
+            const result = await scraper.scrape();
+
+            this.io.emit('scraper-progress', {
+                id: id,
+                type: 'cnpj',
+                message: `[Manager] CNPJ scraper concluído com sucesso`,
+                status: 'completed'
+            });
+
+            // Add to history
+            const historyItem = {
+                id,
+                config,
+                type: 'cnpj',
+                result,
+                status: 'completed',
+                timestamp: Date.now()
+            };
+
+            this.history.unshift(historyItem);
+            this.io.emit('scraper-completed', { id, type: 'cnpj', result });
+
+        } catch (error) {
+            console.error(`[Manager] CNPJ Scraper ${id} failed:`, error);
+
+            const partialResults = scraper.results || [];
+            const errorFilePath = await this.saveErrorResults(id, config, 'cnpj', error.message, partialResults);
+
+            const historyItem = {
+                id,
+                config,
+                type: 'cnpj',
+                error: error.message,
+                status: 'failed',
+                result: {
+                    success: false,
+                    count: partialResults.length,
+                    data: partialResults,
+                    filePath: errorFilePath
+                },
+                timestamp: Date.now()
+            };
+
+            this.history.unshift(historyItem);
+            this.io.emit('scraper-error', { id, type: 'cnpj', error: error.message });
+        } finally {
+            this.scrapers.delete(id);
+            this.io.emit('scraper-removed', { id });
+        }
     }
 
     async runInstagramScraper(id, config) {

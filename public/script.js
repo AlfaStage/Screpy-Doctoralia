@@ -227,36 +227,90 @@ if (mapsForm) {
 }
 
 // Handle Maps scrape-started event
-socket.on('scrape-started', ({ id, type }) => {
-    if (type === 'googlemaps') {
-        const config = {
-            searchTerm: document.getElementById('search-term')?.value || '',
-            city: document.getElementById('maps-city')?.value || '',
-            quantity: parseInt(document.getElementById('maps-quantity')?.value) || 10,
-            investigateWebsites: document.getElementById('investigate-websites')?.checked ?? true
-        };
-        const scraper = {
-            id,
-            type: 'googlemaps',
-            config,
-            status: 'running',
-            current: 0,
-            total: config.quantity,
-            logs: [],
-            results: [],
-            startTime: Date.now(),
-            successCount: 0,
-            errorCount: 0,
-            websitesInvestigated: 0
-        };
-        activeScrapers.set(id, scraper);
-        renderActiveScrapers();
+socket.on('scrape-started', onStarted);
+socket.once('error', onError);
 
-        // Open modal automatically
-        currentModalScraperId = id;
-        openModal(id, true);
-    }
+socket.emit('start-maps-scrape', {
+    searchTerm,
+    city,
+    quantity: parseInt(quantity),
+    investigateWebsites,
+    useProxy,
+    requiredFields
 });
+    });
+}
+
+// CNPJ Form Handler
+const cnpjForm = document.getElementById('cnpj-form');
+if (cnpjForm) {
+    cnpjForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (!socket.connected) {
+            alert('Erro de conexão com o servidor. Tentando reconectar...');
+            socket.connect();
+            return;
+        }
+
+        const razaoSocial = document.getElementById('cnpj-razao-social').value;
+        const cnae = document.getElementById('cnpj-cnae').value;
+        const natureza = document.getElementById('cnpj-natureza').value;
+        const uf = document.getElementById('cnpj-uf').value;
+        const municipio = document.getElementById('cnpj-municipio').value;
+        const bairro = document.getElementById('cnpj-bairro').value;
+        const cep = document.getElementById('cnpj-cep').value;
+        const capitalSocialMin = document.getElementById('cnpj-capital-social').value;
+        const ddd = document.getElementById('cnpj-ddd').value;
+
+        const somenteMei = document.getElementById('cnpj-somente-mei').checked;
+        const excluirMei = document.getElementById('cnpj-excluir-mei').checked;
+        const comTelefone = document.getElementById('cnpj-com-telefone').checked;
+        const comEmail = document.getElementById('cnpj-com-email').checked;
+
+        // Visual feedback
+        const btn = cnpjForm.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
+
+        const timeoutId = setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert('O servidor demorou para responder. Tente novamente.');
+        }, 5000);
+
+        const onStarted = (data) => {
+            if (data.type === 'cnpj') {
+                clearTimeout(timeoutId);
+                socket.off('scrape-started', onStarted);
+                socket.off('error', onError);
+
+                cnpjForm.reset();
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        };
+
+        const onError = (err) => {
+            clearTimeout(timeoutId);
+            socket.off('scrape-started', onStarted);
+            socket.off('error', onError);
+
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert(err.message);
+        };
+
+        socket.on('scrape-started', onStarted);
+        socket.once('error', onError);
+
+        socket.emit('start-cnpj-scrape', {
+            razaoSocial, cnae, natureza, uf, municipio, bairro, cep, capitalSocialMin, ddd,
+            somenteMei, excluirMei, comTelefone, comEmail
+        });
+    });
+}
 
 // Socket.io Events
 socket.on('initial-state', (data) => {
@@ -293,6 +347,32 @@ socket.on('scrape-started', ({ id, type }) => {
             successCount: 0,
             errorCount: 0,
             skippedCount: 0
+        };
+        activeScrapers.set(id, scraper);
+        renderActiveScrapers();
+        currentModalScraperId = id;
+        openModal(id, true);
+        return;
+    }
+
+    // Handle CNPJ type
+    if (type === 'cnpj') {
+        const config = {
+            razaoSocial: document.getElementById('cnpj-razao-social')?.value || '',
+            uf: document.getElementById('cnpj-uf')?.value || ''
+        };
+        const scraper = {
+            id,
+            type: 'cnpj',
+            config,
+            status: 'running',
+            current: 0,
+            total: 0, // Search first
+            logs: [],
+            results: [],
+            startTime: Date.now(),
+            successCount: 0,
+            errorCount: 0
         };
         activeScrapers.set(id, scraper);
         renderActiveScrapers();
@@ -365,13 +445,20 @@ socket.on('scraper-result', (data) => {
             const thead = document.querySelector('#modal-results-table thead tr');
             if (thead && thead.children.length === 0) {
                 const isMaps = scraper.type === 'googlemaps';
-                const keys = isMaps
-                    ? ['nome', 'categoria', 'telefone', 'whatsapp', 'website', 'email', 'instagram', 'endereco']
-                    : ['nome', 'especialidades', 'numeroFixo', 'numeroMovel', 'enderecos'];
+                const isCnpj = scraper.type === 'cnpj';
+
+                let keys = [];
+                if (isMaps) {
+                    keys = ['nome', 'categoria', 'telefone', 'whatsapp', 'website', 'email', 'instagram', 'endereco'];
+                } else if (isCnpj) {
+                    keys = ['cnpj', 'razao_social', 'situacao_cadastral', 'telefone', 'email', 'municipio', 'uf'];
+                } else {
+                    keys = ['nome', 'especialidades', 'numeroFixo', 'numeroMovel', 'enderecos'];
+                }
 
                 keys.forEach(key => {
                     const th = document.createElement('th');
-                    th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+                    th.textContent = key.replace('_', ' ').toUpperCase();
                     thead.appendChild(th);
                 });
 
@@ -1007,6 +1094,12 @@ function createScraperCard(item, isActive) {
         badgeClass = 'badge-instagram';
         badgeText = 'Instagram';
         iconClass = 'fab fa-instagram';
+    } else if (scraperType === 'cnpj') {
+        title = item.config?.razaoSocial || 'Pesquisa CNPJ';
+        subtitle = item.config?.uf || 'Brasil';
+        badgeClass = 'badge-doctoralia'; // Reusing blue for now
+        badgeText = 'CNPJ';
+        iconClass = 'fa-building';
     } else {
         const specialties = item.config?.specialties?.join(', ') || 'Médico';
         title = specialties;
@@ -1266,9 +1359,16 @@ function appendResultToModal(data, type) {
 
     // Determine columns based on type (must match header definition in updateModal)
     const isMaps = type === 'googlemaps';
-    const keys = isMaps
-        ? ['nome', 'categoria', 'telefone', 'whatsapp', 'website', 'email', 'instagram', 'endereco']
-        : ['nome', 'especialidades', 'numeroFixo', 'numeroMovel', 'enderecos'];
+    const isCnpj = type === 'cnpj';
+
+    let keys = [];
+    if (isMaps) {
+        keys = ['nome', 'categoria', 'telefone', 'whatsapp', 'website', 'email', 'instagram', 'endereco'];
+    } else if (isCnpj) {
+        keys = ['cnpj', 'razao_social', 'situacao_cadastral', 'telefone', 'email', 'municipio', 'uf'];
+    } else {
+        keys = ['nome', 'especialidades', 'numeroFixo', 'numeroMovel', 'enderecos'];
+    }
 
     let html = '';
     keys.forEach(key => {
