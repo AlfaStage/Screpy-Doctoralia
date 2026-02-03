@@ -407,6 +407,16 @@
                 <!-- CNPJ (Casa dos Dados) Form -->
                 <form id="cnpj-form" class="tab-content" data-tab="cnpj">
                     <div class="form-group">
+                        <label for="cnpj-provider">Modo de Busca</label>
+                        <select id="cnpj-provider" class="form-control">
+                            <option value="casadosdados">Filtros Completos (Casa dos Dados)</option>
+                            <option value="minhareceita">Alto Volume (API Minha Receita)</option>
+                        </select>
+                        <small class="form-hint" id="cnpj-provider-hint">O Casa dos Dados tem filtros avançados (bairro,
+                            capital), mas limita a 20 resultados sem o particionamento.</small>
+                    </div>
+
+                    <div class="form-group">
                         <label for="cnpj-razao-social">Razão Social ou Nome Fantasia</label>
                         <div class="input-wrapper">
                             <i class="fas fa-building"></i>

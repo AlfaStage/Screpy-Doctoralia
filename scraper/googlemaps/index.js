@@ -718,8 +718,12 @@ class GoogleMapsScraper {
     }
 
     async close() {
-        if (this.browserManager) {
-            await this.browserManager.close();
+        try {
+            if (this.browserManager) {
+                await this.browserManager.close();
+            }
+        } catch (error) {
+            console.warn(`[GoogleMapsScraper ${this.id}] Erro ao fechar browser:`, error.message);
         }
         this.status = 'closed';
     }

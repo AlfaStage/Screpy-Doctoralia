@@ -469,6 +469,10 @@ class InstagramScraper {
     checkRequiredFields(data, requiredFields) {
         const missing = [];
 
+        if (!data || typeof data !== 'object') {
+            return ['Data inválida'];
+        }
+
         for (const field of requiredFields) {
             switch (field) {
                 case 'phone':
@@ -660,8 +664,12 @@ class InstagramScraper {
      * Close browser and cleanup
      */
     async close() {
-        if (this.browserManager) {
-            await this.browserManager.close().catch(() => { });
+        try {
+            if (this.browserManager) {
+                await this.browserManager.close();
+            }
+        } catch (error) {
+            console.warn(`[InstagramScraper ${this.id}] Erro ao fechar browser:`, error.message);
         }
     }
 
@@ -746,17 +754,19 @@ class InstagramScraper {
         const csvLines = [csvHeaders.join(',')];
 
         this.results.forEach(result => {
+            if (!result || typeof result !== 'object') return;
+            
             const line = [
-                this.escapeCsv(result.nome),
-                this.escapeCsv('@' + result.username),
-                this.escapeCsv(result.bio),
-                this.escapeCsv(result.telefone),
-                this.escapeCsv(result.whatsapp),
-                this.escapeCsv(result.email),
-                this.escapeCsv(result.website),
-                this.escapeCsv(result.followers),
-                this.escapeCsv(result.following),
-                this.escapeCsv(result.posts),
+                this.escapeCsv(result.nome || ''),
+                this.escapeCsv('@' + (result.username || '')),
+                this.escapeCsv(result.bio || ''),
+                this.escapeCsv(result.telefone || ''),
+                this.escapeCsv(result.whatsapp || ''),
+                this.escapeCsv(result.email || ''),
+                this.escapeCsv(result.website || ''),
+                this.escapeCsv(result.followers || ''),
+                this.escapeCsv(result.following || ''),
+                this.escapeCsv(result.posts || ''),
                 result.isVerified ? 'Sim' : 'Não',
                 result.isPrivate ? 'Sim' : 'Não'
             ].join(',');

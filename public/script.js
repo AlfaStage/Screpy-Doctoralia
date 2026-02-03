@@ -226,23 +226,46 @@ if (mapsForm) {
     });
 }
 
-// Handle Maps scrape-started event
-socket.on('scrape-started', onStarted);
-socket.once('error', onError);
+// CNPJ Form Handler
+const cnpjForm = document.getElementById('cnpj-form');
+const cnpjProvider = document.getElementById('cnpj-provider');
+const cnpjProviderHint = document.getElementById('cnpj-provider-hint');
 
-socket.emit('start-maps-scrape', {
-    searchTerm,
-    city,
-    quantity: parseInt(quantity),
-    investigateWebsites,
-    useProxy,
-    requiredFields
-});
+if (cnpjProvider) {
+    cnpjProvider.addEventListener('change', () => {
+        const mode = cnpjProvider.value;
+        const advancedFields = [
+            'cnpj-natureza', 'cnpj-bairro', 'cnpj-cep', 'cnpj-capital-social', 'cnpj-ddd',
+            'cnpj-somente-mei', 'cnpj-excluir-mei', 'cnpj-com-telefone', 'cnpj-com-email'
+        ];
+
+        if (mode === 'minhareceita') {
+            cnpjProviderHint.textContent = 'A API Minha Receita permite alto volume, mas suporta apenas Razão Social, CNAE, UF e Município.';
+            advancedFields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const group = el.closest('.form-group') || el.closest('.form-row');
+                    if (group) group.classList.add('hidden');
+                }
+            });
+            // Also hide the Profile Filters group label
+            const profileFiltersLabel = document.querySelector('#cnpj-form .form-group:has(.required-fields-selector)');
+            if (profileFiltersLabel) profileFiltersLabel.classList.add('hidden');
+        } else {
+            cnpjProviderHint.textContent = 'O Casa dos Dados tem filtros avançados (bairro, capital), mas limita a 20 resultados sem o particionamento.';
+            advancedFields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const group = el.closest('.form-group') || el.closest('.form-row');
+                    if (group) group.classList.remove('hidden');
+                }
+            });
+            const profileFiltersLabel = document.querySelector('#cnpj-form .form-group:has(.required-fields-selector)');
+            if (profileFiltersLabel) profileFiltersLabel.classList.remove('hidden');
+        }
     });
 }
 
-// CNPJ Form Handler
-const cnpjForm = document.getElementById('cnpj-form');
 if (cnpjForm) {
     cnpjForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -253,6 +276,7 @@ if (cnpjForm) {
             return;
         }
 
+        const provider = document.getElementById('cnpj-provider').value;
         const razaoSocial = document.getElementById('cnpj-razao-social').value;
         const cnae = document.getElementById('cnpj-cnae').value;
         const natureza = document.getElementById('cnpj-natureza').value;
@@ -287,6 +311,9 @@ if (cnpjForm) {
                 socket.off('error', onError);
 
                 cnpjForm.reset();
+                // Reset provider specific field visibility if it was minhareceita
+                if (cnpjProvider) cnpjProvider.dispatchEvent(new Event('change'));
+
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }
@@ -306,6 +333,7 @@ if (cnpjForm) {
         socket.once('error', onError);
 
         socket.emit('start-cnpj-scrape', {
+            provider,
             razaoSocial, cnae, natureza, uf, municipio, bairro, cep, capitalSocialMin, ddd,
             somenteMei, excluirMei, comTelefone, comEmail
         });
@@ -358,6 +386,7 @@ socket.on('scrape-started', ({ id, type }) => {
     // Handle CNPJ type
     if (type === 'cnpj') {
         const config = {
+            provider: document.getElementById('cnpj-provider')?.value || 'casadosdados',
             razaoSocial: document.getElementById('cnpj-razao-social')?.value || '',
             uf: document.getElementById('cnpj-uf')?.value || ''
         };

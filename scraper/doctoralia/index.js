@@ -496,12 +496,12 @@ class DoctoraliaScraper {
 
         this.results.forEach(result => {
             // Fallback for missing data using config
-            let specialtiesStr = result.especialidades.join('; ');
+            let specialtiesStr = (result.especialidades || []).join('; ');
             if (!specialtiesStr && this.config.specialties && this.config.specialties.length > 0) {
                 specialtiesStr = this.config.specialties.join('; ');
             }
 
-            let addressStr = result.enderecos.join('; ');
+            let addressStr = (result.enderecos || []).join('; ');
             if (!addressStr && this.config.city) {
                 addressStr = this.config.city;
             }
@@ -526,6 +526,12 @@ class DoctoraliaScraper {
         // Enrich results in JSON as well
         const enrichedResults = this.results.map(r => {
             const enriched = { ...r };
+            if (!enriched.especialidades) {
+                enriched.especialidades = [];
+            }
+            if (!enriched.enderecos) {
+                enriched.enderecos = [];
+            }
             if ((!enriched.especialidades || enriched.especialidades.length === 0) && this.config.specialties) {
                 enriched.especialidades = [...this.config.specialties];
             }
@@ -566,8 +572,12 @@ class DoctoraliaScraper {
     }
 
     async close() {
-        if (this.browserManager) {
-            await this.browserManager.close();
+        try {
+            if (this.browserManager) {
+                await this.browserManager.close();
+            }
+        } catch (error) {
+            console.warn(`[DoctoraliaScraper ${this.id}] Erro ao fechar browser:`, error.message);
         }
     }
 

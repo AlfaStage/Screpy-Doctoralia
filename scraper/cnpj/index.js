@@ -40,7 +40,9 @@ class CnpjScraper {
             this.page = await this.browserManager.setupPage();
             this.page2 = await this.browserManager.setupPage();
 
-            this.searchHandler = new CnpjSearch(this.page);
+            const emitUpdate = (type, data) => this.emitUpdate(type, data);
+
+            this.searchHandler = new CnpjSearch(this.page, this.config, (msg) => this.logCallback({ message: msg }), emitUpdate);
             this.extractor = new CnpjExtractor(this.page2);
 
             this.logCallback({ message: '✅ Páginas inicializadas.' });
@@ -56,8 +58,8 @@ class CnpjScraper {
             await this.initialize();
 
             // 1. Perform search
-            this.logCallback({ message: '🔍 Iniciando pesquisa avançada...' });
-            const companyLinks = await this.searchHandler.search(this.config, this.logCallback);
+            this.logCallback({ message: `🔍 Iniciando pesquisa via ${this.config.provider === 'minhareceita' ? 'API Minha Receita' : 'Casa dos Dados'}...` });
+            const companyLinks = await this.searchHandler.search();
 
             if (!companyLinks || companyLinks.length === 0) {
                 this.logCallback({ message: '⚠️ Nenhum resultado encontrado para os filtros aplicados.' });
@@ -84,24 +86,36 @@ class CnpjScraper {
                 continue;
             }
 
-            const companyUrl = this.queue.shift();
-            try {
-                this.logCallback({ message: `📄 Extraindo dados de: ${companyUrl}` });
-                const data = await this.extractor.extract(companyUrl, this.logCallback);
+            const item = this.queue.shift();
+            const companyUrl = item.url;
+            const directData = item.directData;
 
-                if (data) {
-                    this.results.push(data);
+            try {
+                if (directData) {
+                    // Data already provided by the API (Minha Receita)
+                    this.logCallback({ message: `✅ Processando dados diretos: ${directData.razao_social || directData.nome_fantasia || 'Empresa'}` });
+                    this.results.push(directData);
                     this.stats.success++;
-                    this.emitUpdate('data', data);
-                } else {
-                    this.stats.skipped++;
+                    this.emitUpdate('data', { id: this.id, data: directData, type: 'cnpj' });
+                } else if (companyUrl) {
+                    // Need to extract from profile page (Casa dos Dados)
+                    this.logCallback({ message: `📄 Extraindo dados de: ${companyUrl}` });
+                    const data = await this.extractor.extract(companyUrl, this.logCallback);
+
+                    if (data) {
+                        this.results.push(data);
+                        this.stats.success++;
+                        this.emitUpdate('data', { id: this.id, data, type: 'cnpj' });
+                    } else {
+                        this.stats.skipped++;
+                    }
+
+                    // Random delay to avoid detection for web scraping
+                    await new Promise(r => setTimeout(r, 2000 + Math.random() * 3000));
                 }
 
-                // Random delay to avoid detection
-                await new Promise(r => setTimeout(r, 2000 + Math.random() * 3000));
-
             } catch (error) {
-                this.logCallback({ message: `⚠️ Erro ao processar ${companyUrl}: ${error.message}` });
+                this.logCallback({ message: `⚠️ Erro ao processar: ${error.message}` });
                 this.stats.error++;
             }
         }
@@ -137,11 +151,15 @@ class CnpjScraper {
         // CSV Export (Simplified)
         const csvPath = path.join(resultsDir, `${baseFileName}.csv`);
         if (this.results.length > 0) {
-            const headers = Object.keys(this.results[0]).join(',');
-            const rows = this.results.map(obj =>
-                Object.values(obj).map(val => `"${String(val).replace(/"/g, '""')}"`).join(',')
-            ).join('\n');
-            await fs.writeFile(csvPath, `${headers}\n${rows}`);
+            // Filter out any null/undefined results
+            const validResults = this.results.filter(r => r && typeof r === 'object');
+            if (validResults.length > 0) {
+                const headers = Object.keys(validResults[0]).join(',');
+                const rows = validResults.map(obj =>
+                    Object.values(obj).map(val => `"${String(val || '').replace(/"/g, '""')}"`).join(',')
+                ).join('\n');
+                await fs.writeFile(csvPath, `${headers}\n${rows}`);
+            }
         }
 
         return csvPath;

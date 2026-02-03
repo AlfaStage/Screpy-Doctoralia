@@ -179,7 +179,16 @@ class ProfileExtractor {
         }
 
         // Format phone numbers to E.164 before returning
-        return formatProfilePhones(profileData);
+        const formattedData = formatProfilePhones(profileData);
+        
+        // Ensure all required fields exist
+        return {
+            nome: formattedData.nome || '',
+            especialidades: formattedData.especialidades || [],
+            numeroFixo: formattedData.numeroFixo || '',
+            numeroMovel: formattedData.numeroMovel || '',
+            enderecos: formattedData.enderecos || []
+        };
     }
 
     /**
