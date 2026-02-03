@@ -1,10 +1,4 @@
-/**
- * Instagram Scraper
- * Main orchestrator class for Instagram scraping operations
- */
-
-const BrowserManager = require('../browser');
-const ProxyManager = require('../proxyManager');
+const BaseScraper = require('../baseScraper');
 const ProfileSearch = require('./profileSearch');
 const HashtagSearch = require('./hashtagSearch');
 const FollowerExtractor = require('./followerExtractor');
@@ -12,295 +6,106 @@ const ProfileExtractor = require('./profileExtractor');
 const AuthHandler = require('./auth');
 const fs = require('fs').promises;
 const path = require('path');
+const config = require('../../config/scraper.config').instagram;
 
-class InstagramScraper {
+class InstagramScraper extends BaseScraper {
     constructor(id, io) {
-        this.id = id;
-        this.io = io;
-        this.browserManager = null;
-        this.proxyManager = new ProxyManager((msg) => this.emitProgress(msg));
-        this.currentProxy = null;
-        this.usingProxy = true;
-
-        // Handlers
+        super(id, io, 'instagram', {
+            defaultDelay: config.delays.noProxy,
+            minDelay: config.delays.min,
+            maxDelay: config.delays.max
+        });
+        
         this.profileSearch = null;
         this.hashtagSearch = null;
         this.followerExtractor = null;
         this.profileExtractor = null;
         this.authHandler = null;
-
-        // State
-        this.results = [];
-        this.logs = [];
-        this.config = {};
-        this.status = 'idle';
-        this.isPaused = false;
-        this.isCancelled = false;
-        this.startTime = null;
-
-        // Delay settings (Instagram is strict)
-        this.currentDelay = 4000;
-        this.minDelay = 3000;
-        this.maxDelay = 15000;
-        this.consecutiveErrors = 0;
-
-        // Progress tracking
-        this.progress = {
-            total: 0,
-            current: 0,
-            successCount: 0,
-            errorCount: 0,
-            skippedCount: 0,
-            message: '',
-            startTime: null,
-            estimatedTimeRemaining: null
-        };
-
-        // Parallel processing support
-        this.page2 = null;
-        this.profileQueue = [];
-        this.isProcessingQueue = false;
-        this.workerExtractor = null;
-
-        // Screenshot for live view
-        this.lastScreenshotTime = null;
-        this.screenshotPath = null;
+        this.workerProfileExtractor = null;
     }
 
-    /**
-     * Initialize the scraper
-     */
     async initialize(useProxy = true, cookies = null) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        this.proxyManager = new ProxyManager((msg) => this.emitProgress(msg));
-
-        // Proxy setup
-        if (!useProxy) {
-            this.emitProgress('🚀 Modo SEM PROXY selecionado');
-            this.currentProxy = null;
-            this.usingProxy = false;
-            this.currentDelay = 6000;
-        } else {
-            this.currentProxy = await this.proxyManager.getNextProxy(true);
-            if (this.currentProxy === null) {
-                this.emitProgress('⚠️ Nenhum proxy disponível. Usando rate limiting agressivo.');
-                this.usingProxy = false;
-                this.currentDelay = 6000;
-            } else {
-                this.usingProxy = true;
-                this.currentDelay = 4000;
-            }
-        }
-
+        // Initialize proxy
+        await this.initializeProxy(useProxy);
+        
         // Initialize browser
-        let initSuccess = false;
-        let initAttempts = 0;
-        const maxInitAttempts = 5;
-
-        while (initAttempts < maxInitAttempts && !initSuccess) {
-            try {
-                this.browserManager = new BrowserManager();
-                const page = await this.browserManager.initialize(this.currentProxy);
-
-                // Initialize handlers
-                this.profileSearch = new ProfileSearch(page);
-                this.hashtagSearch = new HashtagSearch(page);
-                this.followerExtractor = new FollowerExtractor(page);
-                this.profileExtractor = new ProfileExtractor(page);
-                this.authHandler = new AuthHandler(
-                    page,
-                    (msg) => this.emitProgress(msg.message),
-                    (action) => this.captureScreenshot(action)
-                );
-
-                // Initialize Worker Page (Page 2) for parallel processing
-                try {
-                    this.page2 = await this.browserManager.browser.newPage();
-                    await this.browserManager.setupPage(this.page2);
-                    this.workerExtractor = new ProfileExtractor(this.page2);
-                    this.emitProgress('✅ Worker Page inicializada para processamento paralelo');
-                } catch (e) {
-                    this.emitProgress('⚠️ Falha ao iniciar Worker Page: ' + e.message);
-                }
-
-                initSuccess = true;
-
-            } catch (error) {
-                initAttempts++;
-
-                if (error.message && error.message.includes('TUNNEL_FAILED')) {
-                    this.emitProgress(`❌ Túnel falhou. Tentando próximo proxy... (${initAttempts}/${maxInitAttempts})`);
-
-                    if (this.currentProxy) {
-                        this.proxyManager.markProxyAsFailed(this.currentProxy);
-                    }
-
-                    await this.browserManager.close().catch(() => { });
-                    this.currentProxy = await this.proxyManager.getNextProxy(true);
-
-                    if (this.currentProxy === null) {
-                        this.emitProgress('⚠️ Sem mais proxies. Tentando sem proxy...');
-                        this.usingProxy = false;
-                        this.currentDelay = 6000;
-                    }
-                    continue;
-                }
-
-                if (initAttempts >= maxInitAttempts) {
-                    throw error;
-                }
-            }
+        const page = await this.initializeBrowser(config.retryAttempts.proxyInit);
+        
+        // Initialize handlers
+        this.profileSearch = new ProfileSearch(page);
+        this.hashtagSearch = new HashtagSearch(page);
+        this.followerExtractor = new FollowerExtractor(page);
+        this.profileExtractor = new ProfileExtractor(page);
+        this.authHandler = new AuthHandler(
+            page,
+            (msg) => this.emitProgress(msg.message),
+            (action) => this.captureScreenshot(action)
+        );
+        
+        // Setup worker page
+        await this.setupWorkerPage();
+        if (this.page2) {
+            this.workerProfileExtractor = new ProfileExtractor(this.page2);
         }
-
-        // Try to restore saved session
+        
+        // Restore session if available
         if (cookies) {
             await this.authHandler.applyCookies(cookies);
         } else {
             await this.authHandler.tryRestoreSession();
         }
-
+        
+        // Set running state
         this.status = 'running';
         this.progress.startTime = Date.now();
         this.startTime = this.progress.startTime;
-
+        
         const mode = this.usingProxy ? `proxy ${this.currentProxy}` : 'SEM PROXY';
         this.emitProgress(`📸 Instagram Scraper inicializado com ${mode}`);
     }
 
-    /**
-     * Main scrape method - routes to appropriate handler
-     */
-    async scrape(config) {
+    async scrape(userConfig) {
         try {
+            // Validate config
+            this.validateConfig(userConfig);
+            
+            // Initialize state
             this.results = [];
-            this.config = config;
-            this.progress.total = config.quantity || 10;
+            this.processedItems.clear();
+            this.config = userConfig;
+            this.profileQueue = [];
+            
+            const { searchType, searchTerm, quantity, filterTerm, requiredFields, cookies } = userConfig;
+            this.progress.total = quantity || 10;
             this.progress.successCount = 0;
             this.progress.errorCount = 0;
             this.progress.skippedCount = 0;
-
-            const { searchType, searchTerm, quantity, filterTerm, requiredFields, cookies } = config;
-
-            // Check if authentication is needed
-            // Followers always triggers auth check. Others might rely on public view but safer to check.
-            if ((searchType === 'followers' || !this.authHandler.isLoggedIn) && !this.authHandler.isLoggedIn) {
-                if (cookies) {
-                    const authSuccess = await this.authHandler.applyCookies(cookies);
-                    if (!authSuccess && (!config.username || !config.password)) {
-                        // Skip error if just browsing public profiles? No, Instagram is strict.
-                        // throw new Error('Cookies inválidos e sem credenciais de backup.');
-                    }
-                }
-
-                // If not logged in yet, try credentials if provided
-                if (!this.authHandler.isLoggedIn && config.username && config.password) {
-                    const success = await this.attemptLogin(config.username, config.password);
-                    if (!success) {
-                        // Fallthrough to pause logic
-                    }
-                }
-
-                // If still not logged in, PAUSE AND ASK USER
-                while (!this.authHandler.isLoggedIn) {
-                    this.emitProgress('🔐 Falha na autenticação. Aguardando login do usuário...');
-                    this.io.emit('instagram-auth-required', {
-                        id: this.id,
-                        message: 'Sessão inválida. Por favor, faça login novamente.'
-                    });
-
-                    this.status = 'paused_for_auth';
-
-                    // Wait for credentials update or cancellation
-                    const newCreds = await this.waitForCredentials();
-
-                    if (!newCreds) {
-                        // Cancelled
-                        throw new Error('Scraping cancelado durante autenticação.');
-                    }
-
-                    this.emitProgress('🔄 Retomando com novas credenciais...');
-                    const success = await this.attemptLogin(newCreds.username, newCreds.password);
-
-                    if (success) {
-                        this.status = 'running';
-                        // Update config for future use
-                        config.username = newCreds.username;
-                        config.password = newCreds.password;
-                    } else {
-                        this.emitProgress('❌ Novas credenciais falharam. Tente novamente.');
-                    }
-                }
-            }
-
-            // Start Queue Processing (Consumer)
-            if (!this.processQueuePromise) {
-                this.processQueuePromise = this.processQueue(filterTerm, requiredFields);
-            }
-
-            // Route to appropriate handler (Producer)
-            // Streaming callback
-            const onProfilesFoundCallback = (newProfiles) => {
-                for (const p of newProfiles) {
-                    if (!this.profileQueue.some(existing => existing.username === p.username) &&
-                        !this.results.some(r => r.username === p.username)) {
-                        this.profileQueue.push(p);
-                        this.emitProgress(`📥 +${this.profileQueue.length} na fila: @${p.username}`);
-                    }
-                }
-            };
-
-            switch (searchType) {
-                case 'profiles':
-                    this.emitProgress(`🔍 Modo: Pesquisa de Perfis (Paralelo)`);
-                    await this.searchProfiles(searchTerm, quantity, onProfilesFoundCallback);
-                    break;
-
-                case 'hashtag':
-                    this.emitProgress(`#️⃣ Modo: Pesquisa por Hashtag (Paralelo)`);
-                    await this.searchByHashtag(searchTerm, quantity, onProfilesFoundCallback);
-                    break;
-
-                case 'followers':
-                    this.emitProgress(`👥 Modo: Extração de Seguidores (Paralelo)`);
-
-                    // Handle "unlimited" or large quantity
-                    const targetQty = (quantity === 0 || !quantity) ? 1000000 : quantity;
-                    const isMultimediaFilter = filterTerm ? true : false;
-
-                    this.emitProgress(isMultimediaFilter
-                        ? `🔎 Filtro "${filterTerm}" ativo. Processando fluxo contínuo até ${targetQty === 1000000 ? 'o fim' : targetQty}...`
-                        : `👥 Extraindo até ${targetQty === 1000000 ? 'o fim' : targetQty} seguidores...`
-                    );
-
-                    await this.extractFollowers(searchTerm, targetQty, null, onProfilesFoundCallback);
-                    break;
-
-                default:
-                    throw new Error(`Tipo de pesquisa inválido: ${searchType}`);
-            }
-
+            
+            // Handle authentication
+            await this.handleAuthentication(userConfig, cookies);
+            
+            // Start queue processing
+            this.processQueuePromise = this.processQueue(filterTerm, requiredFields);
+            
+            // Route to appropriate handler
+            await this.executeSearch(searchType, searchTerm, quantity, filterTerm);
+            
             // Wait for queue to empty
             this.emitProgress('🏁 Coleta finalizada. Aguardando processamento da fila restante...');
-
-            // Polling wait loop 
-            while (this.profileQueue.length > 0 && this.progress.successCount < quantity && !this.isCancelled) {
-                await new Promise(r => setTimeout(r, 2000));
-            }
-
-            // Clean up
-            this.isProcessingQueue = false;
-            if (this.processQueuePromise) await this.processQueuePromise;
-
+            await this.waitForQueueEmpty(quantity);
+            
+            // Stop queue and finalize
+            await this.stopQueue();
+            
             // Save results
             await this.checkState();
             this.emitProgress('💾 Salvando resultados...');
-            const filePath = await this.saveResults();
-
+            const filePath = await this.saveResultsWithCsv();
+            
             this.status = 'completed';
             const summary = `Scraping concluído! Sucessos: ${this.progress.successCount}, Erros: ${this.progress.errorCount}, Ignorados: ${this.progress.skippedCount}`;
             this.emitProgress(summary, { filePath });
-
+            
             return {
                 success: true,
                 count: this.results.length,
@@ -311,168 +116,268 @@ class InstagramScraper {
                 data: this.results,
                 logs: this.logs
             };
-
+            
         } catch (error) {
             if (this.isCancelled) {
                 return { success: false, message: 'Cancelled', data: this.results, logs: this.logs };
             }
-
+            
             await this.captureScreenshot('ERROR');
             this.emitProgress(`❌ Erro: ${error.message}`);
-            // throw error; // Don't throw to allow safe shutdown return
             return { success: false, message: error.message, data: this.results, logs: this.logs };
         }
     }
 
-    /**
-     * Search profiles by term
-     */
-    async searchProfiles(searchTerm, quantity, onProfilesFound) {
+    validateConfig(userConfig) {
+        if (!userConfig || typeof userConfig !== 'object') {
+            throw new Error('Configuração inválida');
+        }
+        
+        const { searchType, searchTerm, quantity } = userConfig;
+        
+        if (!searchType || !config.searchTypes.includes(searchType)) {
+            throw new Error(`Tipo de pesquisa inválido. Deve ser um de: ${config.searchTypes.join(', ')}`);
+        }
+        
+        if (!searchTerm || searchTerm.trim().length === 0) {
+            throw new Error('Termo de busca ou perfil é obrigatório');
+        }
+        
+        if (quantity !== undefined && (typeof quantity !== 'number' || quantity < 0 || quantity > 5000)) {
+            throw new Error('Quantidade deve ser um número entre 0 e 5000');
+        }
+    }
+
+    async handleAuthentication(userConfig, cookies) {
+        const { searchType, username, password } = userConfig;
+        
+        // Check if authentication is needed
+        const needsAuth = config.auth.requiredFor.includes(searchType) || !this.authHandler.isLoggedIn;
+        
+        if (!needsAuth) return;
+        
+        // Try cookies first
+        if (cookies) {
+            const authSuccess = await this.authHandler.applyCookies(cookies);
+            if (authSuccess) return;
+        }
+        
+        // Try credentials if provided
+        if (username && password) {
+            const success = await this.attemptLogin(username, password);
+            if (success) return;
+        }
+        
+        // Wait for user authentication
+        await this.waitForUserAuth(userConfig);
+    }
+
+    async waitForUserAuth(userConfig) {
+        while (!this.authHandler.isLoggedIn && !this.isCancelled) {
+            this.emitProgress('🔐 Falha na autenticação. Aguardando login do usuário...');
+            
+            if (this.io) {
+                this.io.emit('instagram-auth-required', {
+                    id: this.id,
+                    message: 'Sessão inválida. Por favor, faça login novamente.'
+                });
+            }
+            
+            this.status = 'paused_for_auth';
+            
+            const newCreds = await this.waitForCredentials();
+            
+            if (!newCreds) {
+                throw new Error('Scraping cancelado durante autenticação');
+            }
+            
+            this.emitProgress('🔄 Retomando com novas credenciais...');
+            const success = await this.attemptLogin(newCreds.username, newCreds.password);
+            
+            if (success) {
+                this.status = 'running';
+                userConfig.username = newCreds.username;
+                userConfig.password = newCreds.password;
+                return;
+            }
+            
+            this.emitProgress('❌ Novas credenciais falharam. Tente novamente.');
+        }
+    }
+
+    async executeSearch(searchType, searchTerm, quantity, filterTerm) {
+        const targetQty = quantity === 0 ? config.unlimitedFollowers : quantity;
+        const isMultimediaFilter = !!filterTerm;
+        
+        switch (searchType) {
+            case 'profiles':
+                this.emitProgress(`🔍 Modo: Pesquisa de Perfis (Paralelo)`);
+                await this.searchProfiles(searchTerm, targetQty);
+                break;
+                
+            case 'hashtag':
+                this.emitProgress(`#️⃣ Modo: Pesquisa por Hashtag (Paralelo)`);
+                await this.searchByHashtag(searchTerm, targetQty);
+                break;
+                
+            case 'followers':
+                this.emitProgress(`👥 Modo: Extração de Seguidores (Paralelo)`);
+                this.emitProgress(isMultimediaFilter
+                    ? `🔎 Filtro "${filterTerm}" ativo. Processando fluxo contínuo...`
+                    : `👥 Extraindo seguidores...`
+                );
+                await this.extractFollowers(searchTerm, targetQty, filterTerm);
+                break;
+                
+            default:
+                throw new Error(`Tipo de pesquisa inválido: ${searchType}`);
+        }
+    }
+
+    async searchProfiles(searchTerm, quantity) {
         // Try Instagram search first
-        let profiles = await this.profileSearch.search(
+        const profiles = await this.profileSearch.search(
             searchTerm,
             quantity,
             (msg) => this.emitProgress(msg.message),
-            onProfilesFound
+            (newProfiles) => this.handleNewProfiles(newProfiles)
         );
-
+        
         // If not enough results, try Google search
-        // Note: Google search is one-shot, but we can still stream the result
-        if (this.profileQueue.length + this.results.length < quantity && profiles.length < quantity) {
+        if (this.profileQueue.length + this.results.length < quantity) {
+            const remaining = quantity - (this.profileQueue.length + this.results.length);
             this.emitProgress('🔄 Expandindo busca via Google...');
-            const googleProfiles = await this.profileSearch.searchViaGoogle(
-                searchTerm,
-                quantity - (this.profileQueue.length + this.results.length),
-                (msg) => this.emitProgress(msg.message)
-            );
-
-            if (googleProfiles && googleProfiles.length > 0 && onProfilesFound) {
-                onProfilesFound(googleProfiles);
+            
+            const googleProfiles = await this.profileSearch.searchViaGoogle(searchTerm, remaining);
+            if (googleProfiles && googleProfiles.length > 0) {
+                this.handleNewProfiles(googleProfiles);
             }
         }
-
-        return profiles; // Return just for reference, real processing is via queue
+        
+        return profiles;
     }
 
-    /**
-     * Search by hashtag
-     */
-    async searchByHashtag(hashtag, quantity, onProfilesFound) {
+    async searchByHashtag(hashtag, quantity) {
         return await this.hashtagSearch.search(
             hashtag,
             quantity,
             (msg) => this.emitProgress(msg.message),
-            onProfilesFound
+            (newProfiles) => this.handleNewProfiles(newProfiles)
         );
     }
 
-    /**
-     * Extract followers from profile
-     */
-    async extractFollowers(profileInput, quantity, filterTerm, onProfilesFound) {
+    async extractFollowers(profileInput, quantity, filterTerm) {
         return await this.followerExtractor.extract(
             profileInput,
             quantity,
             filterTerm,
             (msg) => this.emitProgress(msg.message),
-            onProfilesFound
+            (newProfiles) => this.handleNewProfiles(newProfiles)
         );
     }
 
-    /**
-     * Process profiles from the queue using the secondary page
-     */
+    handleNewProfiles(newProfiles) {
+        let added = 0;
+        
+        for (const profile of newProfiles) {
+            if (!profile || !profile.username) continue;
+            
+            const isDuplicate = this.profileQueue.some(p => p.username === profile.username) ||
+                this.results.some(r => r.username === profile.username) ||
+                this.processedItems.has(profile.username);
+            
+            if (!isDuplicate) {
+                this.processedItems.add(profile.username);
+                this.profileQueue.push(profile);
+                added++;
+            }
+        }
+        
+        if (added > 0) {
+            this.emitProgress(`📥 +${added} na fila: Total ${this.profileQueue.length}`);
+        }
+    }
+
     async processQueue(filterTerm, requiredFields) {
         this.isProcessingQueue = true;
         this.emitProgress(`👷 Worker iniciado: Aguardando perfis...`);
-
+        
+        const extractor = this.workerProfileExtractor || this.profileExtractor;
+        
         while (this.isProcessingQueue && !this.isCancelled) {
-            // Check if queue has items
-            if (this.profileQueue.length > 0) {
-
-                // Pop the next profile
-                const profile = this.profileQueue.shift();
-
-                // If it's already in results (race condition), skip
-                if (this.results.some(r => r.username === profile.username)) continue;
-
-                try {
-                    // Extract detailed profile data using Workder Extractor (Page 2)
-                    // If no worker page (e.g. init fail), fallback to main? No, main is busy searching.
-                    const extractor = this.workerExtractor || this.profileExtractor;
-
-                    await this.captureScreenshot('WORKER_START', 'worker');
-                    const detailedData = await extractor.extractProfile(
-                        profile.username,
-                        (msg) => this.emitProgress(`Worker: ${msg.message}`)
-                    );
-                    await this.captureScreenshot('WORKER_EXTRACT', 'worker');
-
-                    // Merge checks
-                    const result = { ...profile, ...detailedData };
-
-                    // Deep Filter
-                    if (filterTerm) {
-                        const matches = this.applyDeepFilter(result, filterTerm);
-                        if (!matches) {
-                            this.progress.skippedCount++;
-                            // Emit to UI so counters update
-                            this.io.emit('scraper-progress', { id: this.id, type: 'instagram', ...this.progress });
-                            continue;
-                        }
-                    }
-
-                    // Required Fields
-                    if (requiredFields && requiredFields.length > 0) {
-                        const missing = this.checkRequiredFields(result, requiredFields);
-                        if (missing.length > 0) {
-                            this.progress.skippedCount++;
-                            this.io.emit('scraper-progress', { id: this.id, type: 'instagram', ...this.progress });
-                            continue;
-                        }
-                    }
-
-                    // Success
-                    this.results.push(result);
-                    this.progress.successCount++;
-
+            if (this.profileQueue.length === 0) {
+                await this.sleep(config.queue.workerDelay);
+                continue;
+            }
+            
+            const profile = this.profileQueue.shift();
+            
+            if (!profile || !profile.username) continue;
+            if (this.results.some(r => r.username === profile.username)) continue;
+            
+            try {
+                await this.captureScreenshot('WORKER_START', 'worker');
+                
+                const detailedData = await extractor.extractProfile(
+                    profile.username,
+                    (msg) => this.emitProgress(`Worker: ${msg.message}`)
+                );
+                
+                await this.captureScreenshot('WORKER_EXTRACT', 'worker');
+                
+                // Merge data
+                const result = { ...profile, ...detailedData };
+                
+                // Apply deep filter
+                if (filterTerm && !this.applyDeepFilter(result, filterTerm)) {
+                    this.progress.skippedCount++;
+                    continue;
+                }
+                
+                // Check required fields
+                const missing = this.checkRequiredFields(result, requiredFields);
+                if (missing.length > 0) {
+                    this.progress.skippedCount++;
+                    continue;
+                }
+                
+                // Success
+                this.results.push(result);
+                this.progress.successCount++;
+                
+                if (this.io) {
                     this.io.emit('scraper-result', {
                         id: this.id,
                         type: 'instagram',
                         data: result
                     });
-
-                    const percent = this.profileQueue.length > 0 ? `(Fila: ${this.profileQueue.length})` : '';
-                    this.emitProgress(`✅ [Worker] Sucesso: @${result.username} ${percent}`);
-                    await this.captureScreenshot('WORKER_COMPLETE', 'worker');
-
-                } catch (e) {
-                    this.progress.errorCount++;
-                    // Log but don't stop
-                    // await this.captureScreenshot('WORKER_ERROR', 'worker');
                 }
-
-                // Small delay for the worker to mimic human behavior
-                await new Promise(r => setTimeout(r, 2000 + Math.random() * 2000));
-
-            } else {
-                // If queue is empty, wait a bit
-                await new Promise(r => setTimeout(r, 1000));
+                
+                const percent = this.profileQueue.length > 0 ? `(Fila: ${this.profileQueue.length})` : '';
+                this.emitProgress(`✅ [Worker] Sucesso: @${result.username} ${percent}`);
+                await this.captureScreenshot('WORKER_COMPLETE', 'worker');
+                
+            } catch (error) {
+                this.progress.errorCount++;
             }
+            
+            await this.sleep(config.queue.workerDelay + Math.random() * 2000);
         }
+        
         this.emitProgress(`👷 Worker finalizado.`);
     }
 
-    /**
-     * Check required fields
-     */
     checkRequiredFields(data, requiredFields) {
         const missing = [];
-
+        
         if (!data || typeof data !== 'object') {
             return ['Data inválida'];
         }
-
+        
+        if (!requiredFields || !Array.isArray(requiredFields)) {
+            return missing;
+        }
+        
         for (const field of requiredFields) {
             switch (field) {
                 case 'phone':
@@ -489,272 +394,124 @@ class InstagramScraper {
                     break;
             }
         }
-
+        
         return missing;
     }
 
-    /**
-     * Handle consecutive errors
-     */
-    async handleConsecutiveErrors() {
-        this.emitProgress('⚠️ Múltiplos erros consecutivos. Rotacionando proxy...');
-        this.consecutiveErrors = 0;
-        this.currentDelay = Math.min(this.currentDelay + 2000, this.maxDelay);
-
-        if (this.usingProxy) {
-            await this.rotateProxy();
-        } else {
-            // Just increase delay
-            this.emitProgress(`⏳ Aumentando delay para ${this.currentDelay / 1000}s`);
-            await new Promise(r => setTimeout(r, 5000));
-        }
-    }
-
-    /**
-     * Rotate to new proxy
-     */
-    async rotateProxy() {
-        this.emitProgress('🔄 Rotacionando proxy...');
-
-        if (this.currentProxy) {
-            this.proxyManager.markProxyAsFailed(this.currentProxy);
-        }
-
-        await this.browserManager.close().catch(() => { });
-
-        this.currentProxy = await this.proxyManager.getNextProxy(true);
-
-        if (this.currentProxy === null) {
-            this.emitProgress('⚠️ Sem proxies disponíveis. Continuando sem proxy...');
-            this.usingProxy = false;
-            this.currentDelay = 6000;
-        }
-
-        // Reinitialize browser
-        this.browserManager = new BrowserManager();
-        const page = await this.browserManager.initialize(this.currentProxy);
-
-        this.profileSearch = new ProfileSearch(page);
-        this.hashtagSearch = new HashtagSearch(page);
-        this.followerExtractor = new FollowerExtractor(page);
-        this.profileExtractor = new ProfileExtractor(page);
-        this.authHandler = new AuthHandler(page, (msg) => this.emitProgress(msg.message), (action) => this.captureScreenshot(action));
-
-        // Try to restore session
-        await this.authHandler.tryRestoreSession();
-
-        // Also re-init the worker page if we rotated proxy/browser!
-        try {
-            this.page2 = await this.browserManager.browser.newPage();
-            await this.browserManager.setupPage(this.page2);
-            this.workerExtractor = new ProfileExtractor(this.page2);
-            this.emitProgress('✅ Worker Page reinicializada após rotação de proxy');
-        } catch (e) {
-            this.emitProgress('⚠️ Falha ao reiniciar Worker Page: ' + e.message);
-        }
-
-        this.emitProgress('✅ Proxy rotacionado');
-    }
-
-    /**
-     * Capture screenshot for live view (multi-window support)
-     */
-    async captureScreenshot(actionName = 'ACTION', source = 'main') {
-        let pageToCapture = this.browserManager?.page;
-
-        // If source is worker, try to get page2
-        if (source === 'worker') {
-            if (this.page2 && !this.page2.isClosed()) {
-                pageToCapture = this.page2;
-            } else {
-                return; // Worker page not active or closed
+    async attemptLogin(username, password) {
+        this.emitProgress('🔐 Tentando login com usuário e senha...');
+        
+        const challengeHandler = async (message) => {
+            this.emitProgress(`⚠️ ${message}`);
+            
+            if (this.io) {
+                this.io.emit('instagram-challenge-required', {
+                    id: this.id,
+                    type: 'code',
+                    message: message
+                });
             }
-        }
-
-        if (!pageToCapture || pageToCapture.isClosed()) return;
-
-        try {
-            const timestamp = Date.now();
-            // New Format: instagram_[id]_live_[source].png
-            const filename = `instagram_${this.id}_live_${source}.png`;
-            const filepath = path.join('./results', filename);
-
-            await pageToCapture.screenshot({ path: filepath, type: 'png' });
-
-            const imageBuffer = await fs.readFile(filepath);
-            const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
-
-            this.io.emit('scraper-screenshot', {
-                id: this.id,
-                action: actionName,
-                timestamp: timestamp,
-                image: base64Image,
-                source: source,
-                url: `/results/${filename}?t=${timestamp}`
+            
+            return new Promise((resolve) => {
+                const timeoutId = setTimeout(() => {
+                    this.offSocket('instagram-challenge-code', onCode);
+                    resolve(null);
+                }, config.timeouts.challenge);
+                
+                const onCode = ({ id, code }) => {
+                    if (id === this.id) {
+                        clearTimeout(timeoutId);
+                        this.offSocket('instagram-challenge-code', onCode);
+                        resolve(code);
+                    }
+                };
+                
+                this.onSocket('instagram-challenge-code', onCode);
             });
-
-            this.lastScreenshotTime = timestamp;
-            if (source === 'main') this.screenshotPath = filepath;
-
-        } catch (e) {
-            // console.log(`Screenshot capture failed: ${e.message}`);
-        }
+        };
+        
+        return await this.authHandler.login(username, password, challengeHandler);
     }
 
-    /**
-     * Adaptive delay between requests
-     */
-    async adaptiveDelay() {
-        const delay = this.currentDelay + Math.random() * 2000;
-        this.emitProgress(`⏳ Aguardando ${(delay / 1000).toFixed(1)}s...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-    }
-
-    /**
-     * Check pause/cancel state
-     */
-    async checkState() {
-        if (this.isCancelled) {
-            throw new Error('Scraping cancelado pelo usuário');
-        }
-
-        while (this.isPaused) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            if (this.isCancelled) {
-                throw new Error('Scraping cancelado pelo usuário');
-            }
-        }
-    }
-
-    /**
-     * Pause scraping
-     */
-    pause() {
-        this.isPaused = true;
-        this.status = 'paused';
-        this.emitProgress('⏸️ Scraping pausado');
-    }
-
-    /**
-     * Resume scraping
-     */
-    resume() {
-        this.isPaused = false;
-        this.status = 'running';
-        this.emitProgress('▶️ Scraping retomado');
-    }
-
-    /**
-     * Cancel scraping
-     */
-    async cancel() {
-        this.isCancelled = true;
-        this.status = 'cancelled';
-        this.emitProgress('🛑 Cancelando scraping...');
-
-        if (this.results.length > 0) {
-            this.emitProgress('💾 Salvando dados parciais...');
-            await this.saveResults();
-        }
-
-        await this.close();
-    }
-
-    /**
-     * Close browser and cleanup
-     */
-    async close() {
-        try {
-            if (this.browserManager) {
-                await this.browserManager.close();
-            }
-        } catch (error) {
-            console.warn(`[InstagramScraper ${this.id}] Erro ao fechar browser:`, error.message);
-        }
-    }
-
-    /**
-     * Get timestamp for logging
-     */
-    getTimestamp() {
-        const now = new Date();
-        const brazilTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
-        const hours = String(brazilTime.getHours()).padStart(2, '0');
-        const minutes = String(brazilTime.getMinutes()).padStart(2, '0');
-        const seconds = String(brazilTime.getSeconds()).padStart(2, '0');
-        return `[${hours}:${minutes}:${seconds}]`;
-    }
-
-    /**
-     * Emit progress to frontend
-     */
-    emitProgress(message, data = {}) {
-        this.progress.message = message;
-        Object.assign(this.progress, data);
-
-        const timestamp = this.getTimestamp();
-        const fullMessage = `${timestamp} ${message}`;
-
-        this.logs.push({
-            timestamp: new Date().toISOString(),
-            message: fullMessage
+    async waitForCredentials() {
+        return new Promise((resolve) => {
+            let resolved = false;
+            
+            const onCreds = ({ id, username, password }) => {
+                if (id === this.id && !resolved) {
+                    resolved = true;
+                    cleanup();
+                    resolve({ username, password });
+                }
+            };
+            
+            const cleanup = () => {
+                this.offSocket('update-instagram-credentials', onCreds);
+                if (checkCancelInterval) {
+                    clearInterval(checkCancelInterval);
+                }
+            };
+            
+            const checkCancelInterval = setInterval(() => {
+                if (this.isCancelled && !resolved) {
+                    resolved = true;
+                    cleanup();
+                    resolve(null);
+                }
+            }, 1000);
+            
+            // Set timeout
+            setTimeout(() => {
+                if (!resolved) {
+                    resolved = true;
+                    cleanup();
+                    resolve(null);
+                }
+            }, config.timeouts.challenge);
+            
+            this.onSocket('update-instagram-credentials', onCreds);
         });
-
-        // Calculate ETA
-        if (this.progress.current > 0 && this.progress.total > 0) {
-            const elapsed = Date.now() - this.progress.startTime;
-            const avgTimePerItem = elapsed / this.progress.current;
-            const remainingItems = this.progress.total - this.progress.current;
-            this.progress.estimatedTimeRemaining = Math.ceil((avgTimePerItem * remainingItems) / 1000);
-        }
-
-        this.io.emit('scraper-progress', {
-            id: this.id,
-            type: 'instagram',
-            ...this.progress
-        });
-
-        this.io.emit('scraper-log', {
-            id: this.id,
-            message: fullMessage
-        });
-
-        console.log(fullMessage);
     }
 
-    /**
-     * Save results to CSV and JSON
-     */
-    async saveResults() {
+    applyDeepFilter(data, term) {
+        if (!term) return true;
+        
+        const normalize = (str) => str ? 
+            str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') : '';
+        
+        const filter = normalize(term);
+        const nome = normalize(data.nome);
+        const user = normalize(data.username);
+        const bio = normalize(data.bio);
+        const categoria = normalize(data.categoria);
+        
+        return nome.includes(filter) ||
+            user.includes(filter) ||
+            bio.includes(filter) ||
+            categoria.includes(filter);
+    }
+
+    async saveResultsWithCsv() {
+        if (this.results.length === 0) {
+            return null;
+        }
+        
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        // New Format: instagram_[id]_results_[timestamp].csv
-        const fileName = `instagram_${this.id}_results_${timestamp}.csv`;
-        const jsonName = `instagram_${this.id}_results_${timestamp}.json`;
-        const filePath = path.join(__dirname, '..', '..', 'results', fileName);
-        const jsonPath = path.join(__dirname, '..', '..', 'results', jsonName);
-
-        await fs.mkdir(path.join(__dirname, '..', '..', 'results'), { recursive: true });
-
-        // CSV
-        const csvHeaders = [
-            'Nome',
-            'Username',
-            'Bio',
-            'Telefone',
-            'WhatsApp',
-            'Email',
-            'Website',
-            'Seguidores',
-            'Seguindo',
-            'Posts',
-            'Verificado',
-            'Privado'
+        const baseFilename = `instagram_${this.id}_results_${timestamp}`;
+        const resultsDir = path.join(__dirname, '..', '..', 'results');
+        
+        await fs.mkdir(resultsDir, { recursive: true });
+        
+        const csvPath = path.join(resultsDir, `${baseFilename}.csv`);
+        const headers = [
+            'Nome', 'Username', 'Bio', 'Telefone', 'WhatsApp', 'Email',
+            'Website', 'Seguidores', 'Seguindo', 'Posts', 'Verificado', 'Privado'
         ];
-
-        const csvLines = [csvHeaders.join(',')];
-
-        this.results.forEach(result => {
-            if (!result || typeof result !== 'object') return;
+        
+        const csvLines = [headers.join(',')];
+        
+        for (const result of this.results) {
+            if (!result || typeof result !== 'object') continue;
             
             const line = [
                 this.escapeCsv(result.nome || ''),
@@ -770,12 +527,14 @@ class InstagramScraper {
                 result.isVerified ? 'Sim' : 'Não',
                 result.isPrivate ? 'Sim' : 'Não'
             ].join(',');
+            
             csvLines.push(line);
-        });
-
-        await fs.writeFile(filePath, csvLines.join('\n'), 'utf8');
-
-        // JSON
+        }
+        
+        await fs.writeFile(csvPath, csvLines.join('\n'), 'utf8');
+        
+        // Save JSON
+        const jsonPath = path.join(resultsDir, `${baseFilename}.json`);
         const jsonData = {
             config: this.config,
             metadata: {
@@ -786,98 +545,10 @@ class InstagramScraper {
             logs: this.logs,
             results: this.results
         };
-
+        
         await fs.writeFile(jsonPath, JSON.stringify(jsonData, null, 2), 'utf8');
-
-        console.log(`Results saved to: ${filePath}`);
-        return filePath;
-    }
-
-    /**
-     * Helper: Attempt Login with retry/challenge logic
-     */
-    async attemptLogin(username, password) {
-        this.emitProgress('🔐 Tentando login com usuário e senha...');
-
-        const challengeHandler = async (message) => {
-            this.emitProgress(`⚠️ ${message}`);
-            this.io.emit('instagram-challenge-required', {
-                id: this.id,
-                type: 'code',
-                message: message
-            });
-
-            // Wait for code
-            return new Promise((resolve) => {
-                const onCode = ({ id, code }) => {
-                    if (id === this.id) {
-                        this.io.off('instagram-challenge-code', onCode);
-                        resolve(code);
-                    }
-                };
-                setTimeout(() => { this.io.off('instagram-challenge-code', onCode); resolve(null); }, 300000);
-                this.io.on('instagram-challenge-code', onCode);
-            });
-        };
-
-        return await this.authHandler.login(username, password, challengeHandler);
-    }
-
-    /**
-     * Helper: Wait for user to provide new credentials via socket
-     */
-    async waitForCredentials() {
-        return new Promise((resolve) => {
-            const onCreds = ({ id, username, password }) => {
-                if (id === this.id) {
-                    this.io.off('update-instagram-credentials', onCreds);
-                    resolve({ username, password });
-                }
-            };
-
-            // Also listen for cancel
-            const checkCancel = setInterval(() => {
-                if (this.isCancelled) {
-                    this.io.off('update-instagram-credentials', onCreds);
-                    clearInterval(checkCancel);
-                    resolve(null);
-                }
-            }, 1000);
-
-            this.io.on('update-instagram-credentials', onCreds);
-        });
-    }
-
-    /**
-     * Apply Deep Filter (Name, Username, Bio, Category)
-     */
-    applyDeepFilter(data, term) {
-        if (!term) return true;
-
-        const normalize = (str) => str ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
-
-        const filter = normalize(term);
-        const nome = normalize(data.nome);
-        const user = normalize(data.username);
-        const bio = normalize(data.bio);
-        const categoria = normalize(data.categoria);
-
-        return nome.includes(filter) ||
-            user.includes(filter) ||
-            bio.includes(filter) ||
-            categoria.includes(filter);
-    }
-
-    /**
-     * Escape CSV field
-     */
-    escapeCsv(field) {
-        if (field === null || field === undefined) return '';
-        const str = String(field);
-        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-            return `"${str.replace(/"/g, '""')}"`;
-        }
-        return str;
+        
+        return csvPath;
     }
 }
 
